@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DyslexiQuest v1</title>
+  <style>
+    body { 
+      font-family: 'Comic Sans MS', cursive; 
+      font-weight: 600; 
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+      margin: 0; padding: 20px; 
+      color: #333;
+      user-select: none;
+    }
+
+    .game-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 20px 0;
+      font-size: 1.4em;
+      font-weight: 800;
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.3);
+      padding: 10px 25px;
+      border-radius: 25px;
+      min-width: 80px;
+    }
+
+    #word-prompt {
+      font-size: 2.2em;
+      background: rgba(255,255,255,0.9);
+      padding: 25px 40px;
+      border-radius: 30px;
+      margin: 30px 0;
+      font-weight: 900;
+      color: #444;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin: 30px 0;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .voice-group label {
+      font-size: 1.1em;
+      font-weight: 700;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    select {
+      padding: 15px 25px;
+      font-size: 1.1em;
+      font-weight: 700;
+      border-radius: 25px;
+      border: 3px solid #4ecdc4;
+      background: white;
+      color: #44a08d;
+      cursor: pointer;
+      min-width: 200px;
+      font-family: inherit;
+    }
+
+    select:focus {
+      outline: none;
+      box-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
+    }
+
+    button { 
+      padding: 20px 30px; 
+      font-size: 1.2em; 
+      font-weight: 700;
+      min-width: 200px; 
+      min-height: 70px; 
+      border-radius: 30px;
+      border: none; 
+      cursor: pointer; 
+      white-space: nowrap;
+      background: linear-gradient(45deg, #4ecdc4, #44a08d); 
+      color: white;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+    }
+
+    button:active {
+      transform: translateY(-1px);
+    }
+
+    .language-btn.active {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+    }
+
+    .speak-btn {
+      background: linear-gradient(45deg, #f093fb, #f5576c) !important;
+      font-size: 1.3em;
+    }
+
+    .game-area {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin: 40px 0;
+      padding: 30px;
+    }
+
+    .card { 
+      width: 240px; 
+      height: 300px; 
+      margin: 10px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 30px; 
+      cursor: pointer; 
+      display: flex; 
+      flex-direction: column;
+      align-items: center; 
+      justify-content: center; 
+      padding: 30px;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-10px) scale(1.02);
+    }
+
+    .card.target-card { 
+      box-shadow: 0 0 40px #4ecdc4, 0 0 80px #4ecdc4; 
+      border: 5px solid #4ecdc4; 
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #4ecdc4, #44a08d);
+    }
+
+    .shape-svg { 
+      width: 180px; 
+      height: 180px; 
+      fill: none;
+      stroke: white; 
+      stroke-width: 10; 
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      margin-bottom: 25px;
+    }
+
+    .card-word { 
+      font-size: 3em; 
+      color: white; 
+      font-weight: 900; 
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
+      letter-spacing: 2px;
+    }
+
+    .feedback {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3em;
+      font-weight: 900;
+      pointer-events: none;
+      z-index: 10;
+      opacity: 0;
+      transition: all 0.5s ease;
+    }
+
+    .feedback.correct {
+      color: #4ecdc4;
+      animation: correctPulse 1s ease-out;
+    }
+
+    .feedback.wrong {
+      color: #f093fb;
+      animation: wrongShake 0.6s ease-out;
+    }
+
+    @keyframes correctPulse {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+      50% { transform: translate(-50%, -50%) scale(1.3); }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+    }
+
+    @keyframes wrongShake {
+      0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+      25% { transform: translate(-50%, -50%) rotate(-5deg); }
+      75% { transform: translate(-50%, -50%) rotate(5deg); }
+    }
+
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: #4ecdc4;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: particleFloat 1.5s ease-out forwards;
+    }
+
+    @keyframes particleFloat {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-100px) scale(0); }
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 60px;
+      border-radius: 40px;
+      color: white;
+      text-align: center;
+      max-width: 500px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      animation: modalBounce 0.8s ease-out;
+    }
+
+    @keyframes modalBounce {
+      0% { transform: scale(0.3); opacity: 0; }
+      50% { transform: scale(1.05); }
+      70% { transform: scale(0.9); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .modal h2 {
+      font-size: 3em;
+      margin-bottom: 20px;
+    }
+
+    .modal-progress {
+      width: 300px;
+      height: 20px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 10px;
+      margin: 30px auto;
+      overflow: hidden;
+    }
+
+    .modal-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4ecdc4, #44a08d);
+      width: 0%;
+      transition: width 2s ease-out;
+    }
+
+    @media (max-width: 700px) { 
+      button {min-width:180px; font-size: 1.1em; padding: 18px 25px;}
+      select {min-width: 180px; font-size: 1em;}
+      .card {width:200px;height:260px; padding: 25px;}
+      .shape-svg {width: 160px; height: 160px;}
+      .card-word {font-size: 2.5em;}
+      h1 {font-size: 2.5em;}
+      .stats {font-size: 1.2em; gap: 20px;}
+      .controls {flex-direction: column; align-items: center;}
+      .control-group {width: 100%; max-width: 300px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>DyslexiQuest</h1>
+    <div class="stats">
+      <div class="stat">Level <span id="level">1</span></div>
+      <div class="stat">Score <span id="score">0</span></div>
+      <div class="stat">Streak <span id="streak">0</span></div>
+      <div class="stat">XP <span id="xp">0</span>/<span id="max-xp">100</span></div>
+    </div>
+    <div id="word-prompt">Listen for: CAT</div>
+    <div class="controls">
+      <div class="control-group">
+        <div class="voice-group">
+          <label>Voice:</label>
+          <select id="voice-select">
+            <option value="">Auto</option>
+          </select>
+        </div>
+      </div>
+      <div class="control-group">
+        <button id="new-game">New Game</button>
+        <button id="flash-cards-btn">Flash Cards</button>
+      </div>
+      <div class="control-group">
+        <button id="english-btn" class="language-btn active">English</button>
+        <button id="french-btn" class="language-btn">French</button>
+      </div>
+      <button id="speak-btn" class="speak-btn">SPEAK WORD</button>
+    </div>
+    <div id="game-area" class="game-area"></div>
+  </div>
+  
+  <div id="level-up-modal" class="modal">
+    <div class="modal-content">
+      <h2>LEVEL UP!</h2>
+      <p>You reached Level <span id="new-level">2</span>!</p>
+      <div class="modal-progress">
+        <div class="modal-progress-fill" id="modal-progress-fill"></div>
+      </div>
+      <button id="continue-btn" style="margin-top: 30px;">Continue Adventure!</button>
+    </div>
+  </div>
+
+  <script>
+    const words = {
+      en: [
+        {word: 'cat', shape: 'M50 100 Q80 60 110 100 T170 100 M90 120 Q100 140 110 120'},
+        {word: 'dog', shape: 'M40 90 Q70 50 100 90 T160 90 M80 110 Q95 130 110 110'},
+        {word: 'hat', shape: 'M60 80 L100 40 L140 80 M70 100 Q100 120 130 100'},
+        {word: 'bat', shape: 'M50 70 Q80 40 110 70 T150 70 M60 90 L110 110 L160 90'},
+        {word: 'rat', shape: 'M60 80 Q90 50 120 80 T160 80 M80 100 Q110 120 140 100'}
+      ],
+      fr: [
+        {word: 'chat', shape: 'M50 100 Q80 60 110 100 T170 100 M90 120 Q105 135 120 125'},
+        {word: 'chien', shape: 'M40 90 Q70 50 100 90 T160 90 M80 110 Q95 130 110 110'},
+        {word: 'chapeau', shape: 'M60 80 L100 40 L140 80 M70 100 Q100 120 130 100'},
+        {word: 'grande', shape: 'M50 70 Q85 40 120 70 T155 70 M60 90 L110 110 L160 90'},
+        {word: 'petit', shape: 'M60 80 Q90 50 120 80 T160 80 M80 100 Q110 120 140 100'}
+      ]
+    };
+
+    class Game {
+      constructor() {
+        this.level = 1; 
+        this.score = 0; 
+        this.streak = 0; 
+        this.xp = 0; 
+        this.maxXP = 100;
+        this.isFrench = false; 
+        this.targetWord = null; 
+        this.words = words;
+        this.selectedVoice = null;
+        this.init();
+      }
+      
+      init() {
+        this.populateVoices();
+        this.bindEvents();
+        this.updateStats();
+        this.newTarget();
+      }
+      
+      populateVoices() {
+        const voiceSelect = document.getElementById('voice-select');
+        const voices = speechSynthesis.getVoices();
+        
+        voices.forEach((voice, index) => {
+          const option = document.createElement('option');
+          option.value = index;
+          option.textContent = `${voice.name} (${voice.lang})`;
+          voiceSelect.appendChild(option);
+        });
+        
+        voiceSelect.addEventListener('change', (e) => {
+          console.log("VOICE: Voice changed to", e.target.value);
+          this.selectedVoice = e.target.value ? voices[e.target.value] : null;
+        });
+      }
+      
+      bindEvents() {
+        document.getElementById('new-game').addEventListener('click', () => {
+          console.log("BTN: New Game clicked");
+          this.reset();
+        });
+        
+        document.getElementById('flash-cards-btn').addEventListener('click', () => {
+          console.log("BTN: Flash Cards clicked");
+          this.renderCards();
+        });
+        
+        document.getElementById('english-btn').addEventListener('click', () => {
+          console.log("BTN: English clicked");
+          this.setLang('en');
+        });
+        
+        document.getElementById('french-btn').addEventListener('click', () => {
+          console.log("BTN: French clicked");
+          this.setLang('fr');
+        });
+        
+        document.getElementById('speak-btn').addEventListener('click', () => {
+          console.log("BTN: SPEAK WORD clicked");
+          this.speak();
+        });
+
+        document.getElementById('continue-btn').addEventListener('click', () => {
+          document.getElementById('level-up-modal').style.display = 'none';
+          this.newTarget();
+        });
+      }
+      
+      reset() {
+        this.level = 1;
+        this.score = 0;
+        this.streak = 0;
+        this.xp = 0;
+        this.maxXP = 100;
+        this.isFrench = false;
+        document.getElementById('english-btn').classList.add('active');
+        document.getElementById('french-btn').classList.remove('active');
+        this.updateStats();
+        this.newTarget();
+      }
+      
+      setLang(lang) {
+        this.isFrench = lang === 'fr';
+        document.querySelectorAll('.language-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(lang === 'fr' ? 'french-btn' : 'english-btn').classList.add('active');
+        this.newTarget();
+      }
+      
+      newTarget() {
+        this.wordsList = this.isFrench ? this.words.fr : this.words.en;
+        const randomIndex = Math.floor(Math.random() * this.wordsList.length);
+        this.targetWord = this.wordsList[randomIndex];
+        document.getElementById('word-prompt').textContent = `Listen for: ${this.targetWord.word.toUpperCase()}`;
+        this.speak();
+        this.renderCards();
+      }
+      
+      speak() {
+        if (speechSynthesis.speaking) speechSynthesis.cancel();
+        let msg = new SpeechSynthesisUtterance(this.targetWord.word);
+        msg.lang = this.isFrench ? 'fr-CA' : 'en-US';
+        msg.rate = 0.65; 
+        msg.pitch = 1.3; 
+        msg.volume = 1;
+        
+        if (this.selectedVoice) {
+          msg.voice = this.selectedVoice;
+        }
+        
+        speechSynthesis.speak(msg);
+      }
+      
+      renderCards() {
+        const gameArea = document.getElementById('game-area');
+        gameArea.innerHTML = '';
+        
+        let cards = [this.targetWord];
+        let others = this.wordsList.filter(w => w.word !== this.targetWord.word);
+        others = others.sort(() => Math.random() - 0.5).slice(0, 4);
+        cards = cards.concat(others);
+        
+        for (let i = cards.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [cards[i], cards[j]] = [cards[j], cards[i]];
+        }
+        
+        cards.forEach((wordData) => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.dataset.word = wordData.word;
+          card.innerHTML = `
+            <div class="particles" style="display: none;"></div>
+            <div class="feedback"></div>
+            <svg class="shape-svg" viewBox="0 0 200 200">
+              <path d="${wordData.shape}" />
+            </svg>
+            <div class="card-word">${wordData.word.toUpperCase()}</div>
+          `;
+          
+          card.addEventListener('click', (e) => this.onCardClick(e, wordData));
+          gameArea.appendChild(card);
+        });
+      }
+      
+      onCardClick(e, clickedWord) {
+        const card = e.currentTarget;
+        const isCorrect = clickedWord.word === this.targetWord.word;
+        
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('target-card'));
+        
+        if (isCorrect) {
+          this.streak++;
+          this.score += 100;
+          this.xp += 25;
+          card.classList.add('target-card');
+          this.showFeedback(card, 'Great job!', 'correct');
+          this.createParticles(card);
+          
+          if (this.xp >= this.maxXP) {
+            setTimeout(() => this.levelUp(), 1500);
+          } else {
+            setTimeout(() => this.newTarget(), 1500);
+          }
+        } else {
+          this.streak = 0;
+          this.xp += 8;
+          this.showFeedback(card, 'Try again!', 'wrong');
+          setTimeout(() => this.newTarget(), 1200);
+        }
+        
+        this.updateStats();
+      }
+      
+      showFeedback(card, text, type) {
+        const feedback = card.querySelector('.feedback');
+        feedback.textContent = text;
+        feedback.className = `feedback ${type}`;
+        setTimeout(() => {
+          feedback.textContent = '';
+          feedback.className = 'feedback';
+        }, 1000);
+      }
+      
+      createParticles(card) {
+        const particlesContainer = card.querySelector('.particles');
+        particlesContainer.style.display = 'block';
+        
+        for (let i = 0; i < 12; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'particle';
+          particle.style.left = Math.random() * 100 + '%';
+          particle.style.background = `hsl(${Math.random()*60 + 160}, 70%, 60%)`;
+          particle.style.animationDelay = Math.random() * 0.3 + 's';
+          particlesContainer.appendChild(particle);
+          
+          setTimeout(() => particle.remove(), 1500);
+        }
+        
+        setTimeout(() => {
+          particlesContainer.style.display = 'none';
+          particlesContainer.innerHTML = '';
+        }, 1500);
+      }
+      
+      levelUp() {
+        this.level++;
+        this.xp = 0;
+        this.maxXP = Math.min(100 + this.level * 50, 500);
+        document.getElementById('new-level').textContent = this.level;
+        document.getElementById('modal-progress-fill').style.width = '100%';
+        document.getElementById('level-up-modal').style.display = 'flex';
+        this.updateStats();
+      }
+      
+      updateStats() {
+        document.getElementById('level').textContent = this.level;
+        document.getElementById('score').textContent = this.score.toLocaleString();
+        document.getElementById('streak').textContent = this.streak;
+        document.getElementById('xp').textContent = this.xp;
+        document.getElementById('max-xp').textContent = this.maxXP;
+      }
+    }
+
+    function initGame() {
+      if (speechSynthesis.getVoices().length > 0) {
+        new Game();
+      } else {
+        speechSynthesis.addEventListener('voiceschanged', initGame);
+      }
+    }
+
+    window.addEventListener('load', initGame);
+  </script>
+</body>
+</html>

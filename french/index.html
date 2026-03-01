@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DyslexiQuest - Dyslexia Reading Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-size: 2.5em;
+        }
+        #game-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.9);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        button {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 10px;
+        }
+        button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        #language-selector, #level-selector {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        select {
+            padding: 10px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            border: 2px solid #4ecdc4;
+        }
+        #cue-card {
+            width: 300px;
+            height: 200px;
+            margin: 20px auto;
+            background: white;
+            border: 5px solid #45b7d1;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 4em;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            animation: pulse 2s infinite;
+            transition: transform 0.3s;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        #cue-card:hover {
+            transform: rotate(2deg) scale(1.05);
+        }
+        #word-options {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+        }
+        .option {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(45deg, #a8e6cf, #dcedc1);
+            border: 4px solid #ff6b6b;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            user-select: none;
+        }
+        .option:hover {
+            transform: scale(1.2);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .option.correct {
+            background: linear-gradient(45deg, #56ab2f, #a8e63f);
+            animation: celebrate 0.5s infinite;
+        }
+        .option.incorrect {
+            background: linear-gradient(45deg, #ff4757, #ff6b81);
+            animation: shake 0.5s;
+        }
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        #score, #level {
+            text-align: center;
+            font-size: 1.5em;
+            margin: 10px 0;
+            color: #45b7d1;
+        }
+        #progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        #progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            width: 0%;
+            transition: width 0.5s;
+        }
+        .hidden {
+            display: none;
+        }
+        #instructions {
+            background: rgba(255,255,255,0.8);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>🧠 DyslexiQuest 🎮</h1>
+        <div id="instructions">
+            <p>Match the cue card shape to the correct word! Recognize words as unique shapes. Switch languages and test your level!</p>
+        </div>
+        <div id="setup">
+            <div id="language-selector">
+                <label>Language / Langue: </label>
+                <select id="language">
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                </select>
+            </div>
+            <div id="level-selector">
+                <label>Level: </label>
+                <select id="level">
+                    <option value="easy">Easy (Beginner)</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard (Advanced)</option>
+                </select>
+            </div>
+            <button onclick="startGame()">Start Quest! 🚀</button>
+        </div>
+        <div id="game" class="hidden">
+            <div id="score">Score: 0</div>
+            <div id="level-display"></div>
+            <div id="progress-bar">
+                <div id="progress-fill"></div>
+            </div>
+            <div id="cue-card">Word Shape</div>
+            <div id="word-options"></div>
+            <button onclick="nextWord()">Next Word ➡️</button>
+            <button onclick="backToMenu()">Menu</button>
+        </div>
+    </div>
+
+    <script>
+        const words = {
+            en: {
+                easy: ['cat', 'dog', 'sun', 'hat', 'run', 'big', 'red', 'top', 'fun', 'box'],
+                medium: ['apple', 'house', 'bird', 'tree', 'fish', 'cake', 'door', 'book', 'car', 'moon'],
+                hard: ['elephant', 'butterfly', 'computer', 'adventure', 'beautiful', 'mountain', 'ocean', 'rainbow', 'elephant', 'whisper']
+            },
+            fr: {
+                easy: ['chat', 'chien', 'soleil', 'chapeau', 'courir', 'grand', 'rouge', 'haut', 'amusant', 'boîte'],
+                medium: ['pomme', 'maison', 'oiseau', 'arbre', 'poisson', 'gâteau', 'porte', 'livre', 'voiture', 'lune'],
+                hard: ['éléphant', 'papillon', 'ordinateur', 'aventure', 'beau', 'montagne', 'océan', 'arc-en-ciel', 'éléphant', 'chuchoter']
+            }
+        };
+
+        let currentLang = 'en';
+        let currentLevel = 'easy';
+        let score = 0;
+        let currentWord = '';
+        let wordIndex = 0;
+        let maxWords = 10;
+
+        function startGame() {
+            currentLang = document.getElementById('language').value;
+            currentLevel = document.getElementById('level').value;
+            score = 0;
+            wordIndex = 0;
+            document.getElementById('setup').classList.add('hidden');
+            document.getElementById('game').classList.remove('hidden');
+            document.getElementById('level-display').textContent = `Level: ${currentLevel.toUpperCase()}`;
+            nextWord();
+        }
+
+        function nextWord() {
+            if (wordIndex >= maxWords) {
+                alert(`Quest Complete! Final Score: ${score}/${maxWords}`);
+                backToMenu();
+                return;
+            }
+            const wordList = words[currentLang][currentLevel];
+            currentWord = wordList[wordIndex % wordList.length];
+            document.getElementById('cue-card').textContent = currentWord.toUpperCase();
+            document.getElementById('cue-card').style.fontSize = '3em';
+
+            const options = [currentWord];
+            const allWords = words[currentLang][currentLevel];
+            while (options.length < 4) {
+                const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
+                if (!options.includes(randomWord)) {
+                    options.push(randomWord);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const container = document.getElementById('word-options');
+            container.innerHTML = '';
+            options.forEach(option => {
+                const div = document.createElement('div');
+                div.className = 'option';
+                div.textContent = option;
+                div.onclick = () => selectOption(option);
+                container.appendChild(div);
+            });
+
+            updateProgress();
+            wordIndex++;
+        }
+
+        function selectOption(selected) {
+            const options = document.querySelectorAll('.option');
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+                if (opt.textContent === currentWord) {
+                    opt.classList.add('correct');
+                } else if (opt.textContent === selected && selected !== currentWord) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            if (selected === currentWord) {
+                score++;
+                document.getElementById('score').textContent = `Score: ${score}`;
+            } else {
+                // Shake the cue card for wrong answer
+                const card = document.getElementById('cue-card');
+                card.classList.add('incorrect');
+                setTimeout(() => card.classList.remove('incorrect'), 500);
+            }
+            setTimeout(nextWord, 1500);
+        }
+
+        function updateProgress() {
+            const progress = (wordIndex / maxWords) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+        }
+
+        function backToMenu() {
+            document.getElementById('game').classList.add('hidden');
+            document.getElementById('setup').classList.remove('hidden');
+            document.getElementById('score').textContent = 'Score: 0';
+            document.getElementById('progress-fill').style.width = '0%';
+        }
+    </script>
+</body>
+</html>
