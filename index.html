@@ -3,17 +3,21 @@
 <head>
   <title>DyslexiQuest v1 - No Emojis</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap');
+    
     body { 
-      font-family: 'Comic Sans MS', cursive !important; 
+      font-family: 'Open Sans', 'Roboto', Arial, sans-serif !important; 
       font-weight: 600; 
       background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
       margin: 0; padding: 20px; 
       color: #333;
       user-select: none;
+      line-height: 1.5;
+      letter-spacing: 0.5px;
     }
 
     * {
-      font-family: 'Comic Sans MS', cursive !important;
+      font-family: 'Open Sans', 'Roboto', Arial, sans-serif !important;
     }
 
     .game-container {
@@ -23,12 +27,14 @@
     }
 
     h1 {
+      font-family: 'Open Sans', 'Roboto', Arial, sans-serif !important;
       font-size: 3em;
       margin-bottom: 20px;
       background: linear-gradient(45deg, #667eea, #764ba2);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      font-weight: 800;
     }
 
     .stats {
@@ -48,6 +54,7 @@
     }
 
     #word-prompt {
+      font-family: 'Open Sans', 'Roboto', Arial, sans-serif !important;
       font-size: 2.2em;
       background: rgba(255,255,255,0.9);
       padding: 25px 40px;
@@ -56,6 +63,7 @@
       font-weight: 900;
       color: #444;
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      line-height: 1.3;
     }
 
     .controls {
@@ -67,6 +75,7 @@
     }
 
     button { 
+      font-family: 'Open Sans', 'Roboto', Arial, sans-serif !important;
       padding: 20px 30px; 
       font-size: 1.2em; 
       font-weight: 700;
@@ -80,6 +89,7 @@
       color: white;
       transition: all 0.3s ease;
       box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      line-height: 1.4;
     }
 
     button:hover {
@@ -168,11 +178,13 @@
     }
 
     .card-word { 
+      font-family: 'Open Sans', 'Roboto', Arial, sans-serif !important;
       font-size: 2.4em; 
       color: white; 
       font-weight: 900; 
       text-shadow: 3px 3px 8px rgba(0,0,0,0.7);
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
+      line-height: 1.2;
     }
 
     .feedback {
@@ -180,6 +192,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      font-family: 'Open Sans', 'Roboto', Arial, sans-serif !important;
       font-size: 3em;
       font-weight: 900;
       pointer-events: none;
@@ -295,15 +308,18 @@
     }
 
     .unlock-title {
+      font-family: 'Open Sans', 'Roboto', Arial, sans-serif !important;
       font-size: 3.5em;
       margin-bottom: 20px;
       background: linear-gradient(45deg, #667eea, #764ba2);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      font-weight: 800;
     }
 
     .rarity-display {
+      font-family: 'Open Sans', 'Roboto', Arial, sans-serif !important;
       font-size: 4em;
       font-weight: 900;
       margin: 20px 0;
@@ -311,6 +327,7 @@
       border-radius: 30px;
       text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
       animation: rarityGlow 2s ease-in-out infinite alternate;
+      line-height: 1.1;
     }
 
     .rarity-common { 
@@ -358,6 +375,7 @@
     }
 
     .unlock-message {
+      font-family: 'Open Sans', 'Roboto', Arial, sans-serif !important;
       font-size: 1.8em;
       margin: 30px 0;
       color: #4ecdc4;
@@ -834,7 +852,7 @@
           <div class="unlock-title">NEW ANIMAL UNLOCKED!</div>
           <div class="unlock-message">CONGRATULATIONS!</div>
           <div class="rarity-display ${animal.rarity.toLowerCase()}">${animal.rarity}</div>
-          <h2 style="font-size: 2.5em; margin: 20px 0;">${animal.name}</h2>
+          <h2 style="font-family: 'Open Sans', 'Roboto', Arial, sans-serif !important; font-size: 2.5em; margin: 20px 0;">${animal.name}</h2>
           <div class="unlock-animal-container">
             <model-viewer src="${animal.model}" 
                           shadow-intensity="1" 
@@ -846,7 +864,7 @@
                           alt="${animal.name}">
             </model-viewer>
           </div>
-          <p style="font-size: 1.4em; margin: 30px 0;">Added to your collection!</p>
+          <p style="font-family: 'Open Sans', 'Roboto', Arial, sans-serif !important; font-size: 1.4em; margin: 30px 0;">Added to your collection!</p>
           <button id="continue-unlock-btn" class="unlock-btn">Continue Adventure</button>
         `;
 
@@ -861,7 +879,7 @@
       showCollectionScreen() {
         const collectionContent = document.getElementById('collection-content');
         collectionContent.innerHTML = `
-          <h2 style="font-size: 3em; margin-bottom: 20px;">Your Collection (${this.unlockedAnimals})</h2>
+          <h2 style="font-family: 'Open Sans', 'Roboto', Arial, sans-serif !important; font-size: 3em; margin-bottom: 20px;">Your Collection (${this.unlockedAnimals})</h2>
           <div class="collection-grid" id="collection-grid"></div>
           <button id="close-collection-btn" class="unlock-btn" style="margin-top: 30px;">Close Collection</button>
         `;
@@ -873,7 +891,7 @@
             const card = document.createElement('div');
             card.className = `collection-card ${animal.rarity.toLowerCase()} ${isUnlocked ? '' : 'locked'}`;
             card.innerHTML = `
-              <div class="rarity-subtitle">${animal.rarity}</div>
+              <div style="font-family: 'Open Sans', 'Roboto', Arial, sans-serif !important; font-size: 1.1em; opacity: ${isUnlocked ? '1' : '0.6'};">${animal.rarity}</div>
               <div class="collection-animal-container">
                 <model-viewer src="${animal.model}" 
                               shadow-intensity="1" 
@@ -884,8 +902,8 @@
                               alt="${animal.name}">
                 </model-viewer>
               </div>
-              <div style="font-size: 1.3em; font-weight: 700;">${animal.name}</div>
-              <div style="opacity: ${isUnlocked ? '1' : '0.4'}">${isUnlocked ? 'Unlocked' : 'Locked'}</div>
+              <div style="font-family: 'Open Sans', 'Roboto', Arial, sans-serif !important; font-size: 1.3em; font-weight: 700;">${animal.name}</div>
+              <div style="font-family: 'Open Sans', 'Roboto', Arial, sans-serif !important; opacity: ${isUnlocked ? '1' : '0.4'}">${isUnlocked ? 'Unlocked' : 'Locked'}</div>
             `;
             grid.appendChild(card);
           }
