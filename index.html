@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>DyslexiQuest v1</title>
+  <title>DyslexiQuest v1 - No Emojis</title>
   <style>
     body { 
       font-family: 'Comic Sans MS', cursive !important; 
@@ -149,50 +149,30 @@
       background: linear-gradient(135deg, #4ecdc4, #44a08d);
     }
 
-    .animal-container {
-      width: 160px;
-      height: 160px;
-      margin-bottom: 15px;
-      position: relative;
-      perspective: 1000px;
-    }
-
-    .animal-model {
-      width: 100%;
-      height: 100%;
-      transition: transform 0.6s ease;
-    }
-
-    .animal-model:hover {
-      transform: rotateY(10deg) rotateX(5deg);
-    }
-
     .shape-svg { 
-      width: 120px; 
-      height: 120px; 
-      margin-bottom: 10px;
-      opacity: 0.7;
+      width: 140px; 
+      height: 140px; 
+      margin-bottom: 15px;
+      opacity: 0.85;
+      filter: drop-shadow(0 8px 20px rgba(0,0,0,0.3));
     }
 
     .shape-svg path {
       fill: none;
       stroke: white; 
-      stroke-width: 6; 
+      stroke-width: 8; 
       stroke-linecap: round;
       stroke-linejoin: round;
-    }
-
-    .card-emoji {
-      font-size: 3em;
-      margin-bottom: 10px;
-      opacity: 0.8;
+      stroke-miterlimit: 10;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
     }
 
     .card-word { 
-      font-size: 2.2em; 
+      font-size: 2.4em; 
       color: white; 
       font-weight: 900; 
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      text-shadow: 3px 3px 8px rgba(0,0,0,0.7);
+      letter-spacing: 2px;
     }
 
     .feedback {
@@ -242,12 +222,13 @@
 
     .particle {
       position: absolute;
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       background: #4ecdc4;
       border-radius: 50%;
       pointer-events: none;
       animation: particleFloat 1.5s ease-out forwards;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
     @keyframes particleFloat {
@@ -255,7 +236,6 @@
       100% { opacity: 0; transform: translateY(-100px) scale(0); }
     }
 
-    /* Unlock Screen */
     .unlock-screen {
       display: none;
       position: fixed;
@@ -265,6 +245,7 @@
       height: 100%;
       background: linear-gradient(135deg, #ff6b6b 0%, #feca57 50%, #ff9ff3 100%);
       z-index: 3000;
+      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -283,7 +264,6 @@
       box-shadow: 0 40px 100px rgba(0,0,0,0.5);
       animation: unlockSlide 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       border: 8px solid;
-      position: relative;
     }
 
     @keyframes unlockSlide {
@@ -321,13 +301,6 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      animation: titleBounce 1s ease-out;
-    }
-
-    @keyframes titleBounce {
-      0% { transform: scale(0.5); opacity: 0; }
-      60% { transform: scale(1.2); }
-      100% { transform: scale(1); opacity: 1; }
     }
 
     .rarity-display {
@@ -388,12 +361,6 @@
       font-size: 1.8em;
       margin: 30px 0;
       color: #4ecdc4;
-      animation: messageGlow 2s ease-in-out infinite alternate;
-    }
-
-    @keyframes messageGlow {
-      from { text-shadow: 0 0 15px #4ecdc4; }
-      to { text-shadow: 0 0 30px #4ecdc4, 0 0 40px #4ecdc4; }
     }
 
     .unlock-btn {
@@ -402,7 +369,6 @@
       margin-top: 30px;
     }
 
-    /* Level Up Modal */
     .modal {
       display: none;
       position: fixed;
@@ -412,6 +378,7 @@
       height: 100%;
       background: rgba(0,0,0,0.8);
       z-index: 1000;
+      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -426,12 +393,6 @@
       text-align: center;
       max-width: 500px;
       box-shadow: 0 30px 80px rgba(0,0,0,0.6);
-      animation: modalSlide 0.8s ease-out;
-    }
-
-    @keyframes modalSlide {
-      0% { transform: scale(0.7) translateY(50px); opacity: 0; }
-      100% { transform: scale(1) translateY(0); opacity: 1; }
     }
 
     .modal-progress {
@@ -450,7 +411,6 @@
       transition: width 1s ease-out;
     }
 
-    /* Collection Screen */
     .collection-screen {
       display: none;
       position: fixed;
@@ -460,6 +420,7 @@
       height: 100%;
       background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       z-index: 2000;
+      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -476,13 +437,7 @@
       max-height: 80vh;
       overflow-y: auto;
       box-shadow: 0 30px 80px rgba(0,0,0,0.6);
-      animation: collectionSlide 1s ease-out;
       border: 8px solid;
-    }
-
-    @keyframes collectionSlide {
-      0% { transform: translateY(100px) scale(0.8); opacity: 0; }
-      100% { transform: translateY(0) scale(1); opacity: 1; }
     }
 
     .collection-grid {
@@ -500,12 +455,6 @@
       padding: 20px;
       color: white;
       position: relative;
-      animation: cardPop 0.5s ease-out;
-    }
-
-    @keyframes cardPop {
-      0% { transform: scale(0.5) rotate(-10deg); opacity: 0; }
-      100% { transform: scale(1) rotate(0deg); opacity: 1; }
     }
 
     .collection-card.locked {
@@ -533,9 +482,8 @@
     @media (max-width: 700px) { 
       button {min-width:180px; font-size: 1.1em; padding: 18px 25px;}
       .card {width:200px;height:260px; padding: 25px;}
-      .animal-container {width: 140px; height: 140px;}
-      .shape-svg {width: 100px; height: 100px;}
-      .shape-svg path {stroke-width: 5;}
+      .shape-svg {width: 120px; height: 120px;}
+      .shape-svg path {stroke-width: 6;}
       .card-word {font-size: 2em;}
       h1 {font-size: 2.5em;}
       .stats {font-size: 1.2em; gap: 20px;}
@@ -549,7 +497,7 @@
 </head>
 <body>
   <div class="game-container">
-    <h1>🧠 DyslexiQuest</h1>
+    <h1>DyslexiQuest</h1>
     <div class="stats">
       <div class="stat">Level <span id="level">1</span></div>
       <div class="stat">Score <span id="score">0</span></div>
@@ -560,19 +508,18 @@
     <div class="controls">
       <button id="new-game">New Game</button>
       <button id="flash-cards-btn">Flash Cards</button>
-      <button id="collection-btn" class="collection-btn">🏆 My Collection (<span id="collection-count">0</span>)</button>
-      <button id="english-btn" class="language-btn active">🇺🇸 English</button>
-      <button id="french-btn" class="language-btn">🇫🇷 French</button>
-      <button id="speak-btn" class="speak-btn">🔊 SPEAK WORD</button>
+      <button id="collection-btn" class="collection-btn">My Collection (<span id="collection-count">0</span>)</button>
+      <button id="english-btn" class="language-btn active">English</button>
+      <button id="french-btn" class="language-btn">French</button>
+      <button id="speak-btn" class="speak-btn">SPEAK WORD</button>
     </div>
     <div id="unlock-message" class="unlock-message" style="display: none;"></div>
     <div id="game-area" class="game-area"></div>
   </div>
   
-  <!-- Level Up Modal -->
   <div id="level-up-modal" class="modal">
     <div class="modal-content">
-      <h2>🎉 LEVEL UP! 🎉</h2>
+      <h2>LEVEL UP!</h2>
       <p>You reached Level <span id="new-level">2</span>!</p>
       <div class="modal-progress">
         <div class="modal-progress-fill" id="modal-progress-fill"></div>
@@ -581,60 +528,56 @@
     </div>
   </div>
 
-  <!-- NEW Unlock Animal Screen -->
   <div id="unlock-screen" class="unlock-screen">
     <div id="unlock-content" class="unlock-content">
-      <!-- Dynamic content populated by JS -->
     </div>
   </div>
 
-  <!-- Collection Screen -->
   <div id="animal-collection-screen" class="collection-screen">
     <div id="collection-content" class="collection-content">
-      <!-- Dynamic content populated by JS -->
     </div>
   </div>
 
   <script>
     const words = {
       en: [
-        {word: 'cat', shape: 'M50,100 Q80,60 110,100 T170,100 M90,120 Q100,140 110,120', emoji: '🐱'},
-        {word: 'dog', shape: 'M40,90 Q70,50 100,90 T160,90 M80,110 Q95,130 110,110', emoji: '🐶'},
-        {word: 'hat', shape: 'M60,80 L100,40 L140,80 M70,100 Q100,120 130,100', emoji: '🎩'},
-        {word: 'bat', shape: 'M50,70 Q80,40 110,70 T150,70 M60,90 L110,110 L160,90', emoji: '🦇'},
-        {word: 'rat', shape: 'M60,80 Q90,50 120,80 T160,80 M80,100 Q110,120 140,100', emoji: '🐀'}
+        {word: 'cat', shape: 'M50,100 Q80,60 110,100 T170,100 M90,120 Q100,140 110,120'},
+        {word: 'dog', shape: 'M40,90 Q70,50 100,90 T160,90 M80,110 Q95,130 110,110'},
+        {word: 'hat', shape: 'M60,80 L100,40 L140,80 M70,100 Q100,120 130,100'},
+        {word: 'bat', shape: 'M50,70 Q80,40 110,70 T150,70 M60,90 L110,110 L160,90'},
+        {word: 'rat', shape: 'M60,80 Q90,50 120,80 T160,80 M80,100 Q110,120 140,100'}
       ],
       fr: [
-        {word: 'chat', shape: 'M50,100 Q80,60 110,100 T170,100 M90,120 Q105,135 120,125', emoji: '🐱'},
-        {word: 'chien', shape: 'M40,90 Q70,50 100,90 T160,90 M80,110 Q95,130 110,110', emoji: '🐶'},
-        {word: 'chapeau', shape: 'M60,80 L100,40 L140,80 M70,100 Q100,120 130,100', emoji: '🎩'},
-        {word: 'grande', shape: 'M50,70 Q85,40 120,70 T155,70 M60,90 L110,110 L160,90', emoji: '📏'},
-        {word: 'petit', shape: 'M60,80 Q90,50 120,80 T160,80 M80,100 Q110,120 140,100', emoji: '📐'}
+        {word: 'chat', shape: 'M50,100 Q80,60 110,100 T170,100 M90,120 Q105,135 120,125'},
+        {word: 'chien', shape: 'M40,90 Q70,50 100,90 T160,90 M80,110 Q95,130 110,110'},
+        {word: 'chapeau', shape: 'M60,80 L100,40 L140,80 M70,100 Q100,120 130,100'},
+        {word: 'grande', shape: 'M50,70 Q85,40 120,70 T155,70 M60,90 L110,110 L160,90'},
+        {word: 'petit', shape: 'M60,80 Q90,50 120,80 T160,80 M80,100 Q110,120 140,100'}
       ]
     };
 
     const uniqueAnimals3D = [
       null,
-      {name: 'Fluffy Cat', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#ff9a9e', rarity: 'Common'},
-      {name: 'Golden Dog', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#ffd93d', rarity: 'Common'},
-      {name: 'White Bunny', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#f8f1f1', rarity: 'Uncommon'},
-      {name: 'Red Fox', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#ff6b6b', rarity: 'Uncommon'},
-      {name: 'Blue Bird', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#4ecdc4', rarity: 'Uncommon'},
-      {name: 'Panda Bear', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#000000', rarity: 'Rare'},
-      {name: 'Spotted Cow', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#ffffff', rarity: 'Rare'},
-      {name: 'Orange Tiger', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#ff8c42', rarity: 'Rare'},
-      {name: 'Pink Flamingo', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#ff69b4', rarity: 'Epic'},
-      {name: 'Grey Wolf', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#808080', rarity: 'Epic'},
-      {name: 'Green Turtle', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#228b22', rarity: 'Epic'},
-      {name: 'Purple Elephant', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#9370db', rarity: 'Epic'},
-      {name: 'Yellow Duck', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#ffff00', rarity: 'Legendary'},
-      {name: 'Brown Bear', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#8b4513', rarity: 'Legendary'},
-      {name: 'Black Panther', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#000000', rarity: 'Legendary'},
-      {name: 'Rainbow Parrot', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#ff1493', rarity: 'Legendary'},
-      {name: 'Polar Bear', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#f0f8ff', rarity: 'Legendary'},
-      {name: 'Golden Lion', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#ffa500', rarity: 'Legendary'},
-      {name: 'Blue Whale', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#4169e1', rarity: 'Legendary'},
-      {name: 'Golden Dragon', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#ffd700', rarity: 'Legendary'}
+      {name: 'Floating Astronaut Cat', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#ff9a9e', rarity: 'Common'},
+      {name: 'Pink Standing Flamingo Dog', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#ffd93d', rarity: 'Common'},
+      {name: 'Ancient Nefertiti Bunny', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#f8f1f1', rarity: 'Uncommon'},
+      {name: 'Space Astronaut Fox', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#ff6b6b', rarity: 'Uncommon'},
+      {name: 'Elegant Flamingo Bird', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#4ecdc4', rarity: 'Uncommon'},
+      {name: 'Mysterious Nefertiti Panda', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#000000', rarity: 'Rare'},
+      {name: 'Bold Astronaut Cow', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#ffffff', rarity: 'Rare'},
+      {name: 'Graceful Flamingo Tiger', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#ff8c42', rarity: 'Rare'},
+      {name: 'Vibrant Pink Flamingo', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#ff69b4', rarity: 'Epic'},
+      {name: 'Timeless Nefertiti Wolf', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#808080', rarity: 'Epic'},
+      {name: 'Cosmic Astronaut Turtle', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#228b22', rarity: 'Epic'},
+      {name: 'Stylish Flamingo Elephant', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#9370db', rarity: 'Epic'},
+      {name: 'Golden Nefertiti Duck', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#ffff00', rarity: 'Legendary'},
+      {name: 'Adventurous Astronaut Bear', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#8b4513', rarity: 'Legendary'},
+      {name: 'Dramatic Flamingo Panther', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#000000', rarity: 'Legendary'},
+      {name: 'Exotic Nefertiti Parrot', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#ff1493', rarity: 'Legendary'},
+      {name: 'Arctic Astronaut Bear', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#f0f8ff', rarity: 'Legendary'},
+      {name: 'Majestic Flamingo Lion', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#ffa500', rarity: 'Legendary'},
+      {name: 'Deep Sea Nefertiti Whale', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#4169e1', rarity: 'Legendary'},
+      {name: 'Mythical Astronaut Dragon', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#ffd700', rarity: 'Legendary'}
     ];
 
     class Game {
@@ -696,7 +639,6 @@
           this.checkAnimalUnlock();
         });
 
-        // Unlock screen close
         document.getElementById('unlock-screen').addEventListener('click', (e) => {
           if (e.target.id === 'unlock-screen') {
             document.getElementById('unlock-screen').style.display = 'none';
@@ -704,7 +646,6 @@
           }
         });
 
-        // Collection screen close
         document.getElementById('animal-collection-screen').addEventListener('click', (e) => {
           if (e.target.id === 'animal-collection-screen') {
             document.getElementById('animal-collection-screen').style.display = 'none';
@@ -726,8 +667,6 @@
         this.unlockedAnimals = 0;
         document.getElementById('english-btn').classList.add('active');
         document.getElementById('french-btn').classList.remove('active');
-        document.getElementById('unlock-message').style.display = 'none';
-        // Clear localStorage for animals
         Object.keys(localStorage).forEach(key => {
           if (key.startsWith('animal_')) {
             localStorage.removeItem(key);
@@ -765,7 +704,7 @@
       }
       
       getAnimalForLevel() {
-        const animalIndex = Math.floor((this.level - 1) / 5) + 1; // +1 because array starts at index 1
+        const animalIndex = Math.floor((this.level - 1) / 5) + 1;
         return uniqueAnimals3D[animalIndex] || null;
       }
       
@@ -788,32 +727,12 @@
           card.className = 'card';
           card.dataset.word = wordData.word;
           
-          const animalData = this.getAnimalForLevel();
-          const animalModel = animalData ? `
-            <model-viewer src="${animalData.model}" 
-                          shadow-intensity="1" 
-                          camera-controls 
-                          auto-rotate 
-                          ar 
-                          style="width: 100%; height: 100%; --poster-color: ${animalData.color};"
-                          alt="${animalData.name}">
-              <button slot="ar-button" style="display: none;">📱</button>
-            </model-viewer>
-          ` : '';
-          
           card.innerHTML = `
             <div class="particles" style="display: none;"></div>
             <div class="feedback"></div>
-            ${animalModel ? `
-              <div class="animal-container">
-                <div class="animal-model">${animalModel}</div>
-              </div>
-            ` : `
-              <svg class="shape-svg" viewBox="0 0 200 200">
-                <path d="${wordData.shape}" />
-              </svg>
-              <div class="card-emoji">${wordData.emoji}</div>
-            `}
+            <svg class="shape-svg" viewBox="0 0 200 200">
+              <path d="${wordData.shape}" />
+            </svg>
             <div class="card-word">${wordData.word.toUpperCase()}</div>
           `;
           
@@ -896,7 +815,6 @@
         this.updateStats();
       }
 
-      // NEW: Check if animal should be unlocked (every 5 levels)
       checkAnimalUnlock() {
         const animal = this.getAnimalForLevel();
         if (animal && !localStorage.getItem(`animal_${animal.name}`)) {
@@ -906,7 +824,6 @@
         }
       }
 
-      // NEW: Show unlock screen with rarity
       showUnlockScreen(animal) {
         localStorage.setItem(`animal_${animal.name}`, 'unlocked');
         this.unlockedAnimals++;
@@ -914,7 +831,7 @@
 
         const unlockContent = document.getElementById('unlock-content');
         unlockContent.innerHTML = `
-          <div class="unlock-title">🎉 NEW ANIMAL UNLOCKED! 🎉</div>
+          <div class="unlock-title">NEW ANIMAL UNLOCKED!</div>
           <div class="unlock-message">CONGRATULATIONS!</div>
           <div class="rarity-display ${animal.rarity.toLowerCase()}">${animal.rarity}</div>
           <h2 style="font-size: 2.5em; margin: 20px 0;">${animal.name}</h2>
@@ -927,14 +844,12 @@
                           style="width: 100%; height: 100%; --poster-color: ${animal.color}; border-radius: 25px;"
                           class="unlock-animal-model"
                           alt="${animal.name}">
-              <button slot="ar-button" style="display: none;">📱</button>
             </model-viewer>
           </div>
           <p style="font-size: 1.4em; margin: 30px 0;">Added to your collection!</p>
-          <button id="continue-unlock-btn" class="unlock-btn">✨ Continue Adventure ✨</button>
+          <button id="continue-unlock-btn" class="unlock-btn">Continue Adventure</button>
         `;
 
-        // Bind continue button
         document.getElementById('continue-unlock-btn').addEventListener('click', () => {
           document.getElementById('unlock-screen').style.display = 'none';
           this.newTarget();
@@ -946,13 +861,13 @@
       showCollectionScreen() {
         const collectionContent = document.getElementById('collection-content');
         collectionContent.innerHTML = `
-          <h2 style="font-size: 3em; margin-bottom: 20px;">🏆 Your Collection (${this.unlockedAnimals})</h2>
+          <h2 style="font-size: 3em; margin-bottom: 20px;">Your Collection (${this.unlockedAnimals})</h2>
           <div class="collection-grid" id="collection-grid"></div>
           <button id="close-collection-btn" class="unlock-btn" style="margin-top: 30px;">Close Collection</button>
         `;
 
         const grid = document.getElementById('collection-grid');
-        uniqueAnimals3D.slice(1).forEach((animal, index) => {
+        uniqueAnimals3D.slice(1).forEach((animal) => {
           if (animal) {
             const isUnlocked = localStorage.getItem(`animal_${animal.name}`) === 'unlocked';
             const card = document.createElement('div');
@@ -970,7 +885,7 @@
                 </model-viewer>
               </div>
               <div style="font-size: 1.3em; font-weight: 700;">${animal.name}</div>
-              <div style="opacity: ${isUnlocked ? '1' : '0.4'}">${isUnlocked ? '✅ Unlocked' : '🔒 Locked'}</div>
+              <div style="opacity: ${isUnlocked ? '1' : '0.4'}">${isUnlocked ? 'Unlocked' : 'Locked'}</div>
             `;
             grid.appendChild(card);
           }
