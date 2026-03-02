@@ -4,12 +4,16 @@
   <title>DyslexiQuest v1</title>
   <style>
     body { 
-      font-family: 'Comic Sans MS', cursive; 
+      font-family: 'Comic Sans MS', cursive !important; 
       font-weight: 600; 
       background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
       margin: 0; padding: 20px; 
       color: #333;
       user-select: none;
+    }
+
+    * {
+      font-family: 'Comic Sans MS', cursive !important;
     }
 
     .game-container {
@@ -62,38 +66,6 @@
       margin: 30px 0;
     }
 
-    .control-group {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .voice-group label {
-      font-size: 1.1em;
-      font-weight: 700;
-      color: #555;
-      margin-bottom: 8px;
-    }
-
-    select {
-      padding: 15px 25px;
-      font-size: 1.1em;
-      font-weight: 700;
-      border-radius: 25px;
-      border: 3px solid #4ecdc4;
-      background: white;
-      color: #44a08d;
-      cursor: pointer;
-      min-width: 200px;
-      font-family: inherit;
-    }
-
-    select:focus {
-      outline: none;
-      box-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
-    }
-
     button { 
       padding: 20px 30px; 
       font-size: 1.2em; 
@@ -126,6 +98,17 @@
     .speak-btn {
       background: linear-gradient(45deg, #f093fb, #f5576c) !important;
       font-size: 1.3em;
+    }
+
+    .collection-btn {
+      background: linear-gradient(45deg, #f39c12, #e67e22) !important;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(243, 156, 18, 0.7); }
+      70% { box-shadow: 0 0 0 20px rgba(243, 156, 18, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(243, 156, 18, 0); }
     }
 
     .game-area {
@@ -166,23 +149,50 @@
       background: linear-gradient(135deg, #4ecdc4, #44a08d);
     }
 
+    .animal-container {
+      width: 160px;
+      height: 160px;
+      margin-bottom: 15px;
+      position: relative;
+      perspective: 1000px;
+    }
+
+    .animal-model {
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s ease;
+    }
+
+    .animal-model:hover {
+      transform: rotateY(10deg) rotateX(5deg);
+    }
+
     .shape-svg { 
-      width: 180px; 
-      height: 180px; 
+      width: 120px; 
+      height: 120px; 
+      margin-bottom: 10px;
+      opacity: 0.7;
+    }
+
+    .shape-svg path {
       fill: none;
       stroke: white; 
-      stroke-width: 10; 
+      stroke-width: 6; 
       stroke-linecap: round;
       stroke-linejoin: round;
-      margin-bottom: 25px;
+    }
+
+    .card-emoji {
+      font-size: 3em;
+      margin-bottom: 10px;
+      opacity: 0.8;
     }
 
     .card-word { 
-      font-size: 3em; 
+      font-size: 2.2em; 
       color: white; 
       font-weight: 900; 
-      text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
-      letter-spacing: 2px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     }
 
     .feedback {
@@ -245,6 +255,154 @@
       100% { opacity: 0; transform: translateY(-100px) scale(0); }
     }
 
+    /* Unlock Screen */
+    .unlock-screen {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #ff6b6b 0%, #feca57 50%, #ff9ff3 100%);
+      z-index: 3000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .unlock-content {
+      background: rgba(255,255,255,0.98);
+      padding: 60px;
+      border-radius: 40px;
+      color: #333;
+      text-align: center;
+      max-width: 700px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+      animation: unlockSlide 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      border: 8px solid;
+      position: relative;
+    }
+
+    @keyframes unlockSlide {
+      0% { 
+        transform: translateY(100px) scale(0.7); 
+        opacity: 0; 
+      }
+      50% { 
+        transform: translateY(-20px) scale(1.05); 
+      }
+      100% { 
+        transform: translateY(0) scale(1); 
+        opacity: 1; 
+      }
+    }
+
+    .unlock-animal-container {
+      width: 300px;
+      height: 300px;
+      margin: 30px auto;
+      perspective: 1200px;
+    }
+
+    .unlock-animal-model {
+      width: 100%;
+      height: 100%;
+      border-radius: 25px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .unlock-title {
+      font-size: 3.5em;
+      margin-bottom: 20px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: titleBounce 1s ease-out;
+    }
+
+    @keyframes titleBounce {
+      0% { transform: scale(0.5); opacity: 0; }
+      60% { transform: scale(1.2); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .rarity-display {
+      font-size: 4em;
+      font-weight: 900;
+      margin: 20px 0;
+      padding: 20px 40px;
+      border-radius: 30px;
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+      animation: rarityGlow 2s ease-in-out infinite alternate;
+    }
+
+    .rarity-common { 
+      background: linear-gradient(135deg, #98d8c8, #a8e6cf); 
+      color: #2d7749; 
+      border: 4px solid #98d8c8;
+    }
+    .rarity-uncommon { 
+      background: linear-gradient(135deg, #5dade2, #85c1e9); 
+      color: #2e5a7a; 
+      border: 4px solid #5dade2;
+    }
+    .rarity-rare { 
+      background: linear-gradient(135deg, #f39c12, #f1c40f); 
+      color: #7f3300; 
+      border: 4px solid #f39c12;
+    }
+    .rarity-epic { 
+      background: linear-gradient(135deg, #9b59b6, #bb8fce); 
+      color: #4a235a; 
+      border: 4px solid #9b59b6;
+    }
+    .rarity-legendary { 
+      background: linear-gradient(135deg, #f1c40f, #f39c12); 
+      color: #7f3300; 
+      border: 4px solid #f1c40f;
+      box-shadow: 0 0 60px #f1c40f;
+      animation: legendaryPulse 1.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes rarityGlow {
+      from { filter: drop-shadow(0 0 10px currentColor); }
+      to { filter: drop-shadow(0 0 25px currentColor); }
+    }
+
+    @keyframes legendaryPulse {
+      from { 
+        filter: drop-shadow(0 0 20px #f1c40f); 
+        transform: scale(1);
+      }
+      to { 
+        filter: drop-shadow(0 0 40px #f1c40f); 
+        transform: scale(1.05);
+      }
+    }
+
+    .unlock-message {
+      font-size: 1.8em;
+      margin: 30px 0;
+      color: #4ecdc4;
+      animation: messageGlow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes messageGlow {
+      from { text-shadow: 0 0 15px #4ecdc4; }
+      to { text-shadow: 0 0 30px #4ecdc4, 0 0 40px #4ecdc4; }
+    }
+
+    .unlock-btn {
+      padding: 25px 50px;
+      font-size: 1.5em;
+      margin-top: 30px;
+    }
+
+    /* Level Up Modal */
     .modal {
       display: none;
       position: fixed;
@@ -254,8 +412,10 @@
       height: 100%;
       background: rgba(0,0,0,0.8);
       z-index: 1000;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      padding: 20px;
     }
 
     .modal-content {
@@ -265,20 +425,13 @@
       color: white;
       text-align: center;
       max-width: 500px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-      animation: modalBounce 0.8s ease-out;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+      animation: modalSlide 0.8s ease-out;
     }
 
-    @keyframes modalBounce {
-      0% { transform: scale(0.3); opacity: 0; }
-      50% { transform: scale(1.05); }
-      70% { transform: scale(0.9); }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    .modal h2 {
-      font-size: 3em;
-      margin-bottom: 20px;
+    @keyframes modalSlide {
+      0% { transform: scale(0.7) translateY(50px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
     }
 
     .modal-progress {
@@ -286,7 +439,7 @@
       height: 20px;
       background: rgba(255,255,255,0.3);
       border-radius: 10px;
-      margin: 30px auto;
+      margin: 20px auto;
       overflow: hidden;
     }
 
@@ -294,25 +447,109 @@
       height: 100%;
       background: linear-gradient(90deg, #4ecdc4, #44a08d);
       width: 0%;
-      transition: width 2s ease-out;
+      transition: width 1s ease-out;
+    }
+
+    /* Collection Screen */
+    .collection-screen {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      z-index: 2000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .collection-content {
+      background: rgba(255,255,255,0.95);
+      padding: 60px;
+      border-radius: 40px;
+      color: #333;
+      text-align: center;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+      animation: collectionSlide 1s ease-out;
+      border: 8px solid;
+    }
+
+    @keyframes collectionSlide {
+      0% { transform: translateY(100px) scale(0.8); opacity: 0; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .collection-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .collection-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 20px;
+      padding: 20px;
+      color: white;
+      position: relative;
+      animation: cardPop 0.5s ease-out;
+    }
+
+    @keyframes cardPop {
+      0% { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    .collection-card.locked {
+      background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+      filter: grayscale(100%);
+    }
+
+    .rarity-common { border-color: #98d8c8; }
+    .rarity-uncommon { border-color: #5dade2; }
+    .rarity-rare { border-color: #f39c12; }
+    .rarity-epic { border-color: #9b59b6; }
+    .rarity-legendary { border-color: #f1c40f; box-shadow: 0 0 50px #f1c40f; }
+
+    .collection-animal-container {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 15px;
+    }
+
+    .collection-animal {
+      width: 100%;
+      height: 100%;
     }
 
     @media (max-width: 700px) { 
       button {min-width:180px; font-size: 1.1em; padding: 18px 25px;}
-      select {min-width: 180px; font-size: 1em;}
       .card {width:200px;height:260px; padding: 25px;}
-      .shape-svg {width: 160px; height: 160px;}
-      .card-word {font-size: 2.5em;}
+      .animal-container {width: 140px; height: 140px;}
+      .shape-svg {width: 100px; height: 100px;}
+      .shape-svg path {stroke-width: 5;}
+      .card-word {font-size: 2em;}
       h1 {font-size: 2.5em;}
       .stats {font-size: 1.2em; gap: 20px;}
       .controls {flex-direction: column; align-items: center;}
-      .control-group {width: 100%; max-width: 300px;}
+      .unlock-content, .collection-content, .modal-content {padding: 30px; margin: 10px;}
+      .unlock-animal-container {width: 250px; height: 250px;}
+      .unlock-title {font-size: 2.8em;}
+      .rarity-display {font-size: 3em;}
     }
   </style>
 </head>
 <body>
   <div class="game-container">
-    <h1>DyslexiQuest</h1>
+    <h1>🧠 DyslexiQuest</h1>
     <div class="stats">
       <div class="stat">Level <span id="level">1</span></div>
       <div class="stat">Score <span id="score">0</span></div>
@@ -321,55 +558,84 @@
     </div>
     <div id="word-prompt">Listen for: CAT</div>
     <div class="controls">
-      <div class="control-group">
-        <div class="voice-group">
-          <label>Voice:</label>
-          <select id="voice-select">
-            <option value="">Auto</option>
-          </select>
-        </div>
-      </div>
-      <div class="control-group">
-        <button id="new-game">New Game</button>
-        <button id="flash-cards-btn">Flash Cards</button>
-      </div>
-      <div class="control-group">
-        <button id="english-btn" class="language-btn active">English</button>
-        <button id="french-btn" class="language-btn">French</button>
-      </div>
-      <button id="speak-btn" class="speak-btn">SPEAK WORD</button>
+      <button id="new-game">New Game</button>
+      <button id="flash-cards-btn">Flash Cards</button>
+      <button id="collection-btn" class="collection-btn">🏆 My Collection (<span id="collection-count">0</span>)</button>
+      <button id="english-btn" class="language-btn active">🇺🇸 English</button>
+      <button id="french-btn" class="language-btn">🇫🇷 French</button>
+      <button id="speak-btn" class="speak-btn">🔊 SPEAK WORD</button>
     </div>
+    <div id="unlock-message" class="unlock-message" style="display: none;"></div>
     <div id="game-area" class="game-area"></div>
   </div>
   
+  <!-- Level Up Modal -->
   <div id="level-up-modal" class="modal">
     <div class="modal-content">
-      <h2>LEVEL UP!</h2>
+      <h2>🎉 LEVEL UP! 🎉</h2>
       <p>You reached Level <span id="new-level">2</span>!</p>
       <div class="modal-progress">
         <div class="modal-progress-fill" id="modal-progress-fill"></div>
       </div>
-      <button id="continue-btn" style="margin-top: 30px;">Continue Adventure!</button>
+      <button id="continue-btn" class="unlock-btn">Continue Adventure!</button>
+    </div>
+  </div>
+
+  <!-- NEW Unlock Animal Screen -->
+  <div id="unlock-screen" class="unlock-screen">
+    <div id="unlock-content" class="unlock-content">
+      <!-- Dynamic content populated by JS -->
+    </div>
+  </div>
+
+  <!-- Collection Screen -->
+  <div id="animal-collection-screen" class="collection-screen">
+    <div id="collection-content" class="collection-content">
+      <!-- Dynamic content populated by JS -->
     </div>
   </div>
 
   <script>
     const words = {
       en: [
-        {word: 'cat', shape: 'M50 100 Q80 60 110 100 T170 100 M90 120 Q100 140 110 120'},
-        {word: 'dog', shape: 'M40 90 Q70 50 100 90 T160 90 M80 110 Q95 130 110 110'},
-        {word: 'hat', shape: 'M60 80 L100 40 L140 80 M70 100 Q100 120 130 100'},
-        {word: 'bat', shape: 'M50 70 Q80 40 110 70 T150 70 M60 90 L110 110 L160 90'},
-        {word: 'rat', shape: 'M60 80 Q90 50 120 80 T160 80 M80 100 Q110 120 140 100'}
+        {word: 'cat', shape: 'M50,100 Q80,60 110,100 T170,100 M90,120 Q100,140 110,120', emoji: '🐱'},
+        {word: 'dog', shape: 'M40,90 Q70,50 100,90 T160,90 M80,110 Q95,130 110,110', emoji: '🐶'},
+        {word: 'hat', shape: 'M60,80 L100,40 L140,80 M70,100 Q100,120 130,100', emoji: '🎩'},
+        {word: 'bat', shape: 'M50,70 Q80,40 110,70 T150,70 M60,90 L110,110 L160,90', emoji: '🦇'},
+        {word: 'rat', shape: 'M60,80 Q90,50 120,80 T160,80 M80,100 Q110,120 140,100', emoji: '🐀'}
       ],
       fr: [
-        {word: 'chat', shape: 'M50 100 Q80 60 110 100 T170 100 M90 120 Q105 135 120 125'},
-        {word: 'chien', shape: 'M40 90 Q70 50 100 90 T160 90 M80 110 Q95 130 110 110'},
-        {word: 'chapeau', shape: 'M60 80 L100 40 L140 80 M70 100 Q100 120 130 100'},
-        {word: 'grande', shape: 'M50 70 Q85 40 120 70 T155 70 M60 90 L110 110 L160 90'},
-        {word: 'petit', shape: 'M60 80 Q90 50 120 80 T160 80 M80 100 Q110 120 140 100'}
+        {word: 'chat', shape: 'M50,100 Q80,60 110,100 T170,100 M90,120 Q105,135 120,125', emoji: '🐱'},
+        {word: 'chien', shape: 'M40,90 Q70,50 100,90 T160,90 M80,110 Q95,130 110,110', emoji: '🐶'},
+        {word: 'chapeau', shape: 'M60,80 L100,40 L140,80 M70,100 Q100,120 130,100', emoji: '🎩'},
+        {word: 'grande', shape: 'M50,70 Q85,40 120,70 T155,70 M60,90 L110,110 L160,90', emoji: '📏'},
+        {word: 'petit', shape: 'M60,80 Q90,50 120,80 T160,80 M80,100 Q110,120 140,100', emoji: '📐'}
       ]
     };
+
+    const uniqueAnimals3D = [
+      null,
+      {name: 'Fluffy Cat', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#ff9a9e', rarity: 'Common'},
+      {name: 'Golden Dog', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#ffd93d', rarity: 'Common'},
+      {name: 'White Bunny', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#f8f1f1', rarity: 'Uncommon'},
+      {name: 'Red Fox', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#ff6b6b', rarity: 'Uncommon'},
+      {name: 'Blue Bird', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#4ecdc4', rarity: 'Uncommon'},
+      {name: 'Panda Bear', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#000000', rarity: 'Rare'},
+      {name: 'Spotted Cow', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#ffffff', rarity: 'Rare'},
+      {name: 'Orange Tiger', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#ff8c42', rarity: 'Rare'},
+      {name: 'Pink Flamingo', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#ff69b4', rarity: 'Epic'},
+      {name: 'Grey Wolf', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#808080', rarity: 'Epic'},
+      {name: 'Green Turtle', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#228b22', rarity: 'Epic'},
+      {name: 'Purple Elephant', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#9370db', rarity: 'Epic'},
+      {name: 'Yellow Duck', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#ffff00', rarity: 'Legendary'},
+      {name: 'Brown Bear', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#8b4513', rarity: 'Legendary'},
+      {name: 'Black Panther', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#000000', rarity: 'Legendary'},
+      {name: 'Rainbow Parrot', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#ff1493', rarity: 'Legendary'},
+      {name: 'Polar Bear', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#f0f8ff', rarity: 'Legendary'},
+      {name: 'Golden Lion', model: 'https://modelviewer.dev/shared-assets/models/Flamingo.glb', color: '#ffa500', rarity: 'Legendary'},
+      {name: 'Blue Whale', model: 'https://modelviewer.dev/shared-assets/models/Nefertiti.glb', color: '#4169e1', rarity: 'Legendary'},
+      {name: 'Golden Dragon', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#ffd700', rarity: 'Legendary'}
+    ];
 
     class Game {
       constructor() {
@@ -381,64 +647,73 @@
         this.isFrench = false; 
         this.targetWord = null; 
         this.words = words;
-        this.selectedVoice = null;
+        this.unlockedAnimals = 0;
         this.init();
       }
       
       init() {
-        this.populateVoices();
+        this.loadModelViewer();
         this.bindEvents();
         this.updateStats();
+        this.updateCollectionButton();
         this.newTarget();
       }
-      
-      populateVoices() {
-        const voiceSelect = document.getElementById('voice-select');
-        const voices = speechSynthesis.getVoices();
-        
-        voices.forEach((voice, index) => {
-          const option = document.createElement('option');
-          option.value = index;
-          option.textContent = `${voice.name} (${voice.lang})`;
-          voiceSelect.appendChild(option);
-        });
-        
-        voiceSelect.addEventListener('change', (e) => {
-          console.log("VOICE: Voice changed to", e.target.value);
-          this.selectedVoice = e.target.value ? voices[e.target.value] : null;
-        });
+
+      loadModelViewer() {
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js';
+        script.type = 'module';
+        document.head.appendChild(script);
       }
       
       bindEvents() {
         document.getElementById('new-game').addEventListener('click', () => {
-          console.log("BTN: New Game clicked");
           this.reset();
         });
         
         document.getElementById('flash-cards-btn').addEventListener('click', () => {
-          console.log("BTN: Flash Cards clicked");
           this.renderCards();
+        });
+
+        document.getElementById('collection-btn').addEventListener('click', () => {
+          this.showCollectionScreen();
         });
         
         document.getElementById('english-btn').addEventListener('click', () => {
-          console.log("BTN: English clicked");
           this.setLang('en');
         });
         
         document.getElementById('french-btn').addEventListener('click', () => {
-          console.log("BTN: French clicked");
           this.setLang('fr');
         });
         
         document.getElementById('speak-btn').addEventListener('click', () => {
-          console.log("BTN: SPEAK WORD clicked");
           this.speak();
         });
 
         document.getElementById('continue-btn').addEventListener('click', () => {
           document.getElementById('level-up-modal').style.display = 'none';
-          this.newTarget();
+          this.checkAnimalUnlock();
         });
+
+        // Unlock screen close
+        document.getElementById('unlock-screen').addEventListener('click', (e) => {
+          if (e.target.id === 'unlock-screen') {
+            document.getElementById('unlock-screen').style.display = 'none';
+            this.newTarget();
+          }
+        });
+
+        // Collection screen close
+        document.getElementById('animal-collection-screen').addEventListener('click', (e) => {
+          if (e.target.id === 'animal-collection-screen') {
+            document.getElementById('animal-collection-screen').style.display = 'none';
+          }
+        });
+      }
+      
+      updateCollectionButton() {
+        document.getElementById('collection-count').textContent = this.unlockedAnimals;
       }
       
       reset() {
@@ -448,9 +723,18 @@
         this.xp = 0;
         this.maxXP = 100;
         this.isFrench = false;
+        this.unlockedAnimals = 0;
         document.getElementById('english-btn').classList.add('active');
         document.getElementById('french-btn').classList.remove('active');
+        document.getElementById('unlock-message').style.display = 'none';
+        // Clear localStorage for animals
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('animal_')) {
+            localStorage.removeItem(key);
+          }
+        });
         this.updateStats();
+        this.updateCollectionButton();
         this.newTarget();
       }
       
@@ -477,12 +761,12 @@
         msg.rate = 0.65; 
         msg.pitch = 1.3; 
         msg.volume = 1;
-        
-        if (this.selectedVoice) {
-          msg.voice = this.selectedVoice;
-        }
-        
         speechSynthesis.speak(msg);
+      }
+      
+      getAnimalForLevel() {
+        const animalIndex = Math.floor((this.level - 1) / 5) + 1; // +1 because array starts at index 1
+        return uniqueAnimals3D[animalIndex] || null;
       }
       
       renderCards() {
@@ -503,12 +787,33 @@
           const card = document.createElement('div');
           card.className = 'card';
           card.dataset.word = wordData.word;
+          
+          const animalData = this.getAnimalForLevel();
+          const animalModel = animalData ? `
+            <model-viewer src="${animalData.model}" 
+                          shadow-intensity="1" 
+                          camera-controls 
+                          auto-rotate 
+                          ar 
+                          style="width: 100%; height: 100%; --poster-color: ${animalData.color};"
+                          alt="${animalData.name}">
+              <button slot="ar-button" style="display: none;">📱</button>
+            </model-viewer>
+          ` : '';
+          
           card.innerHTML = `
             <div class="particles" style="display: none;"></div>
             <div class="feedback"></div>
-            <svg class="shape-svg" viewBox="0 0 200 200">
-              <path d="${wordData.shape}" />
-            </svg>
+            ${animalModel ? `
+              <div class="animal-container">
+                <div class="animal-model">${animalModel}</div>
+              </div>
+            ` : `
+              <svg class="shape-svg" viewBox="0 0 200 200">
+                <path d="${wordData.shape}" />
+              </svg>
+              <div class="card-emoji">${wordData.emoji}</div>
+            `}
             <div class="card-word">${wordData.word.toUpperCase()}</div>
           `;
           
@@ -525,8 +830,8 @@
         
         if (isCorrect) {
           this.streak++;
-          this.score += 100;
-          this.xp += 25;
+          this.score += 100 * this.level;
+          this.xp += 25 * this.level;
           card.classList.add('target-card');
           this.showFeedback(card, 'Great job!', 'correct');
           this.createParticles(card);
@@ -538,9 +843,8 @@
           }
         } else {
           this.streak = 0;
-          this.xp += 8;
           this.showFeedback(card, 'Try again!', 'wrong');
-          setTimeout(() => this.newTarget(), 1200);
+          card.classList.add('target-card');
         }
         
         this.updateStats();
@@ -551,60 +855,136 @@
         feedback.textContent = text;
         feedback.className = `feedback ${type}`;
         setTimeout(() => {
-          feedback.textContent = '';
           feedback.className = 'feedback';
+          feedback.textContent = '';
         }, 1000);
       }
       
       createParticles(card) {
         const particlesContainer = card.querySelector('.particles');
         particlesContainer.style.display = 'block';
-        
         for (let i = 0; i < 12; i++) {
           const particle = document.createElement('div');
           particle.className = 'particle';
           particle.style.left = Math.random() * 100 + '%';
-          particle.style.background = `hsl(${Math.random()*60 + 160}, 70%, 60%)`;
+          particle.style.top = Math.random() * 100 + '%';
           particle.style.animationDelay = Math.random() * 0.3 + 's';
           particlesContainer.appendChild(particle);
-          
           setTimeout(() => particle.remove(), 1500);
         }
-        
         setTimeout(() => {
           particlesContainer.style.display = 'none';
           particlesContainer.innerHTML = '';
         }, 1500);
       }
       
-      levelUp() {
-        this.level++;
-        this.xp = 0;
-        this.maxXP = Math.min(100 + this.level * 50, 500);
-        document.getElementById('new-level').textContent = this.level;
-        document.getElementById('modal-progress-fill').style.width = '100%';
-        document.getElementById('level-up-modal').style.display = 'flex';
-        this.updateStats();
-      }
-      
       updateStats() {
         document.getElementById('level').textContent = this.level;
-        document.getElementById('score').textContent = this.score.toLocaleString();
+        document.getElementById('score').textContent = this.score;
         document.getElementById('streak').textContent = this.streak;
         document.getElementById('xp').textContent = this.xp;
         document.getElementById('max-xp').textContent = this.maxXP;
       }
-    }
+      
+      levelUp() {
+        this.level++;
+        this.maxXP = Math.min(100 + (this.level - 1) * 50, 500);
+        this.xp = 0;
+        document.getElementById('new-level').textContent = this.level;
+        document.getElementById('level-up-modal').style.display = 'flex';
+        document.querySelector('.modal-progress-fill').style.width = '100%';
+        this.updateStats();
+      }
 
-    function initGame() {
-      if (speechSynthesis.getVoices().length > 0) {
-        new Game();
-      } else {
-        speechSynthesis.addEventListener('voiceschanged', initGame);
+      // NEW: Check if animal should be unlocked (every 5 levels)
+      checkAnimalUnlock() {
+        const animal = this.getAnimalForLevel();
+        if (animal && !localStorage.getItem(`animal_${animal.name}`)) {
+          this.showUnlockScreen(animal);
+        } else {
+          this.newTarget();
+        }
+      }
+
+      // NEW: Show unlock screen with rarity
+      showUnlockScreen(animal) {
+        localStorage.setItem(`animal_${animal.name}`, 'unlocked');
+        this.unlockedAnimals++;
+        this.updateCollectionButton();
+
+        const unlockContent = document.getElementById('unlock-content');
+        unlockContent.innerHTML = `
+          <div class="unlock-title">🎉 NEW ANIMAL UNLOCKED! 🎉</div>
+          <div class="unlock-message">CONGRATULATIONS!</div>
+          <div class="rarity-display ${animal.rarity.toLowerCase()}">${animal.rarity}</div>
+          <h2 style="font-size: 2.5em; margin: 20px 0;">${animal.name}</h2>
+          <div class="unlock-animal-container">
+            <model-viewer src="${animal.model}" 
+                          shadow-intensity="1" 
+                          camera-controls 
+                          auto-rotate 
+                          ar 
+                          style="width: 100%; height: 100%; --poster-color: ${animal.color}; border-radius: 25px;"
+                          class="unlock-animal-model"
+                          alt="${animal.name}">
+              <button slot="ar-button" style="display: none;">📱</button>
+            </model-viewer>
+          </div>
+          <p style="font-size: 1.4em; margin: 30px 0;">Added to your collection!</p>
+          <button id="continue-unlock-btn" class="unlock-btn">✨ Continue Adventure ✨</button>
+        `;
+
+        // Bind continue button
+        document.getElementById('continue-unlock-btn').addEventListener('click', () => {
+          document.getElementById('unlock-screen').style.display = 'none';
+          this.newTarget();
+        });
+
+        document.getElementById('unlock-screen').style.display = 'flex';
+      }
+      
+      showCollectionScreen() {
+        const collectionContent = document.getElementById('collection-content');
+        collectionContent.innerHTML = `
+          <h2 style="font-size: 3em; margin-bottom: 20px;">🏆 Your Collection (${this.unlockedAnimals})</h2>
+          <div class="collection-grid" id="collection-grid"></div>
+          <button id="close-collection-btn" class="unlock-btn" style="margin-top: 30px;">Close Collection</button>
+        `;
+
+        const grid = document.getElementById('collection-grid');
+        uniqueAnimals3D.slice(1).forEach((animal, index) => {
+          if (animal) {
+            const isUnlocked = localStorage.getItem(`animal_${animal.name}`) === 'unlocked';
+            const card = document.createElement('div');
+            card.className = `collection-card ${animal.rarity.toLowerCase()} ${isUnlocked ? '' : 'locked'}`;
+            card.innerHTML = `
+              <div class="rarity-subtitle">${animal.rarity}</div>
+              <div class="collection-animal-container">
+                <model-viewer src="${animal.model}" 
+                              shadow-intensity="1" 
+                              camera-controls 
+                              auto-rotate 
+                              style="width: 100%; height: 100%; --poster-color: ${animal.color};"
+                              class="collection-animal"
+                              alt="${animal.name}">
+                </model-viewer>
+              </div>
+              <div style="font-size: 1.3em; font-weight: 700;">${animal.name}</div>
+              <div style="opacity: ${isUnlocked ? '1' : '0.4'}">${isUnlocked ? '✅ Unlocked' : '🔒 Locked'}</div>
+            `;
+            grid.appendChild(card);
+          }
+        });
+
+        document.getElementById('close-collection-btn').addEventListener('click', () => {
+          document.getElementById('animal-collection-screen').style.display = 'none';
+        });
+
+        document.getElementById('animal-collection-screen').style.display = 'flex';
       }
     }
-
-    window.addEventListener('load', initGame);
+    
+    const game = new Game();
   </script>
 </body>
 </html>
