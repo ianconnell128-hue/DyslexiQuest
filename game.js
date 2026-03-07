@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v6.3 – game.js
+//  DyslexiQuest v6.4 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 const QUEST_TEMPLATES = [
@@ -944,16 +944,22 @@ class Game {
   }
 
   levelUp() {
-    this.playSFX('levelUp'); this.level++; 
+    this.playSFX('levelUp'); this.level++;
     this.maxXP = 5 + (this.level - 1) * 5; this.xp = 0;
     this.updateQuestProgress('level_up', 1);
     this.updateStats(); this.saveProfile();
+
+    // If it's an even level (2, 4, 6...), go STRAIGHT to the capture forest
+    if (this.level >= 2 && (this.level % 2 === 0)) {
+      this.checkAnimalUnlock();
+      return;
+    }
+
     const newLevelEl = document.getElementById('new-level');
     if (newLevelEl) newLevelEl.textContent = this.level;
     const levelUpModal = document.getElementById('level-up-modal');
     if (levelUpModal) levelUpModal.style.display = 'flex';
   }
-
   getAnimalForLevel() { 
     const roll = Math.random() * 100; let accumulated = 0, selectedRarity = 'Common';
     const rarities = [...RARITY_ORDER].reverse(); 
