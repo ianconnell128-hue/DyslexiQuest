@@ -432,11 +432,21 @@ const SELL_PRICES = {
 };
 
 const GEAR_SHOP = [
-  { id: 'astro_silver', name: 'Silver Space Suit', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', price: 100 },
-  { id: 'robot_gold', name: 'Golden Robot', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', price: 250 },
-  { id: 'fox_fire', name: 'Fire Fox', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb', price: 500 },
-  { id: 'cesium_elite', name: 'Elite Explorer', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', price: 1000 }
+  { id: 'suit_explorer', name: 'Explorer Suit', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', price: 150 },
+  { id: 'suit_space', name: 'Space Suit', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', price: 300 },
+  { id: 'suit_robot', name: 'Robot Armor', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', price: 500 }
 ];
+
+const AVATAR_MODELS = [
+  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb',
+  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb'
+];
+
+const COLORS = {
+  skin: ['#fde68a', '#fbbf24', '#d97706', '#92400e', '#451a03'],
+  hair: ['#451a03', '#92400e', '#d97706', '#fbbf24', '#1e293b', '#3b82f6'],
+  eye: ['#3b82f6', '#10b981', '#92400e', '#1e293b']
+};
 
 const PET_NAMES = [
   'Barnaby', 'Pip', 'Zelda', 'Finn', 'Mochi', 'Rocket', 'Luna', 'Buster', 'Cleo', 'Dash',
@@ -482,23 +492,6 @@ function parseLevels(text) {
   return result;
 }
 
-const AVATAR_MODELS = [
-  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb',
-  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb'
-];
-
-const COLORS = {
-  skin: ['#fde68a', '#fbbf24', '#d97706', '#92400e', '#451a03'],
-  hair: ['#451a03', '#92400e', '#d97706', '#fbbf24', '#1e293b', '#3b82f6'],
-  eye: ['#3b82f6', '#10b981', '#92400e', '#1e293b']
-};
-
-const GEAR_SHOP = [
-  { id: 'suit_explorer', name: 'Explorer Suit', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', price: 150 },
-  { id: 'suit_space', name: 'Space Suit', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', price: 300 },
-  { id: 'suit_robot', name: 'Robot Armor', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', price: 500 }
-];
-
 class Game {
   constructor() {
     this.level = 1; this.score = 0; this.streak = 0; this.xp = 0; this.maxXP = 100;
@@ -513,8 +506,6 @@ class Game {
     Object.entries(SFX).forEach(([key, url]) => { this.sounds[key] = new Audio(url); this.sounds[key].volume = 0.5; });
     this.initSpeechRecognition();
   }
-
-  // ... (initSpeechRecognition, start, playSFX, hideLoading, loadWordFiles)
 
   initSpeechRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
