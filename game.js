@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v3.8 – game.js
+//  DyslexiQuest v3.9 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── 3-D collectible characters ──────────────────────────────────────────────
@@ -70,59 +70,76 @@ const MODELS = {
 };
 
 const GEAR_SHOP = [
-  { id: 'item_1', name: 'Scout Hat', cat: 'Hats', model: MODELS.cesium, price: 5 },
-  { id: 'item_2', name: 'Pink Ribbon', cat: 'Hats', model: MODELS.michelle, price: 5 },
-  { id: 'item_3', name: 'Blue Scarf', cat: 'Shirts', model: MODELS.soldier, price: 8 },
-  { id: 'item_4', name: 'Goggles', cat: 'Hats', model: MODELS.astro, price: 10 },
-  { id: 'item_5', name: 'Red Boots', cat: 'Shoes', model: MODELS.figure, price: 12 },
-  { id: 'item_6', name: 'Green Shirt', cat: 'Shirts', model: MODELS.cesium, price: 15 },
-  { id: 'item_7', name: 'Cargo Pants', cat: 'Pants', model: MODELS.soldier, price: 18 },
-  { id: 'item_8', name: 'Blue Cape', cat: 'Sets', model: MODELS.figure, price: 20 },
-  { id: 'item_9', name: 'Work Pants', cat: 'Pants', model: MODELS.soldier, price: 25 },
-  { id: 'item_10', name: 'Star Badge', cat: 'Shirts', model: MODELS.astro, price: 30 },
-  { id: 'item_11', name: 'Explorer', cat: 'Sets', model: MODELS.cesium, price: 35 },
-  { id: 'item_12', name: 'Runners', cat: 'Shoes', model: MODELS.figure, price: 40 },
-  { id: 'item_13', name: 'Marine', cat: 'Sets', model: MODELS.soldier, price: 45 },
-  { id: 'item_14', name: 'Superstar', cat: 'Sets', model: MODELS.michelle, price: 50 },
-  { id: 'item_15', name: 'Cadet', cat: 'Sets', model: MODELS.astro, price: 55 },
-  { id: 'item_16', name: 'Elite Guard', cat: 'Sets', model: MODELS.soldier, price: 60 },
-  { id: 'item_17', name: 'Royal Hero', cat: 'Sets', model: MODELS.figure, price: 65 },
-  { id: 'item_18', name: 'Astro Pilot', cat: 'Sets', model: MODELS.astro, price: 70 },
-  { id: 'item_19', name: 'General', cat: 'Sets', model: MODELS.soldier, price: 75 },
-  { id: 'item_20', name: 'Commander', cat: 'Sets', model: MODELS.astro, price: 80 },
-  { id: 'item_21', name: 'Shadow Suit', cat: 'Sets', model: MODELS.soldier, price: 85 },
-  { id: 'item_22', name: 'Light Gown', cat: 'Sets', model: MODELS.figure, price: 90 },
-  { id: 'item_23', name: 'Cyber Hero', cat: 'Sets', model: MODELS.soldier, price: 95 },
-  { id: 'item_24', name: 'Robo Pilot', cat: 'Sets', model: MODELS.astro, price: 100 },
-  { id: 'item_25', name: 'Fire Suit', cat: 'Sets', model: MODELS.cesium, price: 110 },
-  { id: 'item_26', name: 'Ice Gown', cat: 'Sets', model: MODELS.figure, price: 120 },
-  { id: 'item_27', name: 'Gold Armor', cat: 'Sets', model: MODELS.soldier, price: 130 },
-  { id: 'item_28', name: 'Star Gazer', cat: 'Sets', model: MODELS.astro, price: 140 },
-  { id: 'item_29', name: 'Mythic Soul', cat: 'Sets', model: MODELS.michelle, price: 150 },
-  { id: 'item_30', name: 'Alpha Hero', cat: 'Sets', model: MODELS.soldier, price: 160 },
-  { id: 'item_31', name: 'Omega Wing', cat: 'Sets', model: MODELS.figure, price: 170 },
-  { id: 'item_32', name: 'Nova Suit', cat: 'Sets', model: MODELS.astro, price: 180 },
-  { id: 'item_33', name: 'Hiker Pants', cat: 'Pants', model: MODELS.cesium, price: 190 },
-  { id: 'item_34', name: 'Ghost Wrap', cat: 'Sets', model: MODELS.soldier, price: 200 },
-  { id: 'item_35', name: 'Sun Gown', cat: 'Sets', model: MODELS.figure, price: 210 },
-  { id: 'item_36', name: 'Moon Suit', cat: 'Sets', model: MODELS.astro, price: 220 },
-  { id: 'item_37', name: 'Sky Rider', cat: 'Sets', model: MODELS.cesium, price: 230 },
-  { id: 'item_38', name: 'Earth Hero', cat: 'Sets', model: MODELS.soldier, price: 240 },
-  { id: 'item_39', name: 'Wind Gown', cat: 'Sets', model: MODELS.figure, price: 250 },
-  { id: 'item_40', name: 'Titan Armor', cat: 'Sets', model: MODELS.soldier, price: 260 },
-  { id: 'item_41', name: 'Divine Suit', cat: 'Sets', model: MODELS.michelle, price: 270 },
-  { id: 'item_42', name: 'Stellar Garb', cat: 'Sets', model: MODELS.astro, price: 280 },
-  { id: 'item_43', name: 'Ancient Wrap', cat: 'Pants', model: MODELS.cesium, price: 290 },
-  { id: 'item_44', name: 'Future Hero', cat: 'Sets', model: MODELS.soldier, price: 300 },
-  { id: 'item_45', name: 'Magic Gown', cat: 'Sets', model: MODELS.figure, price: 350 },
-  { id: 'item_46', name: 'Grand Master', cat: 'Sets', model: MODELS.cesium, price: 400 },
-  { id: 'item_47', name: 'Galaxy King', cat: 'Sets', model: MODELS.astro, price: 450 },
-  { id: 'item_48', name: 'Universe Hero', cat: 'Sets', model: MODELS.soldier, price: 500 },
-  { id: 'item_49', name: 'Legendary One', cat: 'Sets', model: MODELS.michelle, price: 750 },
-  { id: 'item_50', name: 'Ultimate God', cat: 'Sets', model: MODELS.figure, price: 1000 }
+  // HATS (15 items)
+  { id: 'hat_1', name: 'Scout Hat', cat: 'Hats', model: MODELS.cesium, price: 5 },
+  { id: 'hat_2', name: 'Pink Ribbon', cat: 'Hats', model: MODELS.michelle, price: 5 },
+  { id: 'hat_3', name: 'Goggles', cat: 'Hats', model: MODELS.astro, price: 10 },
+  { id: 'hat_4', name: 'Red Cap', cat: 'Hats', model: MODELS.soldier, price: 15 },
+  { id: 'hat_5', name: 'Blue Beanie', cat: 'Hats', model: MODELS.cesium, price: 15 },
+  { id: 'hat_6', name: 'Straw Hat', cat: 'Hats', model: MODELS.figure, price: 20 },
+  { id: 'hat_7', name: 'Crown', cat: 'Hats', model: MODELS.michelle, price: 50 },
+  { id: 'hat_8', name: 'Viking Horns', cat: 'Hats', model: MODELS.soldier, price: 40 },
+  { id: 'hat_9', name: 'Space Helm', cat: 'Hats', model: MODELS.astro, price: 60 },
+  { id: 'hat_10', name: 'Magic Hat', cat: 'Hats', model: MODELS.cesium, price: 45 },
+  { id: 'hat_11', name: 'Cowboy Hat', cat: 'Hats', model: MODELS.figure, price: 25 },
+  { id: 'hat_12', name: 'Tiara', cat: 'Hats', model: MODELS.michelle, price: 35 },
+  { id: 'hat_13', name: 'Fedora', cat: 'Hats', model: MODELS.soldier, price: 30 },
+  { id: 'hat_14', name: 'Winter Cap', cat: 'Hats', model: MODELS.cesium, price: 10 },
+  { id: 'hat_15', name: 'Pilot Cap', cat: 'Hats', model: MODELS.astro, price: 55 },
+
+  // SHIRTS (15 items)
+  { id: 'shirt_1', name: 'Blue Scarf', cat: 'Shirts', model: MODELS.soldier, price: 8 },
+  { id: 'shirt_2', name: 'Green Shirt', cat: 'Shirts', model: MODELS.cesium, price: 15 },
+  { id: 'shirt_3', name: 'Yellow Vest', cat: 'Shirts', model: MODELS.soldier, price: 18 },
+  { id: 'shirt_4', name: 'Star Badge', cat: 'Shirts', model: MODELS.astro, price: 30 },
+  { id: 'shirt_5', name: 'Red Tee', cat: 'Shirts', model: MODELS.figure, price: 10 },
+  { id: 'shirt_6', name: 'Nature Tee', cat: 'Shirts', model: MODELS.cesium, price: 12 },
+  { id: 'shirt_7', name: 'Hero Cape', cat: 'Shirts', model: MODELS.figure, price: 45 },
+  { id: 'shirt_8', name: 'Armor Plate', cat: 'Shirts', model: MODELS.soldier, price: 60 },
+  { id: 'shirt_9', name: 'Space Suit Top', cat: 'Shirts', model: MODELS.astro, price: 70 },
+  { id: 'shirt_10', name: 'Fancy Tunic', cat: 'Shirts', model: MODELS.michelle, price: 40 },
+  { id: 'shirt_11', name: 'Explorer Shirt', cat: 'Shirts', model: MODELS.cesium, price: 25 },
+  { id: 'shirt_12', name: 'Training Gear', cat: 'Shirts', model: MODELS.figure, price: 20 },
+  { id: 'shirt_13', name: 'Commander Top', cat: 'Shirts', model: MODELS.soldier, price: 80 },
+  { id: 'shirt_14', name: 'Graphic Tee', cat: 'Shirts', model: MODELS.michelle, price: 15 },
+  { id: 'shirt_15', name: 'Winter Parka', cat: 'Shirts', model: MODELS.cesium, price: 35 },
+
+  // SHOES (15 items)
+  { id: 'shoes_1', name: 'Red Boots', cat: 'Shoes', model: MODELS.figure, price: 12 },
+  { id: 'shoes_2', name: 'Runners', cat: 'Shoes', model: MODELS.figure, price: 40 },
+  { id: 'shoes_3', name: 'Fast Shoes', cat: 'Shoes', model: MODELS.cesium, price: 25 },
+  { id: 'shoes_4', name: 'Heavy Boots', cat: 'Shoes', model: MODELS.soldier, price: 30 },
+  { id: 'shoes_5', name: 'Space Boots', cat: 'Shoes', model: MODELS.astro, price: 50 },
+  { id: 'shoes_6', name: 'Sandals', cat: 'Shoes', model: MODELS.figure, price: 10 },
+  { id: 'shoes_7', name: 'Golden Shoes', cat: 'Shoes', model: MODELS.michelle, price: 100 },
+  { id: 'shoes_8', name: 'Sneakers', cat: 'Shoes', model: MODELS.cesium, price: 20 },
+  { id: 'shoes_9', name: 'Combat Boots', cat: 'Shoes', model: MODELS.soldier, price: 45 },
+  { id: 'shoes_10', name: 'Moon Walkers', cat: 'Shoes', model: MODELS.astro, price: 75 },
+  { id: 'shoes_11', name: 'Ballet Flats', cat: 'Shoes', model: MODELS.michelle, price: 35 },
+  { id: 'shoes_12', name: 'Hiking Boots', cat: 'Shoes', model: MODELS.cesium, price: 30 },
+  { id: 'shoes_13', name: 'Royal Slippers', cat: 'Shoes', model: MODELS.figure, price: 60 },
+  { id: 'shoes_14', name: 'Iron Sabatons', cat: 'Shoes', model: MODELS.soldier, price: 80 },
+  { id: 'shoes_15', name: 'Jump Shoes', cat: 'Shoes', model: MODELS.astro, price: 90 },
+
+  // SETS (15 items)
+  { id: 'set_1', name: 'Blue Cape Set', cat: 'Sets', model: MODELS.figure, price: 20 },
+  { id: 'set_2', name: 'Iron Gloves Set', cat: 'Sets', model: MODELS.soldier, price: 25 },
+  { id: 'set_3', name: 'Explorer Set', cat: 'Sets', model: MODELS.cesium, price: 35 },
+  { id: 'set_4', name: 'Dancer Set', cat: 'Sets', model: MODELS.figure, price: 40 },
+  { id: 'set_5', name: 'Marine Set', cat: 'Sets', model: MODELS.soldier, price: 45 },
+  { id: 'set_6', name: 'Superstar Set', cat: 'Sets', model: MODELS.michelle, price: 50 },
+  { id: 'set_7', name: 'Cadet Set', cat: 'Sets', model: MODELS.astro, price: 55 },
+  { id: 'set_8', name: 'Elite Guard Set', cat: 'Sets', model: MODELS.soldier, price: 60 },
+  { id: 'set_9', name: 'Royal Hero Set', cat: 'Sets', model: MODELS.figure, price: 65 },
+  { id: 'set_10', name: 'Astro Pilot Set', cat: 'Sets', model: MODELS.astro, price: 70 },
+  { id: 'set_11', name: 'General Set', cat: 'Sets', model: MODELS.soldier, price: 75 },
+  { id: 'set_12', name: 'Commander Set', cat: 'Sets', model: MODELS.astro, price: 80 },
+  { id: 'set_13', name: 'Shadow Suit Set', cat: 'Sets', model: MODELS.soldier, price: 85 },
+  { id: 'set_14', name: 'Mythic Soul Set', cat: 'Sets', model: MODELS.michelle, price: 150 },
+  { id: 'set_15', name: 'Ultimate God Set', cat: 'Sets', model: MODELS.figure, price: 1000 }
 ];
 
-const SHOP_CATEGORIES = ['Hats', 'Shirts', 'Pants', 'Shoes', 'Sets'];
+const SHOP_CATEGORIES = ['Hats', 'Shirts', 'Shoes', 'Sets'];
 
 const AVATAR_MODELS = {
   male: MODELS.soldier,
@@ -347,12 +364,12 @@ class Game {
         }
         
         const btn = document.createElement('button');
-        btn.style.width = '80px'; btn.style.height = '80px'; btn.style.flexShrink = '0';
+        btn.style.width = '80px'; btn.style.height = '100px'; btn.style.flexShrink = '0';
         btn.style.padding = '5px'; btn.style.fontSize = '0.7rem'; btn.style.border = '2px solid #e2e8f0';
         btn.style.borderRadius = '12px'; btn.style.background = 'white';
         if (this.avatarModel === modelUrl) btn.style.borderColor = 'var(--primary)';
         
-        btn.innerHTML = `<div style="height:40px"><model-viewer src="${modelUrl}" auto-rotate style="width:100%;height:100%"></model-viewer></div><div>${gearInfo.name}</div>`;
+        btn.innerHTML = `<div style="height:60px"><model-viewer src="${modelUrl}" auto-rotate style="width:100%;height:100%"></model-viewer></div><div style="margin-top:5px; line-height:1.1;">${gearInfo.name}</div>`;
         btn.onclick = () => {
           this.avatarModel = modelUrl;
           this.playSFX('click');
@@ -413,10 +430,11 @@ class Game {
         content.insertBefore(tabs, gearList.parentNode);
       } else {
         [...tabs.children].forEach(b => b.classList.remove('active'));
-        tabs.children[SHOP_CATEGORIES.indexOf('Sets')].classList.add('active');
+        const activeIdx = SHOP_CATEGORIES.indexOf(currentMyGearCat);
+        if (activeIdx !== -1) tabs.children[activeIdx].classList.add('active');
       }
 
-      renderMyGear('Sets');
+      renderMyGear(currentMyGearCat);
 
       document.getElementById('save-avatar-btn').onclick = () => {
         this.playSFX('click'); this.saveProfile(); screen.style.display = 'none';
@@ -641,6 +659,10 @@ class Game {
         tabs.appendChild(btn);
       });
       buyView.insertBefore(tabs, buyList);
+    } else {
+      [...tabs.children].forEach(b => b.classList.remove('active'));
+      const activeIdx = SHOP_CATEGORIES.indexOf(currentBuyCat);
+      if (activeIdx !== -1) tabs.children[activeIdx].classList.add('active');
     }
 
     document.getElementById('shop-tab-sell').onclick = (e) => {
