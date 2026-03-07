@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v6.5 – game.js
+//  DyslexiQuest v6.6 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 const QUEST_TEMPLATES = [
@@ -150,7 +150,9 @@ const GEAR_SHOP = [
   { id: 'shoes_14', name: 'Iron Sabatons', cat: 'Shoes', model: MODELS.soldier, price: 320 },
   { id: 'shoes_15', name: 'Jump Shoes', cat: 'Shoes', model: MODELS.astro, price: 400 },
 
-  // SETS (15 items) - High End Prices ($500 - $5000)
+  // SETS (17 items) - High End Prices ($0 - $5000)
+  { id: 'set_0m', name: 'Base Boy', cat: 'Sets', model: MODELS.soldier, price: 0 },
+  { id: 'set_0f', name: 'Base Girl', cat: 'Sets', model: MODELS.michelle, price: 0 },
   { id: 'set_1', name: 'Hero Spirit', cat: 'Sets', model: MODELS.figure, price: 500 },
   { id: 'set_2', name: 'Iron Knight', cat: 'Sets', model: MODELS.soldier, price: 750 },
   { id: 'set_3', name: 'Explorer Form', cat: 'Sets', model: MODELS.cesium, price: 600 },
