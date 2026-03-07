@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v6.2 – game.js
+//  DyslexiQuest v6.3 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 const QUEST_TEMPLATES = [
@@ -240,6 +240,7 @@ class Game {
     this.avatarColors = { skin: COLORS.skin[0], hair: COLORS.hair[0], eye: COLORS.eye[0] };
     this.activeQuests = []; this.lastQuestRefresh = null;
     this.equippedPet = null; this.bgm = new Audio(BGM_URL); this.bgm.loop = true; this.bgm.volume = 0.2;
+    this.musicEnabled = true;
     this.dyslexicFont = false;
     this.wordBank = { en: {}, fr: {} }; this.users = JSON.parse(localStorage.getItem('dyslexiquest_users')) || {};
     this.currentUser = null; this.canClick = true; this.attemptsForCurrentWord = 0; this.currentAudio = null;
@@ -339,6 +340,7 @@ class Game {
     this.avatarColors = u.avatarColors || { skin: COLORS.skin[0], hair: COLORS.hair[0], eye: COLORS.eye[0] };
     this.activeQuests = u.activeQuests || []; this.lastQuestRefresh = u.lastQuestRefresh || null;
     this.equippedPet = u.equippedPet || null; this.dyslexicFont = u.dyslexicFont || false;
+    this.musicEnabled = (u.musicEnabled !== undefined) ? u.musicEnabled : true;
     this.startGameplay();
   }
 
@@ -365,7 +367,8 @@ class Game {
       gender: this.gender, avatarModel: this.avatarModel, nextUnlockLevel: this.nextUnlockLevel,
       coins: this.coins, unlockedAvatars: this.unlockedAvatars, avatarColors: this.avatarColors,
       activeQuests: this.activeQuests, lastQuestRefresh: this.lastQuestRefresh,
-      equippedPet: this.equippedPet, dyslexicFont: this.dyslexicFont
+      equippedPet: this.equippedPet, dyslexicFont: this.dyslexicFont,
+      musicEnabled: this.musicEnabled
     };
     localStorage.setItem('dyslexiquest_users', JSON.stringify(this.users));
   }
@@ -501,6 +504,7 @@ class Game {
     document.getElementById('start-overlay').style.display = 'none'; 
     this.updateStats(); this.updateCollectionButton(); this.populateVoiceList(); 
     this.checkDailyRefresh(); this.updateGameplayVisuals(); this.setFont(this.dyslexicFont);
+    this.setMusic(this.musicEnabled);
     
     // Check if we are overdue for a treasure (like if the user is level 30 but has none)
     if (this.level >= this.nextUnlockLevel) {
@@ -509,7 +513,21 @@ class Game {
       this.newTarget(); 
     }
     
-    document.addEventListener('click', () => { this.bgm.play().catch(() => {}); }, { once: true });
+    document.addEventListener('click', () => { 
+      if (this.musicEnabled) this.bgm.play().catch(() => {}); 
+    }, { once: true });
+  }
+
+  setMusic(enabled) {
+    this.musicEnabled = enabled;
+    if (enabled) {
+      this.bgm.play().catch(() => {});
+    } else {
+      this.bgm.pause();
+    }
+    document.getElementById('music-on-btn')?.classList.toggle('active', enabled);
+    document.getElementById('music-off-btn')?.classList.toggle('active', !enabled);
+    this.saveProfile();
   }
 
   setFont(isDyslexic) {
@@ -1269,6 +1287,8 @@ class Game {
     document.getElementById('quests-btn-top')?.addEventListener('click', () => this.showQuestsScreen());
     document.getElementById('font-standard-btn')?.addEventListener('click', () => this.setFont(false));
     document.getElementById('font-dyslexic-btn')?.addEventListener('click', () => this.setFont(true));
+    document.getElementById('music-on-btn')?.addEventListener('click', () => this.setMusic(true));
+    document.getElementById('music-off-btn')?.addEventListener('click', () => this.setMusic(false));
     document.getElementById('close-quests-btn')?.addEventListener('click', () => { this.playSFX('click'); document.getElementById('quests-screen').style.display = 'none'; });
     document.getElementById('shop-btn').addEventListener('click', () => this.showShopScreen());
     document.getElementById('shop-btn-sidebar')?.addEventListener('click', () => this.showShopScreen());
