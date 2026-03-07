@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v3.5 – game.js
+//  DyslexiQuest v3.6 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── 3-D collectible characters ──────────────────────────────────────────────
@@ -70,57 +70,59 @@ const MODELS = {
 };
 
 const GEAR_SHOP = [
-  { id: 'item_1', name: 'Scout Hat', model: MODELS.cesium, price: 5 },
-  { id: 'item_2', name: 'Pink Ribbon', model: MODELS.michelle, price: 5 },
-  { id: 'item_3', name: 'Blue Scarf', model: MODELS.soldier, price: 8 },
-  { id: 'item_4', name: 'Goggles', model: MODELS.astro, price: 10 },
-  { id: 'item_5', name: 'Red Boots', model: MODELS.figure, price: 12 },
-  { id: 'item_6', name: 'Green Shirt', model: MODELS.cesium, price: 15 },
-  { id: 'item_7', name: 'Yellow Vest', model: MODELS.soldier, price: 18 },
-  { id: 'item_8', name: 'Blue Cape', model: MODELS.figure, price: 20 },
-  { id: 'item_9', name: 'Iron Gloves', model: MODELS.soldier, price: 25 },
-  { id: 'item_10', name: 'Star Badge', model: MODELS.astro, price: 30 },
-  { id: 'item_11', name: 'Explorer', model: MODELS.cesium, price: 35 },
-  { id: 'item_12', name: 'Dancer', model: MODELS.figure, price: 40 },
-  { id: 'item_13', name: 'Marine', model: MODELS.soldier, price: 45 },
-  { id: 'item_14', name: 'Superstar', model: MODELS.michelle, price: 50 },
-  { id: 'item_15', name: 'Cadet', model: MODELS.astro, price: 55 },
-  { id: 'item_16', name: 'Elite Guard', model: MODELS.soldier, price: 60 },
-  { id: 'item_17', name: 'Royal Hero', model: MODELS.figure, price: 65 },
-  { id: 'item_18', name: 'Astro Pilot', model: MODELS.astro, price: 70 },
-  { id: 'item_19', name: 'General', model: MODELS.soldier, price: 75 },
-  { id: 'item_20', name: 'Commander', model: MODELS.astro, price: 80 },
-  { id: 'item_21', name: 'Shadow Suit', model: MODELS.soldier, price: 85 },
-  { id: 'item_22', name: 'Light Gown', model: MODELS.figure, price: 90 },
-  { id: 'item_23', name: 'Cyber Hero', model: MODELS.soldier, price: 95 },
-  { id: 'item_24', name: 'Robo Pilot', model: MODELS.astro, price: 100 },
-  { id: 'item_25', name: 'Fire Suit', model: MODELS.cesium, price: 110 },
-  { id: 'item_26', name: 'Ice Gown', model: MODELS.figure, price: 120 },
-  { id: 'item_27', name: 'Gold Armor', model: MODELS.soldier, price: 130 },
-  { id: 'item_28', name: 'Star Gazer', model: MODELS.astro, price: 140 },
-  { id: 'item_29', name: 'Mythic Soul', model: MODELS.michelle, price: 150 },
-  { id: 'item_30', name: 'Alpha Hero', model: MODELS.soldier, price: 160 },
-  { id: 'item_31', name: 'Omega Wing', model: MODELS.figure, price: 170 },
-  { id: 'item_32', name: 'Nova Suit', model: MODELS.astro, price: 180 },
-  { id: 'item_33', name: 'Primal Garb', model: MODELS.cesium, price: 190 },
-  { id: 'item_34', name: 'Ghost Wrap', model: MODELS.soldier, price: 200 },
-  { id: 'item_35', name: 'Sun Gown', model: MODELS.figure, price: 210 },
-  { id: 'item_36', name: 'Moon Suit', model: MODELS.astro, price: 220 },
-  { id: 'item_37', name: 'Sky Rider', model: MODELS.cesium, price: 230 },
-  { id: 'item_38', name: 'Earth Hero', model: MODELS.soldier, price: 240 },
-  { id: 'item_39', name: 'Wind Gown', model: MODELS.figure, price: 250 },
-  { id: 'item_40', name: 'Titan Armor', model: MODELS.soldier, price: 260 },
-  { id: 'item_41', name: 'Divine Suit', model: MODELS.michelle, price: 270 },
-  { id: 'item_42', name: 'Stellar Garb', model: MODELS.astro, price: 280 },
-  { id: 'item_43', name: 'Ancient Wrap', model: MODELS.cesium, price: 290 },
-  { id: 'item_44', name: 'Future Hero', model: MODELS.soldier, price: 300 },
-  { id: 'item_45', name: 'Magic Gown', model: MODELS.figure, price: 350 },
-  { id: 'item_46', name: 'Grand Master', model: MODELS.cesium, price: 400 },
-  { id: 'item_47', name: 'Galaxy King', model: MODELS.astro, price: 450 },
-  { id: 'item_48', name: 'Universe Hero', model: MODELS.soldier, price: 500 },
-  { id: 'item_49', name: 'Legendary One', model: MODELS.michelle, price: 750 },
-  { id: 'item_50', name: 'Ultimate God', model: MODELS.figure, price: 1000 }
+  { id: 'item_1', name: 'Scout Hat', cat: 'Hats', model: MODELS.cesium, price: 5 },
+  { id: 'item_2', name: 'Pink Ribbon', cat: 'Hats', model: MODELS.michelle, price: 5 },
+  { id: 'item_3', name: 'Blue Scarf', cat: 'Shirts', model: MODELS.soldier, price: 8 },
+  { id: 'item_4', name: 'Goggles', cat: 'Hats', model: MODELS.astro, price: 10 },
+  { id: 'item_5', name: 'Red Boots', cat: 'Shoes', model: MODELS.figure, price: 12 },
+  { id: 'item_6', name: 'Green Shirt', cat: 'Shirts', model: MODELS.cesium, price: 15 },
+  { id: 'item_7', name: 'Yellow Vest', cat: 'Shirts', model: MODELS.soldier, price: 18 },
+  { id: 'item_8', name: 'Blue Cape', cat: 'Sets', model: MODELS.figure, price: 20 },
+  { id: 'item_9', name: 'Iron Gloves', cat: 'Sets', model: MODELS.soldier, price: 25 },
+  { id: 'item_10', name: 'Star Badge', cat: 'Shirts', model: MODELS.astro, price: 30 },
+  { id: 'item_11', name: 'Explorer', cat: 'Sets', model: MODELS.cesium, price: 35 },
+  { id: 'item_12', name: 'Dancer', cat: 'Sets', model: MODELS.figure, price: 40 },
+  { id: 'item_13', name: 'Marine', cat: 'Sets', model: MODELS.soldier, price: 45 },
+  { id: 'item_14', name: 'Superstar', cat: 'Sets', model: MODELS.michelle, price: 50 },
+  { id: 'item_15', name: 'Cadet', cat: 'Sets', model: MODELS.astro, price: 55 },
+  { id: 'item_16', name: 'Elite Guard', cat: 'Sets', model: MODELS.soldier, price: 60 },
+  { id: 'item_17', name: 'Royal Hero', cat: 'Sets', model: MODELS.figure, price: 65 },
+  { id: 'item_18', name: 'Astro Pilot', cat: 'Sets', model: MODELS.astro, price: 70 },
+  { id: 'item_19', name: 'General', cat: 'Sets', model: MODELS.soldier, price: 75 },
+  { id: 'item_20', name: 'Commander', cat: 'Sets', model: MODELS.astro, price: 80 },
+  { id: 'item_21', name: 'Shadow Suit', cat: 'Sets', model: MODELS.soldier, price: 85 },
+  { id: 'item_22', name: 'Light Gown', cat: 'Sets', model: MODELS.figure, price: 90 },
+  { id: 'item_23', name: 'Cyber Hero', cat: 'Sets', model: MODELS.soldier, price: 95 },
+  { id: 'item_24', name: 'Robo Pilot', cat: 'Sets', model: MODELS.astro, price: 100 },
+  { id: 'item_25', name: 'Fire Suit', cat: 'Sets', model: MODELS.cesium, price: 110 },
+  { id: 'item_26', name: 'Ice Gown', cat: 'Sets', model: MODELS.figure, price: 120 },
+  { id: 'item_27', name: 'Gold Armor', cat: 'Sets', model: MODELS.soldier, price: 130 },
+  { id: 'item_28', name: 'Star Gazer', cat: 'Sets', model: MODELS.astro, price: 140 },
+  { id: 'item_29', name: 'Mythic Soul', cat: 'Sets', model: MODELS.michelle, price: 150 },
+  { id: 'item_30', name: 'Alpha Hero', cat: 'Sets', model: MODELS.soldier, price: 160 },
+  { id: 'item_31', name: 'Omega Wing', cat: 'Sets', model: MODELS.figure, price: 170 },
+  { id: 'item_32', name: 'Nova Suit', cat: 'Sets', model: MODELS.astro, price: 180 },
+  { id: 'item_33', name: 'Primal Garb', cat: 'Sets', model: MODELS.cesium, price: 190 },
+  { id: 'item_34', name: 'Ghost Wrap', cat: 'Sets', model: MODELS.soldier, price: 200 },
+  { id: 'item_35', name: 'Sun Gown', cat: 'Sets', model: MODELS.figure, price: 210 },
+  { id: 'item_36', name: 'Moon Suit', cat: 'Sets', model: MODELS.astro, price: 220 },
+  { id: 'item_37', name: 'Sky Rider', cat: 'Sets', model: MODELS.cesium, price: 230 },
+  { id: 'item_38', name: 'Earth Hero', cat: 'Sets', model: MODELS.soldier, price: 240 },
+  { id: 'item_39', name: 'Wind Gown', cat: 'Sets', model: MODELS.figure, price: 250 },
+  { id: 'item_40', name: 'Titan Armor', cat: 'Sets', model: MODELS.soldier, price: 260 },
+  { id: 'item_41', name: 'Divine Suit', cat: 'Sets', model: MODELS.michelle, price: 270 },
+  { id: 'item_42', name: 'Stellar Garb', cat: 'Sets', model: MODELS.astro, price: 280 },
+  { id: 'item_43', name: 'Ancient Wrap', cat: 'Sets', model: MODELS.cesium, price: 290 },
+  { id: 'item_44', name: 'Future Hero', cat: 'Sets', model: MODELS.soldier, price: 300 },
+  { id: 'item_45', name: 'Magic Gown', cat: 'Sets', model: MODELS.figure, price: 350 },
+  { id: 'item_46', name: 'Grand Master', cat: 'Sets', model: MODELS.cesium, price: 400 },
+  { id: 'item_47', name: 'Galaxy King', cat: 'Sets', model: MODELS.astro, price: 450 },
+  { id: 'item_48', name: 'Universe Hero', cat: 'Sets', model: MODELS.soldier, price: 500 },
+  { id: 'item_49', name: 'Legendary One', cat: 'Sets', model: MODELS.michelle, price: 750 },
+  { id: 'item_50', name: 'Ultimate God', cat: 'Sets', model: MODELS.figure, price: 1000 }
 ];
+
+const SHOP_CATEGORIES = ['Hats', 'Shirts', 'Pants', 'Shoes', 'Sets'];
 
 const AVATAR_MODELS = {
   male: MODELS.soldier,
@@ -537,13 +539,33 @@ class Game {
   showShopScreen() {
     this.playSFX('click');
     const screen = document.getElementById('shop-screen');
-    const sellList = document.getElementById('shop-sell-list');
     const buyList = document.getElementById('shop-buy-list');
-    
+    const sellList = document.getElementById('shop-sell-list');
+    let currentBuyCat = 'Hats';
+
+    const renderBuy = (cat) => {
+      buyList.innerHTML = '';
+      const items = GEAR_SHOP.filter(g => g.cat === cat);
+      items.forEach(item => {
+        const isOwned = this.unlockedAvatars.includes(item.model);
+        const card = document.createElement('div');
+        card.className = 'collection-card';
+        card.innerHTML = `
+          <div style="font-weight: 800; font-size: 0.9rem;">${item.name}</div>
+          <div style="height: 80px;"><model-viewer src="${item.model}" auto-rotate style="width:100%; height:100%;"></model-viewer></div>
+          <button class="${isOwned ? '' : 'accent'}" style="margin-top: 10px; font-size: 0.8rem; padding: 8px;" ${isOwned ? 'disabled' : ''}>
+            ${isOwned ? 'Owned' : `Buy 🪙${item.price}`}
+          </button>
+        `;
+        if (!isOwned) card.querySelector('button').onclick = () => this.performBuyGear(item);
+        buyList.appendChild(card);
+      });
+    };
+
     const renderSell = () => {
       sellList.innerHTML = '';
       if (this.unlockedAnimals.length === 0) {
-        sellList.innerHTML = '<p style="grid-column: 1/-1; color: var(--text-light); margin-top: 20px;">No treasures to sell yet!</p>';
+        sellList.innerHTML = '<p style="grid-column: 1/-1; color: var(--text-light);">No treasures to sell yet!</p>';
         return;
       }
       this.unlockedAnimals.forEach((ua, index) => {
@@ -552,35 +574,37 @@ class Game {
         const price = SELL_PRICES[data.rarity] || 10;
         const card = document.createElement('div');
         card.className = 'collection-card';
-        card.style.padding = '10px';
         card.innerHTML = `
           <div style="font-weight: 800; font-size: 0.9rem;">${ua.petName}</div>
           <div style="font-size: 0.7rem; color: var(--text-light);">${data.rarity}</div>
-          <button class="primary" style="margin-top: 10px; font-size: 0.8rem; padding: 8px;">Sell for 🪙${price}</button>
+          <button class="primary" style="margin-top: 10px; font-size: 0.8rem; padding: 8px;">Sell 🪙${price}</button>
         `;
         card.querySelector('button').onclick = () => this.performSell(index, price);
         sellList.appendChild(card);
       });
     };
 
-    const renderBuy = () => {
-      buyList.innerHTML = '';
-      GEAR_SHOP.forEach(item => {
-        const isOwned = this.unlockedAvatars.includes(item.model);
-        const card = document.createElement('div');
-        card.className = 'collection-card';
-        card.style.padding = '10px';
-        card.innerHTML = `
-          <div style="font-weight: 800; font-size: 0.9rem;">${item.name}</div>
-          <div style="height: 80px;"><model-viewer src="${item.model}" auto-rotate style="width:100%; height:100%;"></model-viewer></div>
-          <button class="${isOwned ? '' : 'accent'}" style="margin-top: 10px; font-size: 0.8rem; padding: 8px;" ${isOwned ? 'disabled' : ''}>
-            ${isOwned ? 'Owned' : `Buy for 🪙${item.price}`}
-          </button>
-        `;
-        if (!isOwned) card.querySelector('button').onclick = () => this.performBuyGear(item);
-        buyList.appendChild(card);
+    const buyView = document.getElementById('shop-buy-view');
+    // Clear and Add category buttons to buy view
+    let tabs = buyView.querySelector('.cat-tabs');
+    if (!tabs) {
+      tabs = document.createElement('div');
+      tabs.className = 'cat-tabs';
+      tabs.style.display = 'flex'; tabs.style.gap = '5px'; tabs.style.overflowX = 'auto'; tabs.style.marginBottom = '15px'; tabs.style.padding = '5px';
+      SHOP_CATEGORIES.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.textContent = cat; btn.style.fontSize = '0.7rem'; btn.style.padding = '8px'; btn.style.width = 'auto';
+        btn.onclick = () => {
+          currentBuyCat = cat;
+          [...tabs.children].forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderBuy(cat);
+        };
+        if (cat === 'Hats') btn.classList.add('active');
+        tabs.appendChild(btn);
       });
-    };
+      buyView.insertBefore(tabs, buyList);
+    }
 
     document.getElementById('shop-tab-sell').onclick = (e) => {
       e.target.classList.add('active'); document.getElementById('shop-tab-buy').classList.remove('active');
@@ -590,7 +614,7 @@ class Game {
     document.getElementById('shop-tab-buy').onclick = (e) => {
       e.target.classList.add('active'); document.getElementById('shop-tab-sell').classList.remove('active');
       document.getElementById('shop-sell-view').style.display = 'none'; document.getElementById('shop-buy-view').style.display = 'block';
-      renderBuy();
+      renderBuy(currentBuyCat);
     };
 
     renderSell();
@@ -605,7 +629,7 @@ class Game {
     this.playSFX('correct');
     this.saveProfile();
     this.updateStats();
-    this.showShopScreen(); // Refresh
+    this.showShopScreen();
   }
 
   performBuyGear(item) {
@@ -619,7 +643,7 @@ class Game {
     this.playSFX('correct');
     this.saveProfile();
     this.updateStats();
-    this.showShopScreen(); // Refresh
+    this.showShopScreen();
   }
 
   levelUp() {
@@ -638,7 +662,7 @@ class Game {
 
   checkAnimalUnlock() {
     if (this.level > 1 && this.level >= this.nextUnlockLevel) { 
-      this.nextUnlockLevel = this.level + Math.floor(Math.random() * 8) + 1; // 1-8 levels from now
+      this.nextUnlockLevel = this.level + Math.floor(Math.random() * 8) + 1;
       this.saveProfile();
       const animal = this.getAnimalForLevel(); 
       if (animal) this.startCatchingSequence(animal); 
@@ -710,14 +734,12 @@ class Game {
     const startX = avatarRect.left + avatarRect.width / 2;
     const startY = avatarRect.top + avatarRect.height / 2;
 
-    // Create blue power projectile
     const power = document.createElement('div');
     power.className = 'blue-power';
     power.style.left = `${startX}px`;
     power.style.top = `${startY}px`;
     document.body.appendChild(power);
 
-    // Animate to model
     requestAnimationFrame(() => {
       power.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
       power.style.left = `${modelRect.left + modelRect.width / 2}px`;
@@ -732,29 +754,23 @@ class Game {
   }
 
   condenseToSpikyBall(animal, rect) {
-    // Hide model
     document.getElementById('catch-model').style.opacity = '0';
-    
-    // Create spiky ball
     const ball = document.createElement('div');
     ball.className = 'spiky-ball';
     ball.style.background = animal.color;
-    ball.style.color = animal.color; // For spikes
+    ball.style.color = animal.color;
     ball.style.left = `${rect.left + rect.width / 2 - 40}px`;
     ball.style.top = `${rect.top + rect.height / 2 - 40}px`;
     ball.style.transform = 'scale(0)';
     
-    // Add spikes
     for (let i = 0; i < 12; i++) {
       const spike = document.createElement('div');
       spike.className = 'spike';
       spike.style.transform = `rotate(${i * 30}deg)`;
       ball.appendChild(spike);
     }
-    
     document.body.appendChild(ball);
 
-    // Animate ball appearing
     requestAnimationFrame(() => {
       ball.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
       ball.style.transform = 'scale(1)';
@@ -767,7 +783,6 @@ class Game {
 
   animateBallToChest(ball, animal) {
     const endRect = document.getElementById('chest-container').getBoundingClientRect();
-    
     ball.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
     ball.style.left = `${endRect.left}px`;
     ball.style.top = `${endRect.top}px`;
@@ -779,13 +794,11 @@ class Game {
       document.getElementById('catching-screen').style.display = 'none';
       document.getElementById('catch-model').style.opacity = '1';
       
-      // Finalize unlock
       const usedNames = this.unlockedAnimals.map(u => u.petName), availableNames = PET_NAMES.filter(n => !usedNames.includes(n));
       const petName = availableNames[Math.floor(Math.random() * availableNames.length)] || `${animal.name} #${this.unlockedAnimals.length + 1}`;
       this.unlockedAnimals.push({ animalName: animal.name, petName: petName, level: this.level });
       this.updateCollectionButton(); this.saveProfile();
       
-      // Visual feedback on chest
       document.getElementById('chest-container').style.transform = 'scale(1.5) rotate(15deg)';
       setTimeout(() => { 
         document.getElementById('chest-container').style.transform = 'scale(1) rotate(0deg)'; 
@@ -795,6 +808,38 @@ class Game {
       
       this.newTarget();
     }, 800);
+  }
+
+  showStoreScreen() {
+    this.playSFX('click'); const container = document.getElementById('store-trade-list'); container.innerHTML = '';
+    const counts = {}; RARITY_ORDER.forEach(r => counts[r] = 0);
+    this.unlockedAnimals.forEach(ua => { const data = ANIMALS.find(a => a.name === ua.animalName); if (data) counts[data.rarity]++; });
+    RARITY_ORDER.slice(0, -1).forEach((rarity, index) => {
+      const nextRarity = RARITY_ORDER[index + 1], count = counts[rarity], canTrade = count >= 3;
+      const row = document.createElement('div'); row.className = 'collection-card'; row.style.flexDirection = 'row'; row.style.justifyContent = 'space-between'; row.style.width = '100%'; row.style.padding = '20px';
+      row.innerHTML = `<div style="text-align: left;"><div style="font-weight: 800; color: var(--text);">Trade 3 ${rarity}s</div><div style="font-size: 0.8rem; color: var(--text-light);">You have: <b>${count}</b></div></div><div style="font-size: 1.5rem;">→</div><div style="text-align: right;"><div class="rarity-display rarity-${nextRarity.toLowerCase()}" style="margin-bottom: 5px;">${nextRarity}</div><button class="${canTrade ? 'accent' : ''}" style="width: auto; padding: 8px 20px; font-size: 0.9rem;" ${canTrade ? '' : 'disabled'}>Trade In!</button></div>`;
+      if (canTrade) row.querySelector('button').addEventListener('click', () => this.performTrade(rarity, nextRarity));
+      container.appendChild(row);
+    });
+    document.getElementById('store-screen').style.display = 'flex';
+  }
+
+  performTrade(fromRarity, toRarity) {
+    if (!confirm(`Trade 3 of your ${fromRarity} treasures for 1 random ${toRarity} treasure?`)) return;
+    let removedCount = 0; const newUnlocked = [];
+    for (const ua of this.unlockedAnimals) {
+      const data = ANIMALS.find(a => a.name === ua.animalName);
+      if (removedCount < 3 && data && data.rarity === fromRarity) { removedCount++; continue; }
+      newUnlocked.push(ua);
+    }
+    if (removedCount === 3) {
+      this.unlockedAnimals = newUnlocked; const pool = ANIMALS.filter(a => a.rarity === toRarity);
+      const prize = pool[Math.floor(Math.random() * pool.length)];
+      const availableNames = PET_NAMES.filter(n => !this.unlockedAnimals.some(u => u.petName === n));
+      const petName = availableNames[Math.floor(Math.random() * availableNames.length)] || `${prize.name} Elite`;
+      this.unlockedAnimals.push({ animalName: prize.name, petName: petName, level: this.level });
+      this.saveProfile(); this.updateCollectionButton(); document.getElementById('store-screen').style.display = 'none'; this.showUnlockScreen(prize); 
+    }
   }
 
   showUnlockScreen(animal) { this.startCatchingSequence(animal); }
@@ -809,56 +854,31 @@ class Game {
     if (this.unlockedAnimals.length === 0) {
       list.innerHTML = `<p style="text-align:center; color:var(--text-light); margin-top: 20px;">Keep playing to unlock your first treasure!</p>`;
     } else {
-      // Group by rarity
       const grouped = {};
       RARITY_ORDER.forEach(r => grouped[r] = []);
-      
       this.unlockedAnimals.forEach(ua => {
         const animalData = ANIMALS.find(a => a.name === ua.animalName);
         if (animalData) grouped[animalData.rarity].push({ ua, data: animalData });
       });
 
-      // Render each rarity section
       RARITY_ORDER.forEach(rarity => {
         const items = grouped[rarity];
         if (items.length === 0) return;
-
         const section = document.createElement('div');
         section.innerHTML = `<h4 style="border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; color: var(--text-light); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 15px;">${rarity} (${items.length})</h4>`;
-        
-        const grid = document.createElement('div');
-        grid.className = 'collection-grid';
-        
+        const grid = document.createElement('div'); grid.className = 'collection-grid';
         items.reverse().forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'collection-card';
-          card.style.cursor = 'pointer';
-          
-          // Environment Background
-          let envBg = 'linear-gradient(to bottom, #dcfce7 0%, #86efac 100%)'; // Forest
+          const card = document.createElement('div'); card.className = 'collection-card'; card.style.cursor = 'pointer';
+          let envBg = 'linear-gradient(to bottom, #dcfce7 0%, #86efac 100%)';
           if (item.data.env === 'water') envBg = 'linear-gradient(to bottom, #e0f2fe 0%, #3b82f6 100%)';
           if (item.data.env === 'space') envBg = 'linear-gradient(to bottom, #1e293b 0%, #0f172a 100%)';
-
           card.style.background = envBg;
-          
-          card.innerHTML = `
-            <div class="rarity-display rarity-${item.data.rarity.toLowerCase()}" style="margin-bottom:5px;">${item.data.rarity}</div>
-            <div style="font-weight:800; color:var(--primary); font-size:1.1rem; text-shadow: 0 1px 2px rgba(255,255,255,0.5);">${item.ua.petName}</div>
-            <div class="collection-animal-container" style="height:120px; width:100%; background: transparent; border: none;">
-              <model-viewer src="${item.data.model}" shadow-intensity="1" camera-controls auto-rotate style="width:100%; height:100%;"></model-viewer>
-            </div>
-            <div style="font-weight:700; font-size:0.8rem; text-transform:uppercase; color:var(--text);">${item.data.name}</div>
-            <div style="font-size:0.7rem; font-weight:800; background:rgba(255,255,255,0.8); padding:4px 10px; border-radius:10px; margin-top:5px;">LVL ${item.ua.level}</div>
-          `;
-          card.addEventListener('click', () => this.showTreasureDetail(item.ua));
-          grid.appendChild(card);
+          card.innerHTML = `<div class="rarity-display rarity-${item.data.rarity.toLowerCase()}" style="margin-bottom:5px;">${item.data.rarity}</div><div style="font-weight:800; color:var(--primary); font-size:1.1rem; text-shadow: 0 1px 2px rgba(255,255,255,0.5);">${item.ua.petName}</div><div class="collection-animal-container" style="height:120px; width:100%; background: transparent; border: none;"><model-viewer src="${item.data.model}" shadow-intensity="1" camera-controls auto-rotate style="width:100%; height:100%;"></model-viewer></div><div style="font-weight:700; font-size:0.8rem; text-transform:uppercase; color:var(--text);">${item.data.name}</div><div style="font-size:0.7rem; font-weight:800; background:rgba(255,255,255,0.8); padding:4px 10px; border-radius:10px; margin-top:5px;">LVL ${item.ua.level}</div>`;
+          card.addEventListener('click', () => this.showTreasureDetail(item.ua)); grid.appendChild(card);
         });
-        
-        section.appendChild(grid);
-        list.appendChild(section);
+        section.appendChild(grid); list.appendChild(section);
       });
     }
-
     document.getElementById('close-collection-btn').addEventListener('click', () => { this.playSFX('click'); document.getElementById('animal-collection-screen').style.display = 'none'; });
     document.getElementById('animal-collection-screen').style.display = 'flex';
   }
@@ -867,25 +887,19 @@ class Game {
     this.playSFX('click');
     const animalData = ANIMALS.find(a => a.name === userAnimal.animalName);
     if (!animalData) return;
-
     const modal = document.getElementById('treasure-detail-screen');
-    
-    // Environment Background
     let envBg = 'linear-gradient(to bottom, #dcfce7 0%, #86efac 100%)';
     if (animalData.env === 'water') envBg = 'linear-gradient(to bottom, #e0f2fe 0%, #3b82f6 100%)';
     if (animalData.env === 'space') envBg = 'linear-gradient(to bottom, #1e293b 0%, #0f172a 100%)';
-    
     const container = modal.querySelector('.unlock-animal-container');
     if (container) container.style.background = envBg;
-
     document.getElementById('detail-rarity').textContent = animalData.rarity;
     document.getElementById('detail-rarity').className = `rarity-display rarity-${animalData.rarity.toLowerCase()}`;
     document.getElementById('detail-pet-name').textContent = userAnimal.petName;
     document.getElementById('detail-animal-name').textContent = `The ${animalData.name}`;
     document.getElementById('detail-model').src = animalData.model;
-    document.getElementById('detail-story').textContent = animalData.story || "A mysterious treasure from a distant land.";
-    document.getElementById('detail-powers').textContent = animalData.powers || "Unknown magic properties.";
-
+    document.getElementById('detail-story').textContent = animalData.story || "Mysterious treasure.";
+    document.getElementById('detail-powers').textContent = animalData.powers || "Magic properties.";
     document.getElementById('close-detail-btn').onclick = () => { this.playSFX('click'); modal.style.display = 'none'; };
     modal.style.display = 'flex';
   }
