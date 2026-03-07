@@ -551,7 +551,7 @@
     <div class="hud-stats">
       <div>LVL <b id="level">1</b></div>
       <div>SCORE <b id="score">0</b></div>
-      <div>STREAK <b id="streak">0</b></div>
+      <div>🪙 <b id="coins">0</b></div>
     </div>
     <div id="chest-container" style="cursor: pointer; font-size: 1.8rem; position: relative; transition: transform 0.3s ease; margin-right: 10px;">
       🪙
@@ -599,7 +599,8 @@
       </div>
 
       <button id="collection-btn" class="primary">My Treasures (<span id="collection-count">0</span>)</button>
-      <button id="store-btn" class="accent">Treasure Store</button>
+      <button id="store-btn" class="accent">Treasure Lab (Trade)</button>
+      <button id="shop-btn" class="accent" style="background: #f59e0b; border-color: #d97706;">DyslexiShop (Sell/Buy)</button>
       <button id="flash-cards-btn">Shuffle Deck</button>
       
       <div>
@@ -621,7 +622,7 @@
     </div>
     
     <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f1f1f1; font-size: 0.8rem; color: var(--text-light); text-align: left;">
-      <h4 style="margin: 0 0 5px 0; color: var(--text);">About DyslexiQuest (v2.7)</h4>
+      <h4 style="margin: 0 0 5px 0; color: var(--text);">About DyslexiQuest (v2.8)</h4>
       <p style="margin: 0 0 15px 0;">A multisensory adventure designed to help students master sight words.</p>
       
       <h4 style="margin: 0 0 5px 0; color: var(--text);">3D Model Credits</h4>
@@ -633,7 +634,7 @@
     </div>
 
     <div style="font-size: 0.75rem; color: var(--text-light); text-align: center; margin-top: 20px;">
-      v2.7 • Created for Mastery
+      v2.8 • Created for Mastery
     </div>
   </aside>
 
@@ -797,10 +798,33 @@
   <!-- Store / Trade-in screen -->
   <div id="store-screen" class="collection-screen" style="display:none">
     <div id="store-content" class="collection-content">
-      <h2 style="font-size:3em;margin-bottom:10px; font-family:'Outfit'; color:var(--primary);">Treasure Store</h2>
+      <h2 style="font-size:3em;margin-bottom:10px; font-family:'Outfit'; color:var(--primary);">Treasure Lab</h2>
       <p style="color:var(--text-light); margin-bottom:20px;">Trade 3 pets of the same rarity for 1 rarer pet!</p>
       <div id="store-trade-list" style="display: flex; flex-direction: column; gap: 20px; max-height: 60vh; overflow-y: auto; padding: 10px;"></div>
-      <button id="close-store-btn" class="primary" style="border-radius:20px; padding:15px 40px; width:auto; margin:20px auto 0;">Close Store</button>
+      <button id="close-store-btn" class="primary" style="border-radius:20px; padding:15px 40px; width:auto; margin:20px auto 0;">Close Lab</button>
+    </div>
+  </div>
+
+  <!-- DyslexiShop Screen -->
+  <div id="shop-screen" class="collection-screen" style="display:none">
+    <div id="shop-content" class="collection-content">
+      <h2 style="font-size:3em;margin-bottom:10px; font-family:'Outfit'; color: #f59e0b;">DyslexiShop</h2>
+      <p style="color:var(--text-light); margin-bottom:20px;">Sell treasures for 🪙 or buy hero gear!</p>
+      
+      <div class="lang-toggle" style="margin-bottom: 20px;">
+        <button id="shop-tab-sell" class="active">Sell Treasures</button>
+        <button id="shop-tab-buy">Buy Gear</button>
+      </div>
+
+      <div id="shop-sell-view" style="display: block;">
+        <div id="shop-sell-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-height: 50vh; overflow-y: auto; padding: 10px;"></div>
+      </div>
+
+      <div id="shop-buy-view" style="display: none;">
+        <div id="shop-buy-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-height: 50vh; overflow-y: auto; padding: 10px;"></div>
+      </div>
+
+      <button id="close-shop-btn" class="primary" style="border-radius:20px; padding:15px 40px; width:auto; margin:20px auto 0;">Exit Shop</button>
     </div>
   </div>
 

@@ -421,6 +421,23 @@ const ANIMALS = [
 
 const RARITY_WEIGHTS = { 'Common': 60, 'Uncommon': 25, 'Rare': 10, 'Epic': 4, 'Legendary': 0.9, 'Mythic': 0.1 };
 const RARITY_ORDER = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Mythic'];
+
+const SELL_PRICES = {
+  'Common': 15,
+  'Uncommon': 25,
+  'Rare': 45,
+  'Epic': 55,
+  'Legendary': 65,
+  'Mythic': 80
+};
+
+const GEAR_SHOP = [
+  { id: 'astro_silver', name: 'Silver Space Suit', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', price: 100 },
+  { id: 'robot_gold', name: 'Golden Robot', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', price: 250 },
+  { id: 'fox_fire', name: 'Fire Fox', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb', price: 500 },
+  { id: 'cesium_elite', name: 'Elite Explorer', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', price: 1000 }
+];
+
 const PET_NAMES = [
   'Barnaby', 'Pip', 'Zelda', 'Finn', 'Mochi', 'Rocket', 'Luna', 'Buster', 'Cleo', 'Dash',
   'Willow', 'Coco', 'Gizmo', 'Nova', 'Rex', 'Socks', 'Toby', 'Ziggy', 'Pearl', 'Ollie',
@@ -478,6 +495,7 @@ class Game {
     this.isFrench = false; this.isTalkMode = false; this.micGranted = false; this.micTested = false; this.isTestMode = false;
     this.targetWord = null; this.unlockedAnimals = []; this.currentPool = []; this.selectedVoiceURI = null;
     this.avatarModel = AVATAR_MODELS[0]; this.nextUnlockLevel = 1;
+    this.coins = 0; this.unlockedAvatars = [AVATAR_MODELS[0]];
     this.wordBank = { en: {}, fr: {} }; this.users = JSON.parse(localStorage.getItem('dyslexiquest_users')) || {};
     this.currentUser = null; this.canClick = true; this.attemptsForCurrentWord = 0; this.currentAudio = null;
     this.recognition = null; this.isListening = false; this.sounds = {};
@@ -566,6 +584,8 @@ class Game {
     this.micTested = u.micTested || false;
     this.avatarModel = u.avatarModel || AVATAR_MODELS[0];
     this.nextUnlockLevel = u.nextUnlockLevel || (this.level + Math.floor(Math.random() * 2) + 3);
+    this.coins = u.coins || 0;
+    this.unlockedAvatars = u.unlockedAvatars || [AVATAR_MODELS[0]];
     this.startGameplay();
   }
 
@@ -576,7 +596,8 @@ class Game {
       name: name, level: 1, score: 0, streak: 0, xp: 0, 
       isFrench: document.getElementById('new-player-fr').classList.contains('active'), 
       unlockedAnimals: [], selectedVoiceURI: null, micTested: false,
-      avatarModel: AVATAR_MODELS[0], nextUnlockLevel: Math.floor(Math.random() * 2) + 4
+      avatarModel: AVATAR_MODELS[0], nextUnlockLevel: Math.floor(Math.random() * 2) + 4,
+      coins: 0, unlockedAvatars: [AVATAR_MODELS[0]]
     };
     localStorage.setItem('dyslexiquest_users', JSON.stringify(this.users)); this.loadProfile(id);
   }
@@ -588,7 +609,8 @@ class Game {
       level: this.level, score: this.score, streak: this.streak, xp: this.xp, 
       isFrench: this.isFrench, unlockedAnimals: this.unlockedAnimals, 
       selectedVoiceURI: this.selectedVoiceURI, micTested: this.micTested,
-      avatarModel: this.avatarModel, nextUnlockLevel: this.nextUnlockLevel
+      avatarModel: this.avatarModel, nextUnlockLevel: this.nextUnlockLevel,
+      coins: this.coins, unlockedAvatars: this.unlockedAvatars
     };
     localStorage.setItem('dyslexiquest_users', JSON.stringify(this.users));
   }
@@ -597,27 +619,28 @@ class Game {
     this.playSFX('click');
     const screen = document.getElementById('avatar-designer-screen');
     const modelViewer = document.getElementById('avatar-preview-model');
-    let currentIndex = AVATAR_MODELS.indexOf(this.avatarModel);
+    const available = this.unlockedAvatars;
+    let currentIndex = available.indexOf(this.avatarModel);
     if (currentIndex === -1) currentIndex = 0;
     
-    const updatePreview = () => { modelViewer.src = AVATAR_MODELS[currentIndex]; };
+    const updatePreview = () => { modelViewer.src = available[currentIndex]; };
     updatePreview();
     
     document.getElementById('prev-avatar-btn').onclick = () => {
       this.playSFX('click');
-      currentIndex = (currentIndex - 1 + AVATAR_MODELS.length) % AVATAR_MODELS.length;
+      currentIndex = (currentIndex - 1 + available.length) % available.length;
       updatePreview();
     };
     
     document.getElementById('next-avatar-btn').onclick = () => {
       this.playSFX('click');
-      currentIndex = (currentIndex + 1) % AVATAR_MODELS.length;
+      currentIndex = (currentIndex + 1) % available.length;
       updatePreview();
     };
     
     document.getElementById('save-avatar-btn').onclick = () => {
       this.playSFX('click');
-      this.avatarModel = AVATAR_MODELS[currentIndex];
+      this.avatarModel = available[currentIndex];
       this.saveProfile();
       screen.style.display = 'none';
     };
@@ -763,12 +786,104 @@ class Game {
 
   updateStats() {
     document.getElementById('level').textContent = this.level; document.getElementById('score').textContent = this.score;
-    const streakEl = document.getElementById('streak'); streakEl.textContent = this.streak; streakEl.classList.toggle('on-fire', this.streak >= 3);
+    document.getElementById('coins').textContent = this.coins;
+    const streakEl = document.getElementById('streak');
+    if (streakEl) {
+      streakEl.textContent = this.streak; streakEl.classList.toggle('on-fire', this.streak >= 3);
+    }
     document.getElementById('xp').textContent = this.xp; document.getElementById('max-xp').textContent = this.maxXP;
     const xpFill = document.getElementById('xp-fill'); if (xpFill) xpFill.style.width = `${(this.xp / this.maxXP) * 100}%`;
   }
 
   updateCollectionButton() { document.getElementById('collection-count').textContent = this.unlockedAnimals.length; }
+
+  showShopScreen() {
+    this.playSFX('click');
+    const screen = document.getElementById('shop-screen');
+    const sellList = document.getElementById('shop-sell-list');
+    const buyList = document.getElementById('shop-buy-list');
+    
+    const renderSell = () => {
+      sellList.innerHTML = '';
+      if (this.unlockedAnimals.length === 0) {
+        sellList.innerHTML = '<p style="grid-column: 1/-1; color: var(--text-light); margin-top: 20px;">No treasures to sell yet!</p>';
+        return;
+      }
+      this.unlockedAnimals.forEach((ua, index) => {
+        const data = ANIMALS.find(a => a.name === ua.animalName);
+        if (!data) return;
+        const price = SELL_PRICES[data.rarity] || 10;
+        const card = document.createElement('div');
+        card.className = 'collection-card';
+        card.style.padding = '10px';
+        card.innerHTML = `
+          <div style="font-weight: 800; font-size: 0.9rem;">${ua.petName}</div>
+          <div style="font-size: 0.7rem; color: var(--text-light);">${data.rarity}</div>
+          <button class="primary" style="margin-top: 10px; font-size: 0.8rem; padding: 8px;">Sell for 🪙${price}</button>
+        `;
+        card.querySelector('button').onclick = () => this.performSell(index, price);
+        sellList.appendChild(card);
+      });
+    };
+
+    const renderBuy = () => {
+      buyList.innerHTML = '';
+      GEAR_SHOP.forEach(item => {
+        const isOwned = this.unlockedAvatars.includes(item.model);
+        const card = document.createElement('div');
+        card.className = 'collection-card';
+        card.style.padding = '10px';
+        card.innerHTML = `
+          <div style="font-weight: 800; font-size: 0.9rem;">${item.name}</div>
+          <div style="height: 80px;"><model-viewer src="${item.model}" auto-rotate style="width:100%; height:100%;"></model-viewer></div>
+          <button class="${isOwned ? '' : 'accent'}" style="margin-top: 10px; font-size: 0.8rem; padding: 8px;" ${isOwned ? 'disabled' : ''}>
+            ${isOwned ? 'Owned' : `Buy for 🪙${item.price}`}
+          </button>
+        `;
+        if (!isOwned) card.querySelector('button').onclick = () => this.performBuyGear(item);
+        buyList.appendChild(card);
+      });
+    };
+
+    document.getElementById('shop-tab-sell').onclick = (e) => {
+      e.target.classList.add('active'); document.getElementById('shop-tab-buy').classList.remove('active');
+      document.getElementById('shop-sell-view').style.display = 'block'; document.getElementById('shop-buy-view').style.display = 'none';
+      renderSell();
+    };
+    document.getElementById('shop-tab-buy').onclick = (e) => {
+      e.target.classList.add('active'); document.getElementById('shop-tab-sell').classList.remove('active');
+      document.getElementById('shop-sell-view').style.display = 'none'; document.getElementById('shop-buy-view').style.display = 'block';
+      renderBuy();
+    };
+
+    renderSell();
+    screen.style.display = 'flex';
+  }
+
+  performSell(index, price) {
+    const ua = this.unlockedAnimals[index];
+    if (!confirm(`Sell "${ua.petName}" for 🪙${price}?`)) return;
+    this.unlockedAnimals.splice(index, 1);
+    this.coins += price;
+    this.playSFX('correct');
+    this.saveProfile();
+    this.updateStats();
+    this.showShopScreen(); // Refresh
+  }
+
+  performBuyGear(item) {
+    if (this.coins < item.price) {
+      alert("Not enough DyslexiCoins!");
+      return;
+    }
+    if (!confirm(`Buy "${item.name}" for 🪙${item.price}?`)) return;
+    this.coins -= item.price;
+    this.unlockedAvatars.push(item.model);
+    this.playSFX('correct');
+    this.saveProfile();
+    this.updateStats();
+    this.showShopScreen(); // Refresh
+  }
 
   levelUp() {
     this.playSFX('levelUp'); this.level++; this.maxXP = Math.min(100 + (this.level - 1) * 50, 500); this.xp = 0;
@@ -1076,6 +1191,8 @@ class Game {
     document.getElementById('new-game').addEventListener('click', () => { if(confirm("Reset progress?")) this.reset(); });
     document.getElementById('delete-profile-btn').addEventListener('click', () => this.deleteCurrentProfile());
     document.getElementById('store-btn').addEventListener('click', () => this.showStoreScreen());
+    document.getElementById('shop-btn').addEventListener('click', () => this.showShopScreen());
+    document.getElementById('close-shop-btn').addEventListener('click', () => { this.playSFX('click'); document.getElementById('shop-screen').style.display = 'none'; });
     document.getElementById('close-store-btn').addEventListener('click', () => { this.playSFX('click'); document.getElementById('store-screen').style.display = 'none'; });
     document.getElementById('english-btn').addEventListener('click', () => this.setLang('en'));
     document.getElementById('french-btn').addEventListener('click', () => this.setLang('fr'));
