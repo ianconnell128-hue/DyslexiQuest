@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v4.1 – game.js
+//  DyslexiQuest v4.2 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── 3-D collectible characters ──────────────────────────────────────────────
@@ -66,7 +66,9 @@ const MODELS = {
   michelle: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Michelle.glb',
   cesium: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb',
   figure: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb',
-  astro: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb'
+  astro: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
+  fox: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb',
+  robot: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb'
 };
 
 const GEAR_SHOP = [
@@ -139,21 +141,21 @@ const GEAR_SHOP = [
   { id: 'shoes_15', name: 'Jump Shoes', cat: 'Shoes', model: MODELS.astro, price: 400 },
 
   // SETS (15 items) - High End Prices ($500 - $5000)
-  { id: 'set_1', name: 'Hero Set', cat: 'Sets', model: MODELS.figure, price: 500 },
-  { id: 'set_2', name: 'Iron Knight Set', cat: 'Sets', model: MODELS.soldier, price: 750 },
-  { id: 'set_3', name: 'Explorer Set', cat: 'Sets', model: MODELS.cesium, price: 600 },
-  { id: 'set_4', name: 'Dancer Set', cat: 'Sets', model: MODELS.figure, price: 550 },
-  { id: 'set_5', name: 'Marine Set', cat: 'Sets', model: MODELS.soldier, price: 850 },
-  { id: 'set_6', name: 'Superstar Set', cat: 'Sets', model: MODELS.michelle, price: 1200 },
-  { id: 'set_7', name: 'Cadet Set', cat: 'Sets', model: MODELS.astro, price: 1000 },
-  { id: 'set_8', name: 'Elite Guard Set', cat: 'Sets', model: MODELS.soldier, price: 1500 },
-  { id: 'set_9', name: 'Royal Hero Set', cat: 'Sets', model: MODELS.figure, price: 2000 },
-  { id: 'set_10', name: 'Astro Pilot Set', cat: 'Sets', model: MODELS.astro, price: 1800 },
-  { id: 'set_11', name: 'General Set', cat: 'Sets', model: MODELS.soldier, price: 2500 },
-  { id: 'set_12', name: 'Commander Set', cat: 'Sets', model: MODELS.astro, price: 3000 },
-  { id: 'set_13', name: 'Shadow Suit Set', cat: 'Sets', model: MODELS.soldier, price: 3500 },
-  { id: 'set_14', name: 'Mythic Soul Set', cat: 'Sets', model: MODELS.michelle, price: 4000 },
-  { id: 'set_15', name: 'Ultimate God Set', cat: 'Sets', model: MODELS.figure, price: 5000 }
+  { id: 'set_1', name: 'Hero Spirit', cat: 'Sets', model: MODELS.figure, price: 500 },
+  { id: 'set_2', name: 'Iron Knight', cat: 'Sets', model: MODELS.soldier, price: 750 },
+  { id: 'set_3', name: 'Explorer Form', cat: 'Sets', model: MODELS.cesium, price: 600 },
+  { id: 'set_4', name: 'Dancer Spirit', cat: 'Sets', model: MODELS.figure, price: 550 },
+  { id: 'set_5', name: 'Marine Suit', cat: 'Sets', model: MODELS.soldier, price: 850 },
+  { id: 'set_6', name: 'Superstar Form', cat: 'Sets', model: MODELS.michelle, price: 1200 },
+  { id: 'set_7', name: 'Space Cadet', cat: 'Sets', model: MODELS.astro, price: 1000 },
+  { id: 'set_8', name: 'Elite Guard', cat: 'Sets', model: MODELS.soldier, price: 1500 },
+  { id: 'set_9', name: 'Royal Hero', cat: 'Sets', model: MODELS.figure, price: 2000 },
+  { id: 'set_10', name: 'Astro Pilot', cat: 'Sets', model: MODELS.astro, price: 1800 },
+  { id: 'set_11', name: 'Fox Spirit Suit', cat: 'Sets', model: MODELS.fox, price: 2500 },
+  { id: 'set_12', name: 'Mecha-Human', cat: 'Sets', model: MODELS.robot, price: 3000 },
+  { id: 'set_13', name: 'Shadow Stalker', cat: 'Sets', model: MODELS.soldier, price: 3500 },
+  { id: 'set_14', name: 'Mythic Guardian', cat: 'Sets', model: MODELS.michelle, price: 4000 },
+  { id: 'set_15', name: 'Celestial God', cat: 'Sets', model: MODELS.figure, price: 5000 }
 ];
 
 const SHOP_CATEGORIES = ['Hats', 'Shirts', 'Pants', 'Shoes', 'Sets'];
@@ -303,7 +305,7 @@ class Game {
   loadProfile(id) {
     this.currentUser = id; const u = this.users[id];
     this.level = u.level || 1; this.score = u.score || 0; this.streak = u.streak || 0; this.xp = u.xp || 0;
-    this.maxXP = 5; this.isFrench = u.isFrench || false;
+    this.maxXP = 5 + (this.level - 1) * 5; this.isFrench = u.isFrench || false;
     this.unlockedAnimals = u.unlockedAnimals || []; this.selectedVoiceURI = u.selectedVoiceURI || null;
     this.micTested = u.micTested || false;
     this.gender = u.gender || 'male';
@@ -603,6 +605,7 @@ class Game {
     if (streakEl) {
       streakEl.textContent = this.streak; streakEl.classList.toggle('on-fire', this.streak >= 3);
     }
+    this.maxXP = 5 + (this.level - 1) * 5;
     document.getElementById('xp').textContent = this.xp; document.getElementById('max-xp').textContent = this.maxXP;
     const xpFill = document.getElementById('xp-fill'); if (xpFill) xpFill.style.width = `${(this.xp / this.maxXP) * 100}%`;
   }
@@ -627,7 +630,7 @@ class Game {
           <div style="font-weight: 800; font-size: 0.9rem;">${item.name}</div>
           <div style="height: 80px;"><model-viewer src="${item.model}" auto-rotate style="width:100%; height:100%;"></model-viewer></div>
           <button class="${isOwned ? '' : 'accent'}" style="margin-top: 10px; font-size: 0.8rem; padding: 8px;" ${isOwned ? 'disabled' : ''}>
-            ${isOwned ? 'Owned' : `Buy 🪙${item.price}`}
+            ${isOwned ? 'Owned' : `Buy $${item.price}`}
           </button>
         `;
         if (!isOwned) card.querySelector('button').onclick = () => this.performBuyGear(item);
@@ -644,13 +647,13 @@ class Game {
       this.unlockedAnimals.forEach((ua, index) => {
         const data = ANIMALS.find(a => a.name === ua.animalName);
         if (!data) return;
-        const price = SELL_PRICES[data.rarity] || 10;
+        const price = SELL_PRICES[data.rarity] || 50;
         const card = document.createElement('div');
         card.className = 'collection-card';
         card.innerHTML = `
           <div style="font-weight: 800; font-size: 0.9rem;">${ua.petName}</div>
           <div style="font-size: 0.7rem; color: var(--text-light);">${data.rarity}</div>
-          <button class="primary" style="margin-top: 10px; font-size: 0.8rem; padding: 8px;">Sell 🪙${price}</button>
+          <button class="primary" style="margin-top: 10px; font-size: 0.8rem; padding: 8px;">Sell $${price}</button>
         `;
         card.querySelector('button').onclick = () => this.performSell(index, price);
         sellList.appendChild(card);
@@ -699,7 +702,7 @@ class Game {
 
   performSell(index, price) {
     const ua = this.unlockedAnimals[index];
-    if (!confirm(`Sell "${ua.petName}" for 🪙${price}?`)) return;
+    if (!confirm(`Sell "${ua.petName}" for $${price}?`)) return;
     this.unlockedAnimals.splice(index, 1);
     this.coins += price;
     this.playSFX('correct');
@@ -713,7 +716,7 @@ class Game {
       alert("Not enough DyslexiCoins!");
       return;
     }
-    if (!confirm(`Buy "${item.name}" for 🪙${item.price}?`)) return;
+    if (!confirm(`Buy "${item.name}" for $${item.price}?`)) return;
     this.coins -= item.price;
     this.unlockedAvatars.push(item.model);
     this.playSFX('correct');
@@ -723,7 +726,8 @@ class Game {
   }
 
   levelUp() {
-    this.playSFX('levelUp'); this.level++; this.maxXP = 5; this.xp = 0;
+    this.playSFX('levelUp'); this.level++; 
+    this.maxXP = 5 + (this.level - 1) * 5; this.xp = 0;
     this.updateStats(); this.saveProfile(); document.getElementById('new-level').textContent = this.level;
     document.getElementById('level-up-modal').style.display = 'flex';
   }
@@ -738,7 +742,7 @@ class Game {
 
   checkAnimalUnlock() {
     if (this.level > 1 && this.level >= this.nextUnlockLevel) { 
-      this.nextUnlockLevel = this.level + Math.floor(Math.random() * 5) + 1; // 1-5 levels away
+      this.nextUnlockLevel = this.level + Math.floor(Math.random() * 5) + 1;
       this.saveProfile();
       const animal = this.getAnimalForLevel(); 
       if (animal) this.startCatchingSequence(animal); 
