@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v5.4 – game.js
+//  DyslexiQuest v5.5 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 const QUEST_TEMPLATES = [
@@ -680,16 +680,31 @@ class Game {
   levelUpOrNext() { if (this.xp >= this.maxXP) this.levelUp(); else this.newTarget(); }
 
   updateStats() {
-    document.getElementById('level').textContent = this.level; document.getElementById('score').textContent = this.score;
+    const levelEl = document.getElementById('level');
+    if (levelEl) levelEl.textContent = this.level;
+    
+    const scoreEl = document.getElementById('score');
+    if (scoreEl) scoreEl.textContent = this.score;
+    
     const coinsEl = document.getElementById('coins');
     if (coinsEl) coinsEl.textContent = this.coins;
+    
     const streakEl = document.getElementById('streak');
     if (streakEl) {
-      streakEl.textContent = this.streak; streakEl.classList.toggle('on-fire', this.streak >= 3);
+      streakEl.textContent = this.streak;
+      streakEl.classList.toggle('on-fire', this.streak >= 3);
     }
+    
     this.maxXP = 5 + (this.level - 1) * 5;
-    document.getElementById('xp').textContent = this.xp; document.getElementById('max-xp').textContent = this.maxXP;
-    const xpFill = document.getElementById('xp-fill'); if (xpFill) xpFill.style.width = `${(this.xp / this.maxXP) * 100}%`;
+    
+    const xpEl = document.getElementById('xp');
+    if (xpEl) xpEl.textContent = this.xp;
+    
+    const maxXpEl = document.getElementById('max-xp');
+    if (maxXpEl) maxXpEl.textContent = this.maxXP;
+    
+    const xpFill = document.getElementById('xp-fill');
+    if (xpFill) xpFill.style.width = `${(this.xp / this.maxXP) * 100}%`;
   }
 
   updateCollectionButton() { document.getElementById('collection-count').textContent = this.unlockedAnimals.length; }
