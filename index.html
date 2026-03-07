@@ -482,15 +482,61 @@
       width: 100%;
       height: 250px;
       margin: 20px 0;
-      background: radial-gradient(circle, #f8fafc 0%, #ffffff 100%);
+      background: linear-gradient(to bottom, #dcfce7 0%, #86efac 100%);
       border-radius: 24px;
       overflow: hidden;
+      border: 4px solid #22c55e;
     }
 
     /* ── Catching Mechanic ── */
     #catching-screen {
-      background: radial-gradient(circle at center, #ffffff 0%, #f1f5f9 100%);
+      background: linear-gradient(to bottom, #166534 0%, #064e3b 100%);
     }
+
+    .forest-bg {
+      background: linear-gradient(to bottom, #dcfce7 0%, #22c55e 50%, #14532d 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .color-picker-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .color-option {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .color-option label {
+      width: 80px;
+      font-weight: 800;
+      font-size: 0.8rem;
+      color: var(--text-light);
+    }
+
+    .color-swatches {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .color-swatch {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 0 0 1px #e2e8f0;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .color-swatch:hover { transform: scale(1.2); }
+    .color-swatch.active { box-shadow: 0 0 0 2px var(--primary); transform: scale(1.1); }
 
     .blue-power {
       position: absolute;
@@ -622,7 +668,7 @@
     </div>
     
     <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f1f1f1; font-size: 0.8rem; color: var(--text-light); text-align: left;">
-      <h4 style="margin: 0 0 5px 0; color: var(--text);">About DyslexiQuest (v2.8)</h4>
+      <h4 style="margin: 0 0 5px 0; color: var(--text);">About DyslexiQuest (v2.9)</h4>
       <p style="margin: 0 0 15px 0;">A multisensory adventure designed to help students master sight words.</p>
       
       <h4 style="margin: 0 0 5px 0; color: var(--text);">3D Model Credits</h4>
@@ -634,7 +680,7 @@
     </div>
 
     <div style="font-size: 0.75rem; color: var(--text-light); text-align: center; margin-top: 20px;">
-      v2.8 • Created for Mastery
+      v2.9 • Created for Mastery
     </div>
   </aside>
 
@@ -657,7 +703,34 @@
       <div id="create-step-1">
         <h3 style="margin-bottom: 15px; color: var(--text);">What is your name, adventurer?</h3>
         <input type="text" id="new-player-name" placeholder="Type your name here..." style="width: 100%; padding: 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-family: inherit; font-size: 1.1rem; margin-bottom: 20px; box-sizing: border-box;" autocomplete="off" />
+        <button id="next-to-avatar-btn" class="primary" style="padding: 18px; border-radius: 15px;">NEXT →</button>
+      </div>
+
+      <!-- Step 1.5: Avatar Customization -->
+      <div id="create-step-avatar" style="display: none;">
+        <h3 style="margin-bottom: 10px; color: var(--text);">Customize Your Hero!</h3>
+        
+        <div style="height: 180px; margin-bottom: 15px; background: #f8fafc; border-radius: 20px;">
+          <model-viewer id="create-avatar-preview" shadow-intensity="1" auto-rotate style="width:100%; height:100%;"></model-viewer>
+        </div>
+
+        <div class="color-picker-group">
+          <div class="color-option">
+            <label>SKIN</label>
+            <div id="skin-colors" class="color-swatches"></div>
+          </div>
+          <div class="color-option">
+            <label>HAIR</label>
+            <div id="hair-colors" class="color-swatches"></div>
+          </div>
+          <div class="color-option">
+            <label>EYES</label>
+            <div id="eye-colors" class="color-swatches"></div>
+          </div>
+        </div>
+
         <button id="next-to-lang-btn" class="primary" style="padding: 18px; border-radius: 15px;">NEXT →</button>
+        <button id="back-to-name-btn" style="background: transparent; color: var(--text-light); margin-top: 10px; border: none; font-size: 0.9rem; width: 100%;">← Back</button>
       </div>
 
       <!-- Step 2: Language -->

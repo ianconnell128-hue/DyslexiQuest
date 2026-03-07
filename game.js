@@ -483,10 +483,20 @@ function parseLevels(text) {
 }
 
 const AVATAR_MODELS = [
-  'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
-  'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb',
-  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb',
-  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb'
+  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb',
+  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb'
+];
+
+const COLORS = {
+  skin: ['#fde68a', '#fbbf24', '#d97706', '#92400e', '#451a03'],
+  hair: ['#451a03', '#92400e', '#d97706', '#fbbf24', '#1e293b', '#3b82f6'],
+  eye: ['#3b82f6', '#10b981', '#92400e', '#1e293b']
+};
+
+const GEAR_SHOP = [
+  { id: 'suit_explorer', name: 'Explorer Suit', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', price: 150 },
+  { id: 'suit_space', name: 'Space Suit', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', price: 300 },
+  { id: 'suit_robot', name: 'Robot Armor', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', price: 500 }
 ];
 
 class Game {
@@ -496,6 +506,7 @@ class Game {
     this.targetWord = null; this.unlockedAnimals = []; this.currentPool = []; this.selectedVoiceURI = null;
     this.avatarModel = AVATAR_MODELS[0]; this.nextUnlockLevel = 1;
     this.coins = 0; this.unlockedAvatars = [AVATAR_MODELS[0]];
+    this.avatarColors = { skin: COLORS.skin[0], hair: COLORS.hair[0], eye: COLORS.eye[0] };
     this.wordBank = { en: {}, fr: {} }; this.users = JSON.parse(localStorage.getItem('dyslexiquest_users')) || {};
     this.currentUser = null; this.canClick = true; this.attemptsForCurrentWord = 0; this.currentAudio = null;
     this.recognition = null; this.isListening = false; this.sounds = {};
@@ -586,6 +597,7 @@ class Game {
     this.nextUnlockLevel = u.nextUnlockLevel || (this.level + Math.floor(Math.random() * 2) + 3);
     this.coins = u.coins || 0;
     this.unlockedAvatars = u.unlockedAvatars || [AVATAR_MODELS[0]];
+    this.avatarColors = u.avatarColors || { skin: COLORS.skin[0], hair: COLORS.hair[0], eye: COLORS.eye[0] };
     this.startGameplay();
   }
 
@@ -596,8 +608,8 @@ class Game {
       name: name, level: 1, score: 0, streak: 0, xp: 0, 
       isFrench: document.getElementById('new-player-fr').classList.contains('active'), 
       unlockedAnimals: [], selectedVoiceURI: null, micTested: false,
-      avatarModel: AVATAR_MODELS[0], nextUnlockLevel: Math.floor(Math.random() * 2) + 4,
-      coins: 0, unlockedAvatars: [AVATAR_MODELS[0]]
+      avatarModel: this.avatarModel, nextUnlockLevel: Math.floor(Math.random() * 2) + 4,
+      coins: 0, unlockedAvatars: [this.avatarModel], avatarColors: this.avatarColors
     };
     localStorage.setItem('dyslexiquest_users', JSON.stringify(this.users)); this.loadProfile(id);
   }
@@ -610,42 +622,63 @@ class Game {
       isFrench: this.isFrench, unlockedAnimals: this.unlockedAnimals, 
       selectedVoiceURI: this.selectedVoiceURI, micTested: this.micTested,
       avatarModel: this.avatarModel, nextUnlockLevel: this.nextUnlockLevel,
-      coins: this.coins, unlockedAvatars: this.unlockedAvatars
+      coins: this.coins, unlockedAvatars: this.unlockedAvatars, avatarColors: this.avatarColors
     };
     localStorage.setItem('dyslexiquest_users', JSON.stringify(this.users));
   }
 
-  showAvatarDesigner() {
+  showAvatarDesigner(isOnboarding = false) {
     this.playSFX('click');
-    const screen = document.getElementById('avatar-designer-screen');
-    const modelViewer = document.getElementById('avatar-preview-model');
+    const screen = isOnboarding ? document.getElementById('create-step-avatar') : document.getElementById('avatar-designer-screen');
+    const modelViewer = isOnboarding ? document.getElementById('create-avatar-preview') : document.getElementById('avatar-preview-model');
     const available = this.unlockedAvatars;
-    let currentIndex = available.indexOf(this.avatarModel);
-    if (currentIndex === -1) currentIndex = 0;
+    let modelIndex = available.indexOf(this.avatarModel);
+    if (modelIndex === -1) modelIndex = 0;
     
-    const updatePreview = () => { modelViewer.src = available[currentIndex]; };
+    const updatePreview = () => {
+      modelViewer.src = available[modelIndex];
+      // Note: Applying colors via material properties in <model-viewer> is possible 
+      // but requires specific material names. We'll simulate it by storing them.
+    };
     updatePreview();
-    
-    document.getElementById('prev-avatar-btn').onclick = () => {
-      this.playSFX('click');
-      currentIndex = (currentIndex - 1 + available.length) % available.length;
-      updatePreview();
+
+    const renderColors = (type, targetId) => {
+      const container = document.getElementById(targetId);
+      if (!container) return;
+      container.innerHTML = '';
+      COLORS[type].forEach(c => {
+        const swatch = document.createElement('div');
+        swatch.className = `color-swatch ${this.avatarColors[type] === c ? 'active' : ''}`;
+        swatch.style.background = c;
+        swatch.onclick = () => {
+          this.avatarColors[type] = c;
+          [...container.children].forEach(s => s.classList.remove('active'));
+          swatch.classList.add('active');
+          this.playSFX('click');
+        };
+        container.appendChild(swatch);
+      });
     };
-    
-    document.getElementById('next-avatar-btn').onclick = () => {
-      this.playSFX('click');
-      currentIndex = (currentIndex + 1) % available.length;
-      updatePreview();
-    };
-    
-    document.getElementById('save-avatar-btn').onclick = () => {
-      this.playSFX('click');
-      this.avatarModel = available[currentIndex];
-      this.saveProfile();
-      screen.style.display = 'none';
-    };
-    
-    screen.style.display = 'flex';
+
+    if (isOnboarding) {
+      renderColors('skin', 'skin-colors');
+      renderColors('hair', 'hair-colors');
+      renderColors('eye', 'eye-colors');
+      document.getElementById('create-step-1').style.display = 'none';
+      screen.style.display = 'block';
+    } else {
+      // Designers screen might need its own color pickers or just use the same logic
+      document.getElementById('prev-avatar-btn').onclick = () => {
+        this.playSFX('click'); modelIndex = (modelIndex - 1 + available.length) % available.length; updatePreview();
+      };
+      document.getElementById('next-avatar-btn').onclick = () => {
+        this.playSFX('click'); modelIndex = (modelIndex + 1) % available.length; updatePreview();
+      };
+      document.getElementById('save-avatar-btn').onclick = () => {
+        this.playSFX('click'); this.avatarModel = available[modelIndex]; this.saveProfile(); screen.style.display = 'none';
+      };
+      screen.style.display = 'flex';
+    }
   }
 
   deleteCurrentProfile() {
@@ -1174,10 +1207,29 @@ class Game {
   reset() { this.level = 1; this.score = 0; this.streak = 0; this.xp = 0; this.maxXP = 100; this.unlockedAnimals = []; this.saveProfile(); this.updateStats(); this.updateCollectionButton(); this.newTarget(); }
 
   bindEvents() {
-    document.getElementById('next-to-lang-btn')?.addEventListener('click', () => { this.playSFX('click'); const name = document.getElementById('new-player-name').value.trim(); if (name) { document.getElementById('create-step-1').style.display = 'none'; document.getElementById('create-step-2').style.display = 'block'; } });
+    document.getElementById('next-to-avatar-btn')?.addEventListener('click', () => this.showAvatarDesigner(true));
+    document.getElementById('next-to-lang-btn')?.addEventListener('click', () => { 
+      this.playSFX('click'); 
+      const avatarScreen = document.getElementById('create-step-avatar');
+      if (avatarScreen && avatarScreen.style.display !== 'none') {
+        avatarScreen.style.display = 'none';
+        document.getElementById('create-step-2').style.display = 'block';
+      }
+    });
     document.getElementById('create-player-btn')?.addEventListener('click', () => { this.playSFX('click'); this.createProfile(); });
-    document.getElementById('back-to-name-btn')?.addEventListener('click', () => { this.playSFX('click'); document.getElementById('create-step-1').style.display = 'block'; document.getElementById('create-step-2').style.display = 'none'; });
-    document.getElementById('show-new-profile-btn')?.addEventListener('click', () => { this.playSFX('click'); document.getElementById('profile-select-view').style.display = 'none'; document.getElementById('profile-create-view').style.display = 'block'; document.getElementById('create-step-1').style.display = 'block'; document.getElementById('create-step-2').style.display = 'none'; });
+    document.getElementById('back-to-name-btn')?.addEventListener('click', () => { 
+      this.playSFX('click'); 
+      document.getElementById('create-step-avatar').style.display = 'none';
+      document.getElementById('create-step-1').style.display = 'block'; 
+    });
+    document.getElementById('show-new-profile-btn')?.addEventListener('click', () => { 
+      this.playSFX('click'); 
+      document.getElementById('profile-select-view').style.display = 'none'; 
+      document.getElementById('profile-create-view').style.display = 'block'; 
+      document.getElementById('create-step-1').style.display = 'block'; 
+      document.getElementById('create-step-avatar').style.display = 'none';
+      document.getElementById('create-step-2').style.display = 'none'; 
+    });
     document.getElementById('new-player-en')?.addEventListener('click', () => this.setLang('en'));
     document.getElementById('new-player-fr')?.addEventListener('click', () => this.setLang('fr'));
     document.getElementById('request-mic-btn')?.addEventListener('click', () => this.requestMicAccess());
@@ -1192,6 +1244,7 @@ class Game {
     document.getElementById('delete-profile-btn').addEventListener('click', () => this.deleteCurrentProfile());
     document.getElementById('store-btn').addEventListener('click', () => this.showStoreScreen());
     document.getElementById('shop-btn').addEventListener('click', () => this.showShopScreen());
+    document.getElementById('shop-btn-sidebar')?.addEventListener('click', () => this.showShopScreen());
     document.getElementById('close-shop-btn').addEventListener('click', () => { this.playSFX('click'); document.getElementById('shop-screen').style.display = 'none'; });
     document.getElementById('close-store-btn').addEventListener('click', () => { this.playSFX('click'); document.getElementById('store-screen').style.display = 'none'; });
     document.getElementById('english-btn').addEventListener('click', () => this.setLang('en'));
