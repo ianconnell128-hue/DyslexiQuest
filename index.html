@@ -557,6 +557,7 @@
       🪙
       <div id="chest-badge" style="position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; display: none;">!</div>
     </div>
+    <button class="menu-toggle" id="avatar-btn" style="margin-right: 10px;">👤</button>
     <button class="menu-toggle" id="sidebar-toggle">☰</button>
   </nav>
 
@@ -564,6 +565,22 @@
   <div id="flying-prize-container" style="position: fixed; pointer-events: none; z-index: 10000; top: 0; left: 0; width: 100%; height: 100%; display: none;"></div>
 
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- Avatar Designer Screen -->
+  <div id="avatar-designer-screen" class="collection-screen" style="display:none">
+    <div class="collection-content">
+      <h2 style="font-family:'Outfit'; font-size: 2.5rem; color: var(--primary); margin-bottom: 10px;">Your Avatar</h2>
+      <p style="color:var(--text-light); margin-bottom: 20px;">Choose your hero for the adventure!</p>
+      
+      <div style="height: 250px; margin-bottom: 20px; background: radial-gradient(circle, #f8fafc 0%, #ffffff 100%); border-radius: 24px; position: relative;">
+        <model-viewer id="avatar-preview-model" shadow-intensity="1" camera-controls auto-rotate style="width:100%; height:100%;"></model-viewer>
+        <button id="prev-avatar-btn" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; padding: 0;">◀</button>
+        <button id="next-avatar-btn" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; padding: 0;">▶</button>
+      </div>
+      
+      <button id="save-avatar-btn" class="primary" style="border-radius:20px; padding:15px 40px; width:auto; margin:0 auto;">Save Avatar</button>
+    </div>
+  </div>
 
   <!-- Sidebar Drawer -->
   <aside class="sidebar" id="sidebar">
@@ -604,7 +621,7 @@
     </div>
     
     <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f1f1f1; font-size: 0.8rem; color: var(--text-light); text-align: left;">
-      <h4 style="margin: 0 0 5px 0; color: var(--text);">About DyslexiQuest (v2.6)</h4>
+      <h4 style="margin: 0 0 5px 0; color: var(--text);">About DyslexiQuest (v2.7)</h4>
       <p style="margin: 0 0 15px 0;">A multisensory adventure designed to help students master sight words.</p>
       
       <h4 style="margin: 0 0 5px 0; color: var(--text);">3D Model Credits</h4>
@@ -616,7 +633,7 @@
     </div>
 
     <div style="font-size: 0.75rem; color: var(--text-light); text-align: center; margin-top: 20px;">
-      v2.6 • Created for Mastery
+      v2.7 • Created for Mastery
     </div>
   </aside>
 
@@ -724,24 +741,30 @@
   </div>
 
   <!-- Catching Screen -->
-  <div id="catching-screen" class="collection-screen" style="display:none">
-    <div id="catching-content" class="collection-content" style="max-width: 600px;">
+  <div id="catching-screen" class="collection-screen" style="display:none; padding: 0;">
+    <!-- 3D Environment Background -->
+    <model-viewer id="catch-environment" src="https://raw.githubusercontent.com/jagenjo/GTR_Framework/master/data/prefabs/tree.glb" style="position: absolute; width: 100%; height: 100%; z-index: -1; opacity: 0.8;" camera-controls disable-zoom auto-rotate scale="3 3 3" camera-orbit="0deg 80deg 10m"></model-viewer>
+    
+    <div id="catching-content" class="collection-content" style="max-width: 600px; z-index: 10; margin-top: 40px; background: rgba(255, 255, 255, 0.85); border-radius: 24px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
       <h2 style="font-family:'Outfit'; font-size: 2rem; color: #3b82f6; margin-bottom: 5px;">A Wild Treasure!</h2>
-      <p id="catch-instruction" style="color:var(--text-light); margin-bottom: 20px;">Complete the challenge to power up your capture!</p>
+      <p id="catch-instruction" style="color:var(--text); margin-bottom: 20px; font-weight: 600;">Complete the challenge to power up your capture!</p>
       
-      <div id="catch-model-container" class="unlock-animal-container" style="height: 200px; background: transparent;">
+      <div id="catch-model-container" class="unlock-animal-container" style="height: 250px; background: transparent; box-shadow: none;">
         <model-viewer id="catch-model" shadow-intensity="1" auto-rotate style="width:100%; height:100%;"></model-viewer>
       </div>
 
-      <div id="catch-challenge-area" style="background: #f8fafc; padding: 20px; border-radius: 24px; margin-bottom: 20px;">
-        <div id="catch-word-prompt" style="font-family:'Outfit'; font-size: 1.8rem; font-weight: 800; margin-bottom: 15px;">Powering up...</div>
+      <div id="catch-challenge-area" style="background: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 24px; margin-bottom: 20px;">
+        <div id="catch-word-prompt" style="font-family:'Outfit'; font-size: 1.8rem; font-weight: 800; margin-bottom: 15px; color: var(--text);">Powering up...</div>
         <div id="catch-game-area" class="game-area" style="margin-top: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;"></div>
       </div>
 
-      <div id="capture-action-area" style="display: none;">
+      <div id="capture-action-area" style="display: none; margin-bottom: 20px;">
         <button id="shoot-power-btn" class="charge-button">✨ SHOOT BLUE POWER! ✨</button>
       </div>
     </div>
+
+    <!-- Player Avatar -->
+    <model-viewer id="catching-player-avatar" shadow-intensity="1" style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%); width: 250px; height: 250px; z-index: 5; pointer-events: none;" camera-orbit="0deg 80deg auto"></model-viewer>
   </div>
 
   <!-- Treasures screen -->

@@ -465,17 +465,27 @@ function parseLevels(text) {
   return result;
 }
 
+const AVATAR_MODELS = [
+  'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
+  'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb',
+  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb',
+  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb'
+];
+
 class Game {
   constructor() {
     this.level = 1; this.score = 0; this.streak = 0; this.xp = 0; this.maxXP = 100;
     this.isFrench = false; this.isTalkMode = false; this.micGranted = false; this.micTested = false; this.isTestMode = false;
     this.targetWord = null; this.unlockedAnimals = []; this.currentPool = []; this.selectedVoiceURI = null;
+    this.avatarModel = AVATAR_MODELS[0]; this.nextUnlockLevel = 1;
     this.wordBank = { en: {}, fr: {} }; this.users = JSON.parse(localStorage.getItem('dyslexiquest_users')) || {};
     this.currentUser = null; this.canClick = true; this.attemptsForCurrentWord = 0; this.currentAudio = null;
     this.recognition = null; this.isListening = false; this.sounds = {};
     Object.entries(SFX).forEach(([key, url]) => { this.sounds[key] = new Audio(url); this.sounds[key].volume = 0.5; });
     this.initSpeechRecognition();
   }
+
+  // ... (initSpeechRecognition, start, playSFX, hideLoading, loadWordFiles)
 
   initSpeechRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -553,20 +563,66 @@ class Game {
     this.level = u.level || 1; this.score = u.score || 0; this.streak = u.streak || 0; this.xp = u.xp || 0;
     this.maxXP = Math.min(100 + (this.level - 1) * 50, 500); this.isFrench = u.isFrench || false;
     this.unlockedAnimals = u.unlockedAnimals || []; this.selectedVoiceURI = u.selectedVoiceURI || null;
-    this.micTested = u.micTested || false; this.startGameplay();
+    this.micTested = u.micTested || false;
+    this.avatarModel = u.avatarModel || AVATAR_MODELS[0];
+    this.nextUnlockLevel = u.nextUnlockLevel || (this.level + Math.floor(Math.random() * 2) + 3);
+    this.startGameplay();
   }
 
   createProfile() {
     const name = document.getElementById('new-player-name').value.trim(); if (!name) return;
     const id = Date.now().toString();
-    this.users[id] = { name: name, level: 1, score: 0, streak: 0, xp: 0, isFrench: document.getElementById('new-player-fr').classList.contains('active'), unlockedAnimals: [], selectedVoiceURI: null, micTested: false };
+    this.users[id] = { 
+      name: name, level: 1, score: 0, streak: 0, xp: 0, 
+      isFrench: document.getElementById('new-player-fr').classList.contains('active'), 
+      unlockedAnimals: [], selectedVoiceURI: null, micTested: false,
+      avatarModel: AVATAR_MODELS[0], nextUnlockLevel: Math.floor(Math.random() * 2) + 4
+    };
     localStorage.setItem('dyslexiquest_users', JSON.stringify(this.users)); this.loadProfile(id);
   }
 
   saveProfile() {
     if (!this.currentUser) return;
-    this.users[this.currentUser] = { ...this.users[this.currentUser], level: this.level, score: this.score, streak: this.streak, xp: this.xp, isFrench: this.isFrench, unlockedAnimals: this.unlockedAnimals, selectedVoiceURI: this.selectedVoiceURI, micTested: this.micTested };
+    this.users[this.currentUser] = { 
+      ...this.users[this.currentUser], 
+      level: this.level, score: this.score, streak: this.streak, xp: this.xp, 
+      isFrench: this.isFrench, unlockedAnimals: this.unlockedAnimals, 
+      selectedVoiceURI: this.selectedVoiceURI, micTested: this.micTested,
+      avatarModel: this.avatarModel, nextUnlockLevel: this.nextUnlockLevel
+    };
     localStorage.setItem('dyslexiquest_users', JSON.stringify(this.users));
+  }
+
+  showAvatarDesigner() {
+    this.playSFX('click');
+    const screen = document.getElementById('avatar-designer-screen');
+    const modelViewer = document.getElementById('avatar-preview-model');
+    let currentIndex = AVATAR_MODELS.indexOf(this.avatarModel);
+    if (currentIndex === -1) currentIndex = 0;
+    
+    const updatePreview = () => { modelViewer.src = AVATAR_MODELS[currentIndex]; };
+    updatePreview();
+    
+    document.getElementById('prev-avatar-btn').onclick = () => {
+      this.playSFX('click');
+      currentIndex = (currentIndex - 1 + AVATAR_MODELS.length) % AVATAR_MODELS.length;
+      updatePreview();
+    };
+    
+    document.getElementById('next-avatar-btn').onclick = () => {
+      this.playSFX('click');
+      currentIndex = (currentIndex + 1) % AVATAR_MODELS.length;
+      updatePreview();
+    };
+    
+    document.getElementById('save-avatar-btn').onclick = () => {
+      this.playSFX('click');
+      this.avatarModel = AVATAR_MODELS[currentIndex];
+      this.saveProfile();
+      screen.style.display = 'none';
+    };
+    
+    screen.style.display = 'flex';
   }
 
   deleteCurrentProfile() {
@@ -729,7 +785,9 @@ class Game {
   }
 
   checkAnimalUnlock() {
-    if (this.level > 1) { 
+    if (this.level > 1 && this.level >= this.nextUnlockLevel) { 
+      this.nextUnlockLevel = this.level + Math.floor(Math.random() * 2) + 3; // 3 or 4 levels from now
+      this.saveProfile();
       const animal = this.getAnimalForLevel(); 
       if (animal) this.startCatchingSequence(animal); 
       else this.newTarget(); 
@@ -743,8 +801,11 @@ class Game {
     const model = document.getElementById('catch-model');
     const challengeArea = document.getElementById('catch-challenge-area');
     const actionArea = document.getElementById('capture-action-area');
+    const avatar = document.getElementById('catching-player-avatar');
     
     model.src = animal.model;
+    avatar.src = this.avatarModel || AVATAR_MODELS[0];
+    
     challengeArea.style.display = 'block';
     actionArea.style.display = 'none';
     screen.style.display = 'flex';
@@ -1008,6 +1069,7 @@ class Game {
     document.getElementById('mic-test-btn')?.addEventListener('click', () => this.startListening(true));
     document.getElementById('mode-listen').addEventListener('click', () => this.setMode('listen'));
     document.getElementById('mode-talk').addEventListener('click', () => this.setMode('talk'));
+    document.getElementById('avatar-btn').addEventListener('click', () => this.showAvatarDesigner());
     document.getElementById('sidebar-toggle').addEventListener('click', () => { this.playSFX('click'); document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebar-overlay').style.display = 'block'; });
     document.getElementById('sidebar-close').addEventListener('click', () => { this.playSFX('click'); document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').style.display = 'none'; });
     document.getElementById('sidebar-overlay').addEventListener('click', () => { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').style.display = 'none'; });
