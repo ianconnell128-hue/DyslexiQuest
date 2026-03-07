@@ -368,10 +368,55 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     @media (max-width: 600px) {
+      .top-bar { padding: 10px 15px; }
+      .brand { font-size: 1.1rem; }
       .hud-stats { display: none; }
-      .game-area { grid-template-columns: 1fr 1fr; gap: 15px; }
-      .card { border-radius: 30px; padding: 20px; }
-      #word-prompt { margin-top: 40px; }
+
+      .game-container { padding: 20px 10px; }
+      #word-prompt { margin: 30px 0 20px; font-size: 2.2rem; }
+
+      .game-area { 
+        display: grid; 
+        grid-template-columns: 1fr 1fr; 
+        gap: 12px; 
+        padding: 0 5px;
+      }
+
+      .card { border-radius: 20px; padding: 15px; aspect-ratio: 1; }
+      .card-word { font-size: 1.4rem; }
+      .word-shape-container { height: 35px; margin-bottom: 8px; }
+      .shape-block.tall { height: 25px; }
+      .shape-block.mid { height: 14px; }
+      .shape-block.low { height: 25px; transform: translateY(6px); }
+
+      /* Modals & Screens */
+      #loading-overlay, #start-overlay, .modal, .unlock-screen, .collection-screen {
+        padding: 15px;
+      }
+
+      .modal-content, .unlock-content, .collection-content {
+        max-width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+      }
+
+      .collection-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 12px;
+      }
+
+      .collection-content h2 { font-size: 2rem !important; }
+
+      .unlock-animal-container { height: 200px; margin: 15px 0; }
+      .unlock-content h2 { font-size: 1.8rem !important; }
+
+      /* Sidebar */
+      .sidebar { width: 85%; right: -100%; padding: 30px 15px; }
+    }
+
+    @media (max-width: 380px) {
+      .collection-grid { grid-template-columns: 1fr 1fr; }
+      #word-prompt { font-size: 1.8rem; }
     }
 
     /* ── Collection & Prizes ── */
