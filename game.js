@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v4.0 – game.js
+//  DyslexiQuest v4.1 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── 3-D collectible characters ──────────────────────────────────────────────
@@ -59,7 +59,7 @@ const ANIMALS = [
 
 const RARITY_WEIGHTS = { 'Common': 60, 'Uncommon': 25, 'Rare': 10, 'Epic': 4, 'Legendary': 0.9, 'Mythic': 0.1 };
 const RARITY_ORDER = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Mythic'];
-const SELL_PRICES = { 'Common': 15, 'Uncommon': 25, 'Rare': 45, 'Epic': 55, 'Legendary': 65, 'Mythic': 80 };
+const SELL_PRICES = { 'Common': 50, 'Uncommon': 100, 'Rare': 250, 'Epic': 500, 'Legendary': 1000, 'Mythic': 2500 };
 
 const MODELS = {
   soldier: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Soldier.glb',
@@ -70,90 +70,90 @@ const MODELS = {
 };
 
 const GEAR_SHOP = [
-  // HATS (15 items)
-  { id: 'hat_1', name: 'Scout Hat', cat: 'Hats', model: MODELS.cesium, price: 5 },
-  { id: 'hat_2', name: 'Pink Ribbon', cat: 'Hats', model: MODELS.michelle, price: 5 },
-  { id: 'hat_3', name: 'Goggles', cat: 'Hats', model: MODELS.astro, price: 10 },
-  { id: 'hat_4', name: 'Red Cap', cat: 'Hats', model: MODELS.soldier, price: 15 },
-  { id: 'hat_5', name: 'Blue Beanie', cat: 'Hats', model: MODELS.cesium, price: 15 },
-  { id: 'hat_6', name: 'Straw Hat', cat: 'Hats', model: MODELS.figure, price: 20 },
-  { id: 'hat_7', name: 'Crown', cat: 'Hats', model: MODELS.michelle, price: 50 },
-  { id: 'hat_8', name: 'Viking Horns', cat: 'Hats', model: MODELS.soldier, price: 40 },
-  { id: 'hat_9', name: 'Space Helm', cat: 'Hats', model: MODELS.astro, price: 60 },
-  { id: 'hat_10', name: 'Magic Hat', cat: 'Hats', model: MODELS.cesium, price: 45 },
-  { id: 'hat_11', name: 'Cowboy Hat', cat: 'Hats', model: MODELS.figure, price: 25 },
-  { id: 'hat_12', name: 'Tiara', cat: 'Hats', model: MODELS.michelle, price: 35 },
-  { id: 'hat_13', name: 'Fedora', cat: 'Hats', model: MODELS.soldier, price: 30 },
-  { id: 'hat_14', name: 'Winter Cap', cat: 'Hats', model: MODELS.cesium, price: 10 },
-  { id: 'hat_15', name: 'Pilot Cap', cat: 'Hats', model: MODELS.astro, price: 55 },
+  // HATS (15 items) - Realistic Day Prices ($25 - $150)
+  { id: 'hat_1', name: 'Scout Hat', cat: 'Hats', model: MODELS.cesium, price: 25 },
+  { id: 'hat_2', name: 'Pink Ribbon', cat: 'Hats', model: MODELS.michelle, price: 20 },
+  { id: 'hat_3', name: 'Sport Goggles', cat: 'Hats', model: MODELS.astro, price: 45 },
+  { id: 'hat_4', name: 'Red Cap', cat: 'Hats', model: MODELS.soldier, price: 30 },
+  { id: 'hat_5', name: 'Blue Beanie', cat: 'Hats', model: MODELS.cesium, price: 35 },
+  { id: 'hat_6', name: 'Straw Hat', cat: 'Hats', model: MODELS.figure, price: 40 },
+  { id: 'hat_7', name: 'Golden Crown', cat: 'Hats', model: MODELS.michelle, price: 150 },
+  { id: 'hat_8', name: 'Viking Horns', cat: 'Hats', model: MODELS.soldier, price: 85 },
+  { id: 'hat_9', name: 'Space Helm', cat: 'Hats', model: MODELS.astro, price: 120 },
+  { id: 'hat_10', name: 'Magic Hat', cat: 'Hats', model: MODELS.cesium, price: 95 },
+  { id: 'hat_11', name: 'Cowboy Hat', cat: 'Hats', model: MODELS.figure, price: 65 },
+  { id: 'hat_12', name: 'Jeweled Tiara', cat: 'Hats', model: MODELS.michelle, price: 110 },
+  { id: 'hat_13', name: 'Classic Fedora', cat: 'Hats', model: MODELS.soldier, price: 55 },
+  { id: 'hat_14', name: 'Winter Cap', cat: 'Hats', model: MODELS.cesium, price: 25 },
+  { id: 'hat_15', name: 'Pilot Helmet', cat: 'Hats', model: MODELS.astro, price: 130 },
 
-  // SHIRTS (15 items)
-  { id: 'shirt_1', name: 'Blue Scarf', cat: 'Shirts', model: MODELS.soldier, price: 8 },
-  { id: 'shirt_2', name: 'Green Shirt', cat: 'Shirts', model: MODELS.cesium, price: 15 },
-  { id: 'shirt_3', name: 'Yellow Vest', cat: 'Shirts', model: MODELS.soldier, price: 18 },
-  { id: 'shirt_4', name: 'Star Badge', cat: 'Shirts', model: MODELS.astro, price: 30 },
-  { id: 'shirt_5', name: 'Red Tee', cat: 'Shirts', model: MODELS.figure, price: 10 },
-  { id: 'shirt_6', name: 'Nature Tee', cat: 'Shirts', model: MODELS.cesium, price: 12 },
-  { id: 'shirt_7', name: 'Hero Cape', cat: 'Shirts', model: MODELS.figure, price: 45 },
-  { id: 'shirt_8', name: 'Armor Plate', cat: 'Shirts', model: MODELS.soldier, price: 60 },
-  { id: 'shirt_9', name: 'Space Suit Top', cat: 'Shirts', model: MODELS.astro, price: 70 },
-  { id: 'shirt_10', name: 'Fancy Tunic', cat: 'Shirts', model: MODELS.michelle, price: 40 },
-  { id: 'shirt_11', name: 'Explorer Shirt', cat: 'Shirts', model: MODELS.cesium, price: 25 },
-  { id: 'shirt_12', name: 'Training Gear', cat: 'Shirts', model: MODELS.figure, price: 20 },
-  { id: 'shirt_13', name: 'Commander Top', cat: 'Shirts', model: MODELS.soldier, price: 80 },
-  { id: 'shirt_14', name: 'Graphic Tee', cat: 'Shirts', model: MODELS.michelle, price: 15 },
-  { id: 'shirt_15', name: 'Winter Parka', cat: 'Shirts', model: MODELS.cesium, price: 35 },
+  // SHIRTS (15 items) - Realistic Day Prices ($40 - $300)
+  { id: 'shirt_1', name: 'Blue Scarf', cat: 'Shirts', model: MODELS.soldier, price: 40 },
+  { id: 'shirt_2', name: 'Green Polo', cat: 'Shirts', model: MODELS.cesium, price: 55 },
+  { id: 'shirt_3', name: 'Yellow Vest', cat: 'Shirts', model: MODELS.soldier, price: 65 },
+  { id: 'shirt_4', name: 'Star Badge Shirt', cat: 'Shirts', model: MODELS.astro, price: 80 },
+  { id: 'shirt_5', name: 'Red Cotton Tee', cat: 'Shirts', model: MODELS.figure, price: 45 },
+  { id: 'shirt_6', name: 'Nature Jacket', cat: 'Shirts', model: MODELS.cesium, price: 95 },
+  { id: 'shirt_7', name: 'Hero Cape', cat: 'Shirts', model: MODELS.figure, price: 150 },
+  { id: 'shirt_8', name: 'Armor Plate', cat: 'Shirts', model: MODELS.soldier, price: 250 },
+  { id: 'shirt_9', name: 'Space Top', cat: 'Shirts', model: MODELS.astro, price: 200 },
+  { id: 'shirt_10', name: 'Fancy Tunic', cat: 'Shirts', model: MODELS.michelle, price: 120 },
+  { id: 'shirt_11', name: 'Explorer Shirt', cat: 'Shirts', model: MODELS.cesium, price: 75 },
+  { id: 'shirt_12', name: 'Training Gear', cat: 'Shirts', model: MODELS.figure, price: 60 },
+  { id: 'shirt_13', name: 'Commander Top', cat: 'Shirts', model: MODELS.soldier, price: 180 },
+  { id: 'shirt_14', name: 'Graphic Tee', cat: 'Shirts', model: MODELS.michelle, price: 50 },
+  { id: 'shirt_15', name: 'Winter Parka', cat: 'Shirts', model: MODELS.cesium, price: 140 },
 
-  // PANTS (15 items)
-  { id: 'pants_1', name: 'Cargo Pants', cat: 'Pants', model: MODELS.soldier, price: 18 },
-  { id: 'pants_2', name: 'Work Pants', cat: 'Pants', model: MODELS.soldier, price: 25 },
-  { id: 'pants_3', name: 'Hiker Pants', cat: 'Pants', model: MODELS.cesium, price: 190 },
-  { id: 'pants_4', name: 'Jeans', cat: 'Pants', model: MODELS.soldier, price: 15 },
-  { id: 'pants_5', name: 'Shorts', cat: 'Pants', model: MODELS.michelle, price: 10 },
-  { id: 'pants_6', name: 'Leggings', cat: 'Pants', model: MODELS.michelle, price: 12 },
-  { id: 'pants_7', name: 'Armor Skirt', cat: 'Pants', model: MODELS.figure, price: 50 },
-  { id: 'pants_8', name: 'Space Pants', cat: 'Pants', model: MODELS.astro, price: 60 },
-  { id: 'pants_9', name: 'Elite Slacks', cat: 'Pants', model: MODELS.soldier, price: 40 },
-  { id: 'pants_10', name: 'Joggers', cat: 'Pants', model: MODELS.cesium, price: 20 },
-  { id: 'pants_11', name: 'Royal Pants', cat: 'Pants', model: MODELS.figure, price: 70 },
-  { id: 'pants_12', name: 'Pilot Trousers', cat: 'Pants', model: MODELS.astro, price: 55 },
-  { id: 'pants_13', name: 'Combat Pants', cat: 'Pants', model: MODELS.soldier, price: 35 },
-  { id: 'pants_14', name: 'Denim Shorts', cat: 'Pants', model: MODELS.michelle, price: 15 },
-  { id: 'pants_15', name: 'Thermal Pants', cat: 'Pants', model: MODELS.cesium, price: 30 },
+  // PANTS (15 items) - Realistic Day Prices ($50 - $350)
+  { id: 'pants_1', name: 'Cargo Pants', cat: 'Pants', model: MODELS.soldier, price: 65 },
+  { id: 'pants_2', name: 'Work Pants', cat: 'Pants', model: MODELS.soldier, price: 75 },
+  { id: 'pants_3', name: 'Hiker Pants', cat: 'Pants', model: MODELS.cesium, price: 85 },
+  { id: 'pants_4', name: 'Denim Jeans', cat: 'Pants', model: MODELS.soldier, price: 60 },
+  { id: 'pants_5', name: 'Summer Shorts', cat: 'Pants', model: MODELS.michelle, price: 45 },
+  { id: 'pants_6', name: 'Sport Leggings', cat: 'Pants', model: MODELS.michelle, price: 55 },
+  { id: 'pants_7', name: 'Armor Skirt', cat: 'Pants', model: MODELS.figure, price: 180 },
+  { id: 'pants_8', name: 'Space Pants', cat: 'Pants', model: MODELS.astro, price: 150 },
+  { id: 'pants_9', name: 'Elite Slacks', cat: 'Pants', model: MODELS.soldier, price: 95 },
+  { id: 'pants_10', name: 'Joggers', cat: 'Pants', model: MODELS.cesium, price: 50 },
+  { id: 'pants_11', name: 'Royal Pants', cat: 'Pants', model: MODELS.figure, price: 220 },
+  { id: 'pants_12', name: 'Pilot Trousers', cat: 'Pants', model: MODELS.astro, price: 140 },
+  { id: 'pants_13', name: 'Combat Pants', cat: 'Pants', model: MODELS.soldier, price: 110 },
+  { id: 'pants_14', name: 'Denim Shorts', cat: 'Pants', model: MODELS.michelle, price: 50 },
+  { id: 'pants_15', name: 'Thermal Pants', cat: 'Pants', model: MODELS.cesium, price: 90 },
 
-  // SHOES (15 items)
-  { id: 'shoes_1', name: 'Red Boots', cat: 'Shoes', model: MODELS.figure, price: 12 },
-  { id: 'shoes_2', name: 'Runners', cat: 'Shoes', model: MODELS.figure, price: 40 },
-  { id: 'shoes_3', name: 'Fast Shoes', cat: 'Shoes', model: MODELS.cesium, price: 25 },
-  { id: 'shoes_4', name: 'Heavy Boots', cat: 'Shoes', model: MODELS.soldier, price: 30 },
-  { id: 'shoes_5', name: 'Space Boots', cat: 'Shoes', model: MODELS.astro, price: 50 },
-  { id: 'shoes_6', name: 'Sandals', cat: 'Shoes', model: MODELS.figure, price: 10 },
-  { id: 'shoes_7', name: 'Golden Shoes', cat: 'Shoes', model: MODELS.michelle, price: 100 },
-  { id: 'shoes_8', name: 'Sneakers', cat: 'Shoes', model: MODELS.cesium, price: 20 },
-  { id: 'shoes_9', name: 'Combat Boots', cat: 'Shoes', model: MODELS.soldier, price: 45 },
-  { id: 'shoes_10', name: 'Moon Walkers', cat: 'Shoes', model: MODELS.astro, price: 75 },
-  { id: 'shoes_11', name: 'Ballet Flats', cat: 'Shoes', model: MODELS.michelle, price: 35 },
-  { id: 'shoes_12', name: 'Hiking Boots', cat: 'Shoes', model: MODELS.cesium, price: 30 },
-  { id: 'shoes_13', name: 'Royal Slippers', cat: 'Shoes', model: MODELS.figure, price: 60 },
-  { id: 'shoes_14', name: 'Iron Sabatons', cat: 'Shoes', model: MODELS.soldier, price: 80 },
-  { id: 'shoes_15', name: 'Jump Shoes', cat: 'Shoes', model: MODELS.astro, price: 90 },
+  // SHOES (15 items) - Realistic Day Prices ($80 - $500)
+  { id: 'shoes_1', name: 'Red Boots', cat: 'Shoes', model: MODELS.figure, price: 120 },
+  { id: 'shoes_2', name: 'Pro Runners', cat: 'Shoes', model: MODELS.figure, price: 140 },
+  { id: 'shoes_3', name: 'Fast Shoes', cat: 'Shoes', model: MODELS.cesium, price: 110 },
+  { id: 'shoes_4', name: 'Heavy Boots', cat: 'Shoes', model: MODELS.soldier, price: 130 },
+  { id: 'shoes_5', name: 'Space Boots', cat: 'Shoes', model: MODELS.astro, price: 250 },
+  { id: 'shoes_6', name: 'Travel Sandals', cat: 'Shoes', model: MODELS.figure, price: 80 },
+  { id: 'shoes_7', name: 'Golden Shoes', cat: 'Shoes', model: MODELS.michelle, price: 500 },
+  { id: 'shoes_8', name: 'Sneakers', cat: 'Shoes', model: MODELS.cesium, price: 90 },
+  { id: 'shoes_9', name: 'Combat Boots', cat: 'Shoes', model: MODELS.soldier, price: 160 },
+  { id: 'shoes_10', name: 'Moon Walkers', cat: 'Shoes', model: MODELS.astro, price: 350 },
+  { id: 'shoes_11', name: 'Ballet Flats', cat: 'Shoes', model: MODELS.michelle, price: 95 },
+  { id: 'shoes_12', name: 'Hiking Boots', cat: 'Shoes', model: MODELS.cesium, price: 150 },
+  { id: 'shoes_13', name: 'Royal Slippers', cat: 'Shoes', model: MODELS.figure, price: 280 },
+  { id: 'shoes_14', name: 'Iron Sabatons', cat: 'Shoes', model: MODELS.soldier, price: 320 },
+  { id: 'shoes_15', name: 'Jump Shoes', cat: 'Shoes', model: MODELS.astro, price: 400 },
 
-  // SETS (15 items)
-  { id: 'set_1', name: 'Blue Cape Set', cat: 'Sets', model: MODELS.figure, price: 20 },
-  { id: 'set_2', name: 'Iron Gloves Set', cat: 'Sets', model: MODELS.soldier, price: 25 },
-  { id: 'set_3', name: 'Explorer Set', cat: 'Sets', model: MODELS.cesium, price: 35 },
-  { id: 'set_4', name: 'Dancer Set', cat: 'Sets', model: MODELS.figure, price: 40 },
-  { id: 'set_5', name: 'Marine Set', cat: 'Sets', model: MODELS.soldier, price: 45 },
-  { id: 'set_6', name: 'Superstar Set', cat: 'Sets', model: MODELS.michelle, price: 50 },
-  { id: 'set_7', name: 'Cadet Set', cat: 'Sets', model: MODELS.astro, price: 55 },
-  { id: 'set_8', name: 'Elite Guard Set', cat: 'Sets', model: MODELS.soldier, price: 60 },
-  { id: 'set_9', name: 'Royal Hero Set', cat: 'Sets', model: MODELS.figure, price: 65 },
-  { id: 'set_10', name: 'Astro Pilot Set', cat: 'Sets', model: MODELS.astro, price: 70 },
-  { id: 'set_11', name: 'General Set', cat: 'Sets', model: MODELS.soldier, price: 75 },
-  { id: 'set_12', name: 'Commander Set', cat: 'Sets', model: MODELS.astro, price: 80 },
-  { id: 'set_13', name: 'Shadow Suit Set', cat: 'Sets', model: MODELS.soldier, price: 85 },
-  { id: 'set_14', name: 'Mythic Soul Set', cat: 'Sets', model: MODELS.michelle, price: 150 },
-  { id: 'set_15', name: 'Ultimate God Set', cat: 'Sets', model: MODELS.figure, price: 1000 }
+  // SETS (15 items) - High End Prices ($500 - $5000)
+  { id: 'set_1', name: 'Hero Set', cat: 'Sets', model: MODELS.figure, price: 500 },
+  { id: 'set_2', name: 'Iron Knight Set', cat: 'Sets', model: MODELS.soldier, price: 750 },
+  { id: 'set_3', name: 'Explorer Set', cat: 'Sets', model: MODELS.cesium, price: 600 },
+  { id: 'set_4', name: 'Dancer Set', cat: 'Sets', model: MODELS.figure, price: 550 },
+  { id: 'set_5', name: 'Marine Set', cat: 'Sets', model: MODELS.soldier, price: 850 },
+  { id: 'set_6', name: 'Superstar Set', cat: 'Sets', model: MODELS.michelle, price: 1200 },
+  { id: 'set_7', name: 'Cadet Set', cat: 'Sets', model: MODELS.astro, price: 1000 },
+  { id: 'set_8', name: 'Elite Guard Set', cat: 'Sets', model: MODELS.soldier, price: 1500 },
+  { id: 'set_9', name: 'Royal Hero Set', cat: 'Sets', model: MODELS.figure, price: 2000 },
+  { id: 'set_10', name: 'Astro Pilot Set', cat: 'Sets', model: MODELS.astro, price: 1800 },
+  { id: 'set_11', name: 'General Set', cat: 'Sets', model: MODELS.soldier, price: 2500 },
+  { id: 'set_12', name: 'Commander Set', cat: 'Sets', model: MODELS.astro, price: 3000 },
+  { id: 'set_13', name: 'Shadow Suit Set', cat: 'Sets', model: MODELS.soldier, price: 3500 },
+  { id: 'set_14', name: 'Mythic Soul Set', cat: 'Sets', model: MODELS.michelle, price: 4000 },
+  { id: 'set_15', name: 'Ultimate God Set', cat: 'Sets', model: MODELS.figure, price: 5000 }
 ];
 
 const SHOP_CATEGORIES = ['Hats', 'Shirts', 'Pants', 'Shoes', 'Sets'];
