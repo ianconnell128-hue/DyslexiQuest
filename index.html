@@ -460,6 +460,27 @@
     .rarity-legendary { background: #fef9c3; color: #854d0e; }
     .rarity-mythic { background: #fee2e2; color: #991b1b; }
 
+    /* ── Quest Items ── */
+    .quest-card {
+     background: white;
+     border: 2px solid #f1f5f9;
+     border-radius: 20px;
+     padding: 15px;
+     text-align: left;
+     display: flex;
+     flex-direction: column;
+     gap: 10px;
+     margin-bottom: 10px;
+    }
+    .quest-header { display: flex; justify-content: space-between; align-items: center; }
+    .quest-title { font-weight: 800; color: var(--text); font-size: 1rem; }
+    .quest-reward { font-weight: 800; color: var(--accent); font-size: 0.9rem; }
+    .quest-progress-bg { width: 100%; height: 10px; background: #f1f5f9; border-radius: 5px; overflow: hidden; }
+    .quest-progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
+    .quest-claim-btn { width: 100%; padding: 10px; border-radius: 12px; font-weight: 800; font-size: 0.8rem; border: none; cursor: pointer; }
+    .quest-claim-btn.ready { background: var(--accent); color: white; }
+    .quest-claim-btn.locked { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+    .quest-claim-btn.claimed { background: #dcfce7; color: #059669; cursor: default; }
     model-viewer {
       width: 100%;
       height: 100%;
@@ -685,6 +706,16 @@
     </div>
   </div>
 
+  <!-- Quests Screen -->
+  <div id="quests-screen" class="collection-screen" style="display:none">
+    <div class="collection-content">
+      <h2 style="font-family:'Outfit'; font-size: 2.5rem; color: var(--primary); margin-bottom: 10px;">Daily Quests</h2>
+      <p style="color:var(--text-light); margin-bottom: 20px;">Master words to earn extra coins!</p>
+      <div id="quests-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px;"></div>
+      <button id="close-quests-btn" class="primary" style="border-radius:20px; padding:15px 40px; width:auto; margin:0 auto;">Close Quests</button>
+    </div>
+  </div>
+
   <!-- Sidebar Drawer -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
@@ -702,6 +733,7 @@
       </div>
 
       <button id="collection-btn" class="primary">My Treasures (<span id="collection-count">0</span>)</button>
+      <button id="quests-btn" class="primary" style="background: var(--accent); border-color: #059669;">Daily Quests ✨</button>
       <button id="store-btn" class="accent">Treasure Lab (Trade)</button>
       <button id="shop-btn" class="accent" style="background: #f59e0b; border-color: #d97706;">DyslexiShop (Sell/Buy)</button>
       <button id="flash-cards-btn">Shuffle Deck</button>
@@ -725,7 +757,7 @@
     </div>
     
     <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f1f1f1; font-size: 0.8rem; color: var(--text-light); text-align: left;">
-      <h4 style="margin: 0 0 5px 0; color: var(--text);">About DyslexiQuest (v4.8)</h4>
+      <h4 style="margin: 0 0 5px 0; color: var(--text);">About DyslexiQuest (v4.9)</h4>
       <p style="margin: 0 0 15px 0;">A multisensory adventure designed to help students master sight words.</p>
       
       <h4 style="margin: 0 0 5px 0; color: var(--text);">3D Model Credits</h4>
@@ -737,7 +769,7 @@
     </div>
 
     <div style="font-size: 0.75rem; color: var(--text-light); text-align: center; margin-top: 20px;">
-      v4.8 • Created for Mastery
+      v4.9 • Created for Mastery
     </div>
   </aside>
 

@@ -1,7 +1,14 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v4.8 – game.js
+//  DyslexiQuest v4.9 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
+
+const QUEST_TEMPLATES = [
+  { id: 'correct_words', text: 'Master {target} words', targets: [10, 20, 30], reward: 200 },
+  { id: 'level_up', text: 'Level up {target} time', targets: [1], reward: 300 },
+  { id: 'use_talk', text: 'Use Talk Mode {target} times', targets: [5, 10], reward: 150 },
+  { id: 'streak', text: 'Get a streak of {target}', targets: [5, 10], reward: 250 }
+];
 
 // ── 3-D collectible characters ──────────────────────────────────────────────
 const ANIMALS = [
@@ -225,6 +232,7 @@ class Game {
     this.avatarModel = AVATAR_MODELS.male; this.nextUnlockLevel = 1;
     this.coins = 0; this.unlockedAvatars = [AVATAR_MODELS.male, AVATAR_MODELS.female];
     this.avatarColors = { skin: COLORS.skin[0], hair: COLORS.hair[0], eye: COLORS.eye[0] };
+    this.activeQuests = []; this.lastQuestRefresh = null;
     this.wordBank = { en: {}, fr: {} }; this.users = JSON.parse(localStorage.getItem('dyslexiquest_users')) || {};
     this.currentUser = null; this.canClick = true; this.attemptsForCurrentWord = 0; this.currentAudio = null;
     this.recognition = null; this.isListening = false; this.sounds = {};
@@ -317,6 +325,7 @@ class Game {
     this.coins = u.coins || 0;
     this.unlockedAvatars = u.unlockedAvatars || [AVATAR_MODELS.male, AVATAR_MODELS.female];
     this.avatarColors = u.avatarColors || { skin: COLORS.skin[0], hair: COLORS.hair[0], eye: COLORS.eye[0] };
+    this.activeQuests = u.activeQuests || []; this.lastQuestRefresh = u.lastQuestRefresh || null;
     this.startGameplay();
   }
 
@@ -341,7 +350,8 @@ class Game {
       isFrench: this.isFrench, unlockedAnimals: this.unlockedAnimals, 
       selectedVoiceURI: this.selectedVoiceURI, micTested: this.micTested,
       gender: this.gender, avatarModel: this.avatarModel, nextUnlockLevel: this.nextUnlockLevel,
-      coins: this.coins, unlockedAvatars: this.unlockedAvatars, avatarColors: this.avatarColors
+      coins: this.coins, unlockedAvatars: this.unlockedAvatars, avatarColors: this.avatarColors,
+      activeQuests: this.activeQuests, lastQuestRefresh: this.lastQuestRefresh
     };
     localStorage.setItem('dyslexiquest_users', JSON.stringify(this.users));
   }
@@ -473,7 +483,7 @@ class Game {
     document.getElementById('sidebar-overlay').style.display = 'none'; this.showProfileSelect();
   }
 
-  startGameplay() { document.getElementById('start-overlay').style.display = 'none'; this.updateStats(); this.updateCollectionButton(); this.populateVoiceList(); this.newTarget(); }
+  startGameplay() { document.getElementById('start-overlay').style.display = 'none'; this.updateStats(); this.updateCollectionButton(); this.populateVoiceList(); this.checkDailyRefresh(); this.newTarget(); }
 
   populateVoiceList() {
     const voiceSelect = document.getElementById('voice-select'); if (!voiceSelect || !window.speechSynthesis) return;
@@ -534,6 +544,9 @@ class Game {
     if (fb) fb.innerHTML = `I heard: <b style="color:var(--primary)">"${t}"</b>`;
     if (t === target || t.includes(target)) {
       this.playSFX('correct'); this.streak++; this.score += 150; this.xp += 5;
+      this.updateQuestProgress('correct_words', 1);
+      this.updateQuestProgress('use_talk', 1);
+      this.updateQuestProgress('streak', this.streak);
       if (fb) fb.innerHTML = '<span style="color:var(--accent)">YES! ✨</span>';
       this.updateStats(); this.saveProfile(); setTimeout(() => this.levelUpOrNext(), 1500);
     } else {
@@ -594,6 +607,8 @@ class Game {
       this.canClick = false; this.playSFX('correct'); card.classList.add('correct-zoom');
       this.xp += 5;
       this.streak = (this.attemptsForCurrentWord === 1) ? this.streak + 1 : 0;
+      this.updateQuestProgress('correct_words', 1);
+      this.updateQuestProgress('streak', this.streak);
       this.score += 100; this.updateStats(); this.saveProfile(); setTimeout(() => this.levelUpOrNext(), 1500);
     } else {
       this.streak = 0; this.canClick = false; this.playSFX('wrong'); card.style.opacity = '0.3';
@@ -707,6 +722,97 @@ class Game {
     screen.style.display = 'flex';
   }
 
+  checkDailyRefresh() {
+    const today = new Date().toLocaleDateString();
+    if (this.lastQuestRefresh !== today) {
+      this.refreshQuests();
+      this.lastQuestRefresh = today;
+      this.saveProfile();
+    }
+  }
+
+  refreshQuests() {
+    this.activeQuests = [];
+    const available = [...QUEST_TEMPLATES];
+    for (let i = 0; i < 3; i++) {
+      const idx = Math.floor(Math.random() * available.length);
+      const template = available.splice(idx, 1)[0];
+      const target = template.targets[Math.floor(Math.random() * template.targets.length)];
+      this.activeQuests.push({
+        id: template.id,
+        text: template.text.replace('{target}', target),
+        target: target,
+        reward: template.reward,
+        progress: 0,
+        claimed: false
+      });
+    }
+  }
+
+  updateQuestProgress(type, amount = 1) {
+    let changed = false;
+    this.activeQuests.forEach(q => {
+      if (q.id === type && !q.claimed && q.progress < q.target) {
+        if (type === 'streak') {
+          if (amount > q.progress) q.progress = amount;
+        } else {
+          q.progress += amount;
+        }
+        if (q.progress > q.target) q.progress = q.target;
+        changed = true;
+      }
+    });
+    if (changed) this.saveProfile();
+  }
+
+  showQuestsScreen() {
+    this.playSFX('click');
+    this.checkDailyRefresh();
+    const screen = document.getElementById('quests-screen');
+    const list = document.getElementById('quests-list');
+    list.innerHTML = '';
+
+    this.activeQuests.forEach((q, idx) => {
+      const card = document.createElement('div');
+      card.className = 'quest-card';
+      const isReady = q.progress >= q.target && !q.claimed;
+      const progressPct = (q.progress / q.target) * 100;
+
+      card.innerHTML = `
+        <div class="quest-header">
+          <span class="quest-title">${q.text}</span>
+          <span class="quest-reward">$${q.reward}</span>
+        </div>
+        <div class="quest-progress-bg">
+          <div class="quest-progress-fill" style="width: ${progressPct}%"></div>
+        </div>
+        <div style="font-size: 0.7rem; color: var(--text-light); text-align: right;">${q.progress} / ${q.target}</div>
+        <button class="quest-claim-btn ${q.claimed ? 'claimed' : (isReady ? 'ready' : 'locked')}" 
+                ${!isReady ? 'disabled' : ''}>
+          ${q.claimed ? 'Claimed ✓' : (isReady ? 'Claim Reward!' : 'Keep Playing...')}
+        </button>
+      `;
+      
+      if (isReady) {
+        card.querySelector('button').onclick = () => this.claimQuestReward(idx);
+      }
+      list.appendChild(card);
+    });
+
+    screen.style.display = 'flex';
+  }
+
+  claimQuestReward(idx) {
+    const q = this.activeQuests[idx];
+    if (q.claimed) return;
+    this.playSFX('correct');
+    q.claimed = true;
+    this.coins += q.reward;
+    this.updateStats();
+    this.saveProfile();
+    this.showQuestsScreen();
+  }
+
   performSell(index, price) {
     const ua = this.unlockedAnimals[index];
     if (!confirm(`Sell "${ua.petName}" for $${price}?`)) return;
@@ -735,6 +841,7 @@ class Game {
   levelUp() {
     this.playSFX('levelUp'); this.level++; 
     this.maxXP = 5 + (this.level - 1) * 5; this.xp = 0;
+    this.updateQuestProgress('level_up', 1);
     this.updateStats(); this.saveProfile();
     const newLevelEl = document.getElementById('new-level');
     if (newLevelEl) newLevelEl.textContent = this.level;
@@ -1056,6 +1163,8 @@ class Game {
     document.getElementById('new-game').addEventListener('click', () => { if(confirm("Reset progress?")) this.reset(); });
     document.getElementById('delete-profile-btn').addEventListener('click', () => this.deleteCurrentProfile());
     document.getElementById('store-btn').addEventListener('click', () => this.showStoreScreen());
+    document.getElementById('quests-btn')?.addEventListener('click', () => this.showQuestsScreen());
+    document.getElementById('close-quests-btn')?.addEventListener('click', () => { this.playSFX('click'); document.getElementById('quests-screen').style.display = 'none'; });
     document.getElementById('shop-btn').addEventListener('click', () => this.showShopScreen());
     document.getElementById('shop-btn-sidebar')?.addEventListener('click', () => this.showShopScreen());
     document.getElementById('close-shop-btn').addEventListener('click', () => { this.playSFX('click'); document.getElementById('shop-screen').style.display = 'none'; });
