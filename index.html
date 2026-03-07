@@ -593,7 +593,10 @@
 
   <!-- Minimalist HUD -->
   <nav class="top-bar">
-    <div class="brand">DyslexiQuest</div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <div class="brand">DyslexiQuest</div>
+      <button class="menu-toggle" id="avatar-btn" style="font-size: 1.2rem;">👤</button>
+    </div>
     <div class="hud-stats">
       <div>LVL <b id="level">1</b></div>
       <div>SCORE <b id="score">0</b></div>
@@ -606,7 +609,6 @@
         <div id="chest-badge" style="position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; display: none;">!</div>
       </div>
       <button class="menu-toggle" id="sidebar-toggle">☰</button>
-      <button class="menu-toggle" id="avatar-btn">👤</button>
     </div>
   </nav>
 
