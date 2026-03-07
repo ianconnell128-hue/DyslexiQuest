@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v5.3 – game.js
+//  DyslexiQuest v5.4 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 const QUEST_TEMPLATES = [
@@ -630,11 +630,11 @@ class Game {
       if (!this.micGranted) this.showMicPermissionOnboarding();
       else if (!this.micTested) { document.getElementById('mic-permission-view').style.display = 'none'; document.getElementById('mic-test-view').style.display = 'flex'; }
       else { document.getElementById('mic-permission-view').style.display = 'none'; document.getElementById('talk-active-view').style.display = 'flex'; }
-      const displayWord = this.formatWordContextually(this.targetWord.word);
+      const displayWord = this.targetWord.word.toUpperCase();
       const targetCard = document.getElementById('speech-target-card');
       if (targetCard) targetCard.innerHTML = `<div class="card" style="margin:0 auto; flex:none; width:100%;">
         <svg class="shape-svg" viewBox="0 0 200 200"><path d="${this.targetWord.shape || generateShape(this.targetWord.word)}"/></svg>
-        <div class="card-word ruled" style="font-size: 2.5rem;">${displayWord}</div></div>`;
+        <div class="card-word" style="font-size: 2.5rem;">${displayWord}</div></div>`;
       const feedback = document.getElementById('speech-feedback');
       if (feedback) feedback.textContent = "Click the mic when ready!";
     } else { setTimeout(() => this.speak(), 500); this.renderCards(); }
@@ -650,10 +650,10 @@ class Game {
     const roundIsRuled = Math.random() > 0.5;
     cards.forEach(wordData => {
       const card = document.createElement('div'); card.className = 'card';
-      const displayWord = this.formatWordContextually(wordData.word);
+      const displayWord = wordData.word.toUpperCase();
       card.innerHTML = `<div class="particles" style="display:none"></div><div class="feedback"></div>
         <svg class="shape-svg" viewBox="0 0 200 200"><path d="${wordData.shape || generateShape(wordData.word)}"/></svg>
-        <div class="card-word ${roundIsRuled ? 'ruled' : ''}">${displayWord}</div>`;
+        <div class="card-word">${displayWord}</div>`;
       card.addEventListener('click', (e) => this.onCardClick(e, wordData)); gameArea.appendChild(card);
     });
   }
@@ -963,7 +963,8 @@ class Game {
     cards.forEach(wordData => {
       const card = document.createElement('div');
       card.className = 'card';
-      card.innerHTML = `<svg class="shape-svg" viewBox="0 0 200 200"><path d="${wordData.shape || generateShape(wordData.word)}"/></svg><div class="card-word">${wordData.word}</div>`;
+      const displayWord = wordData.word.toUpperCase();
+      card.innerHTML = `<svg class="shape-svg" viewBox="0 0 200 200"><path d="${wordData.shape || generateShape(wordData.word)}"/></svg><div class="card-word">${displayWord}</div>`;
       card.addEventListener('click', () => {
         if (wordData.word === target.word) {
           this.playSFX('correct');
