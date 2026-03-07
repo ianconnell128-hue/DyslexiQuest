@@ -571,7 +571,7 @@ class Game {
     } else { setTimeout(() => this.speak(), 500); this.renderCards(); }
   }
 
-  formatWordContextually(w) { return Math.random() > 0.5 ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : w.toLowerCase(); }
+  formatWordContextually(w) { return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); }
 
   renderCards() {
     const gameArea = document.getElementById('game-area'); gameArea.innerHTML = '';
