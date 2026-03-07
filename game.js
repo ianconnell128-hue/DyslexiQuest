@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v5.7 – game.js
+//  DyslexiQuest v5.8 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 const QUEST_TEMPLATES = [
@@ -329,7 +329,11 @@ class Game {
     this.micTested = u.micTested || false;
     this.gender = u.gender || 'male';
     this.avatarModel = u.avatarModel || AVATAR_MODELS.male;
-    this.nextUnlockLevel = u.nextUnlockLevel || (this.level + 2);
+    this.nextUnlockLevel = u.nextUnlockLevel;
+    if (this.nextUnlockLevel === undefined || this.nextUnlockLevel === null) {
+      // If user has no animals but is high level, trigger next encounter immediately
+      this.nextUnlockLevel = (this.unlockedAnimals.length === 0 && this.level > 1) ? this.level : (this.level + 2);
+    }
     this.coins = u.coins || 0;
     this.unlockedAvatars = u.unlockedAvatars || [AVATAR_MODELS.male, AVATAR_MODELS.female];
     this.avatarColors = u.avatarColors || { skin: COLORS.skin[0], hair: COLORS.hair[0], eye: COLORS.eye[0] };
@@ -496,7 +500,15 @@ class Game {
   startGameplay() { 
     document.getElementById('start-overlay').style.display = 'none'; 
     this.updateStats(); this.updateCollectionButton(); this.populateVoiceList(); 
-    this.checkDailyRefresh(); this.updateGameplayVisuals(); this.setFont(this.dyslexicFont); this.newTarget(); 
+    this.checkDailyRefresh(); this.updateGameplayVisuals(); this.setFont(this.dyslexicFont);
+    
+    // Check if we are overdue for a treasure (like if the user is level 30 but has none)
+    if (this.level > 1 && this.level >= this.nextUnlockLevel) {
+      this.checkAnimalUnlock();
+    } else {
+      this.newTarget(); 
+    }
+    
     document.addEventListener('click', () => { this.bgm.play().catch(() => {}); }, { once: true });
   }
 
