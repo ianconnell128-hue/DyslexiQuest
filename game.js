@@ -792,19 +792,57 @@ class Game {
   }
 
   showCollectionScreen() {
-    this.playSFX('click'); const badge = document.getElementById('chest-badge'); if (badge) badge.style.display = 'none';
+    this.playSFX('click');
+    const badge = document.getElementById('chest-badge'); if (badge) badge.style.display = 'none';
     const content = document.getElementById('collection-content');
-    content.innerHTML = `<h2 style="font-size:3em;margin-bottom:20px; font-family:'Outfit'; color:var(--primary);">Your Treasures</h2><div id="collection-list" style="text-align:left; display:flex; flex-direction:column; gap:30px; margin-bottom:30px; max-height:60vh; overflow-y:auto; padding-right:10px;"></div><button id="close-collection-btn" class="primary" style="border-radius:20px; padding:15px 40px; width:auto; margin:0 auto;">Close Treasures</button>`;
-    const list = document.getElementById('collection-list'), grid = document.createElement('div'); grid.className = 'collection-grid';
-    [...this.unlockedAnimals].reverse().forEach(ua => {
-      const animalData = ANIMALS.find(a => a.name === ua.animalName); if (!animalData) return;
-      const card = document.createElement('div'); card.className = 'collection-card'; card.style.cursor = 'pointer';
-      card.innerHTML = `<div class="rarity-display rarity-${animalData.rarity.toLowerCase()}" style="margin-bottom:5px;">${animalData.rarity}</div><div style="font-weight:800; color:var(--primary); font-size:1.1rem;">${ua.petName}</div><div class="collection-animal-container" style="height:120px; width:100%;"><model-viewer src="${animalData.model}" shadow-intensity="1" camera-controls auto-rotate style="width:100%; height:100%; --poster-color:#ffffff"></model-viewer></div><div style="font-weight:700; font-size:0.8rem; text-transform:uppercase; color:var(--text-light);">${animalData.name}</div><div style="font-size:0.7rem; font-weight:800; background:#f1f5f9; padding:4px 10px; border-radius:10px; margin-top:5px;">LVL ${ua.level}</div>`;
-      card.addEventListener('click', () => this.showTreasureDetail(ua));
-      grid.appendChild(card);
-    });
-    if (this.unlockedAnimals.length === 0) list.innerHTML = `<p style="text-align:center; color:var(--text-light);">Keep playing to unlock treasure!</p>`;
-    else list.appendChild(grid);
+    content.innerHTML = `<h2 style="font-size:3em;margin-bottom:20px; font-family:'Outfit'; color:var(--primary);">Your Treasures</h2><div id="collection-list" style="text-align:left; display:flex; flex-direction:column; gap:20px; margin-bottom:30px; max-height:60vh; overflow-y:auto; padding-right:10px;"></div><button id="close-collection-btn" class="primary" style="border-radius:20px; padding:15px 40px; width:auto; margin:0 auto;">Close Treasures</button>`;
+    const list = document.getElementById('collection-list');
+
+    if (this.unlockedAnimals.length === 0) {
+      list.innerHTML = `<p style="text-align:center; color:var(--text-light); margin-top: 20px;">Keep playing to unlock your first treasure!</p>`;
+    } else {
+      // Group by rarity
+      const grouped = {};
+      RARITY_ORDER.forEach(r => grouped[r] = []);
+      
+      this.unlockedAnimals.forEach(ua => {
+        const animalData = ANIMALS.find(a => a.name === ua.animalName);
+        if (animalData) grouped[animalData.rarity].push({ ua, data: animalData });
+      });
+
+      // Render each rarity section
+      RARITY_ORDER.forEach(rarity => {
+        const items = grouped[rarity];
+        if (items.length === 0) return;
+
+        const section = document.createElement('div');
+        section.innerHTML = `<h4 style="border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; color: var(--text-light); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 15px;">${rarity} (${items.length})</h4>`;
+        
+        const grid = document.createElement('div');
+        grid.className = 'collection-grid';
+        
+        items.reverse().forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'collection-card';
+          card.style.cursor = 'pointer';
+          card.innerHTML = `
+            <div class="rarity-display rarity-${item.data.rarity.toLowerCase()}" style="margin-bottom:5px;">${item.data.rarity}</div>
+            <div style="font-weight:800; color:var(--primary); font-size:1.1rem;">${item.ua.petName}</div>
+            <div class="collection-animal-container" style="height:120px; width:100%;">
+              <model-viewer src="${item.data.model}" shadow-intensity="1" camera-controls auto-rotate style="width:100%; height:100%; --poster-color:#ffffff"></model-viewer>
+            </div>
+            <div style="font-weight:700; font-size:0.8rem; text-transform:uppercase; color:var(--text-light);">${item.data.name}</div>
+            <div style="font-size:0.7rem; font-weight:800; background:#f1f5f9; padding:4px 10px; border-radius:10px; margin-top:5px;">LVL ${item.ua.level}</div>
+          `;
+          card.addEventListener('click', () => this.showTreasureDetail(item.ua));
+          grid.appendChild(card);
+        });
+        
+        section.appendChild(grid);
+        list.appendChild(section);
+      });
+    }
+
     document.getElementById('close-collection-btn').addEventListener('click', () => { this.playSFX('click'); document.getElementById('animal-collection-screen').style.display = 'none'; });
     document.getElementById('animal-collection-screen').style.display = 'flex';
   }
