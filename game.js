@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v3.6 – game.js
+//  DyslexiQuest v3.7 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── 3-D collectible characters ──────────────────────────────────────────────
@@ -76,12 +76,12 @@ const GEAR_SHOP = [
   { id: 'item_4', name: 'Goggles', cat: 'Hats', model: MODELS.astro, price: 10 },
   { id: 'item_5', name: 'Red Boots', cat: 'Shoes', model: MODELS.figure, price: 12 },
   { id: 'item_6', name: 'Green Shirt', cat: 'Shirts', model: MODELS.cesium, price: 15 },
-  { id: 'item_7', name: 'Yellow Vest', cat: 'Shirts', model: MODELS.soldier, price: 18 },
+  { id: 'item_7', name: 'Cargo Pants', cat: 'Pants', model: MODELS.soldier, price: 18 },
   { id: 'item_8', name: 'Blue Cape', cat: 'Sets', model: MODELS.figure, price: 20 },
-  { id: 'item_9', name: 'Iron Gloves', cat: 'Sets', model: MODELS.soldier, price: 25 },
+  { id: 'item_9', name: 'Work Pants', cat: 'Pants', model: MODELS.soldier, price: 25 },
   { id: 'item_10', name: 'Star Badge', cat: 'Shirts', model: MODELS.astro, price: 30 },
   { id: 'item_11', name: 'Explorer', cat: 'Sets', model: MODELS.cesium, price: 35 },
-  { id: 'item_12', name: 'Dancer', cat: 'Sets', model: MODELS.figure, price: 40 },
+  { id: 'item_12', name: 'Runners', cat: 'Shoes', model: MODELS.figure, price: 40 },
   { id: 'item_13', name: 'Marine', cat: 'Sets', model: MODELS.soldier, price: 45 },
   { id: 'item_14', name: 'Superstar', cat: 'Sets', model: MODELS.michelle, price: 50 },
   { id: 'item_15', name: 'Cadet', cat: 'Sets', model: MODELS.astro, price: 55 },
@@ -102,7 +102,7 @@ const GEAR_SHOP = [
   { id: 'item_30', name: 'Alpha Hero', cat: 'Sets', model: MODELS.soldier, price: 160 },
   { id: 'item_31', name: 'Omega Wing', cat: 'Sets', model: MODELS.figure, price: 170 },
   { id: 'item_32', name: 'Nova Suit', cat: 'Sets', model: MODELS.astro, price: 180 },
-  { id: 'item_33', name: 'Primal Garb', cat: 'Sets', model: MODELS.cesium, price: 190 },
+  { id: 'item_33', name: 'Hiker Pants', cat: 'Pants', model: MODELS.cesium, price: 190 },
   { id: 'item_34', name: 'Ghost Wrap', cat: 'Sets', model: MODELS.soldier, price: 200 },
   { id: 'item_35', name: 'Sun Gown', cat: 'Sets', model: MODELS.figure, price: 210 },
   { id: 'item_36', name: 'Moon Suit', cat: 'Sets', model: MODELS.astro, price: 220 },
@@ -112,7 +112,7 @@ const GEAR_SHOP = [
   { id: 'item_40', name: 'Titan Armor', cat: 'Sets', model: MODELS.soldier, price: 260 },
   { id: 'item_41', name: 'Divine Suit', cat: 'Sets', model: MODELS.michelle, price: 270 },
   { id: 'item_42', name: 'Stellar Garb', cat: 'Sets', model: MODELS.astro, price: 280 },
-  { id: 'item_43', name: 'Ancient Wrap', cat: 'Sets', model: MODELS.cesium, price: 290 },
+  { id: 'item_43', name: 'Ancient Wrap', cat: 'Pants', model: MODELS.cesium, price: 290 },
   { id: 'item_44', name: 'Future Hero', cat: 'Sets', model: MODELS.soldier, price: 300 },
   { id: 'item_45', name: 'Magic Gown', cat: 'Sets', model: MODELS.figure, price: 350 },
   { id: 'item_46', name: 'Grand Master', cat: 'Sets', model: MODELS.cesium, price: 400 },
@@ -274,7 +274,7 @@ class Game {
     this.micTested = u.micTested || false;
     this.gender = u.gender || 'male';
     this.avatarModel = u.avatarModel || AVATAR_MODELS.male;
-    this.nextUnlockLevel = u.nextUnlockLevel || (this.level + Math.floor(Math.random() * 8) + 1);
+    this.nextUnlockLevel = u.nextUnlockLevel || (this.level + Math.floor(Math.random() * 5) + 1);
     this.coins = u.coins || 0;
     this.unlockedAvatars = u.unlockedAvatars || [AVATAR_MODELS.male, AVATAR_MODELS.female];
     this.avatarColors = u.avatarColors || { skin: COLORS.skin[0], hair: COLORS.hair[0], eye: COLORS.eye[0] };
@@ -288,7 +288,7 @@ class Game {
       name: name, level: 1, score: 0, streak: 0, xp: 0, 
       isFrench: document.getElementById('new-player-en').classList.contains('active'), 
       unlockedAnimals: [], selectedVoiceURI: null, micTested: false,
-      gender: this.gender, avatarModel: this.avatarModel, nextUnlockLevel: Math.floor(Math.random() * 8) + 2,
+      gender: this.gender, avatarModel: this.avatarModel, nextUnlockLevel: Math.floor(Math.random() * 5) + 2,
       coins: 0, unlockedAvatars: this.unlockedAvatars, avatarColors: this.avatarColors
     };
     localStorage.setItem('dyslexiquest_users', JSON.stringify(this.users)); this.loadProfile(id);
@@ -312,6 +312,7 @@ class Game {
     const screen = isOnboarding ? document.getElementById('create-step-avatar') : document.getElementById('avatar-designer-screen');
     const modelViewer = isOnboarding ? document.getElementById('create-avatar-preview') : document.getElementById('avatar-preview-model');
     const gearList = document.getElementById('my-gear-list');
+    let currentMyGearCat = 'Sets';
     
     const updatePreview = () => {
       modelViewer.src = this.avatarModel;
@@ -325,6 +326,42 @@ class Game {
       document.getElementById('avatar-gender-female').classList.toggle('active', g === 'female');
       updatePreview();
       this.playSFX('click');
+    };
+
+    const renderMyGear = (cat) => {
+      if (!gearList) return;
+      gearList.innerHTML = '';
+      
+      const filtered = this.unlockedAvatars.filter(modelUrl => {
+        const gearInfo = GEAR_SHOP.find(g => g.model === modelUrl);
+        if (modelUrl === AVATAR_MODELS.male || modelUrl === AVATAR_MODELS.female) {
+          return cat === 'Sets'; // Base models are full sets
+        }
+        return gearInfo && gearInfo.cat === cat;
+      });
+
+      filtered.forEach(modelUrl => {
+        const gearInfo = GEAR_SHOP.find(g => g.model === modelUrl) || { name: 'Base' };
+        if (modelUrl === AVATAR_MODELS.male || modelUrl === AVATAR_MODELS.female) {
+          gearInfo.name = modelUrl === AVATAR_MODELS.male ? 'Base Boy' : 'Base Girl';
+        }
+        
+        const btn = document.createElement('button');
+        btn.style.width = '80px'; btn.style.height = '80px'; btn.style.flexShrink = '0';
+        btn.style.padding = '5px'; btn.style.fontSize = '0.7rem'; btn.style.border = '2px solid #e2e8f0';
+        btn.style.borderRadius = '12px'; btn.style.background = 'white';
+        if (this.avatarModel === modelUrl) btn.style.borderColor = 'var(--primary)';
+        
+        btn.innerHTML = `<div style="height:40px"><model-viewer src="${modelUrl}" auto-rotate style="width:100%;height:100%"></model-viewer></div><div>${gearInfo.name}</div>`;
+        btn.onclick = () => {
+          this.avatarModel = modelUrl;
+          this.playSFX('click');
+          updatePreview();
+          [...gearList.children].forEach(b => b.style.borderColor = '#e2e8f0');
+          btn.style.borderColor = 'var(--primary)';
+        };
+        gearList.appendChild(btn);
+      });
     };
 
     if (isOnboarding) {
@@ -355,30 +392,31 @@ class Game {
       document.getElementById('create-step-1').style.display = 'none';
       screen.style.display = 'block';
     } else {
-      // Render My Gear
-      if (gearList) {
-        gearList.innerHTML = '';
-        this.unlockedAvatars.forEach(modelUrl => {
-          const gearInfo = GEAR_SHOP.find(g => g.model === modelUrl) || { name: 'Base' };
-          if (modelUrl === AVATAR_MODELS.male || modelUrl === AVATAR_MODELS.female) {
-            gearInfo.name = modelUrl === AVATAR_MODELS.male ? 'Base Boy' : 'Base Girl';
-          }
-          
+      // Add category tabs to My Gear
+      let tabs = screen.querySelector('.my-gear-tabs');
+      if (!tabs) {
+        tabs = document.createElement('div');
+        tabs.className = 'my-gear-tabs cat-tabs';
+        tabs.style.display = 'flex'; tabs.style.gap = '5px'; tabs.style.overflowX = 'auto'; tabs.style.marginBottom = '10px'; tabs.style.padding = '5px';
+        SHOP_CATEGORIES.forEach(cat => {
           const btn = document.createElement('button');
-          btn.style.width = '80px'; btn.style.height = '80px'; btn.style.flexShrink = '0';
-          btn.style.padding = '5px'; btn.style.fontSize = '0.7rem'; btn.style.border = '2px solid #e2e8f0';
-          btn.style.borderRadius = '12px'; btn.style.background = 'white';
-          btn.innerHTML = `<div style="height:40px"><model-viewer src="${modelUrl}" auto-rotate style="width:100%;height:100%"></model-viewer></div><div>${gearInfo.name}</div>`;
+          btn.textContent = cat; btn.style.fontSize = '0.7rem'; btn.style.padding = '8px'; btn.style.width = 'auto';
           btn.onclick = () => {
-            this.avatarModel = modelUrl;
-            this.playSFX('click');
-            updatePreview();
-            [...gearList.children].forEach(b => b.style.borderColor = '#e2e8f0');
-            btn.style.borderColor = 'var(--primary)';
+            currentMyGearCat = cat;
+            [...tabs.children].forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderMyGear(cat);
           };
-          gearList.appendChild(btn);
+          if (cat === 'Sets') btn.classList.add('active');
+          tabs.appendChild(btn);
         });
+        screen.insertBefore(tabs, gearList);
+      } else {
+        [...tabs.children].forEach(b => b.classList.remove('active'));
+        tabs.children[SHOP_CATEGORIES.indexOf('Sets')].classList.add('active');
       }
+
+      renderMyGear('Sets');
 
       document.getElementById('save-avatar-btn').onclick = () => {
         this.playSFX('click'); this.saveProfile(); screen.style.display = 'none';
@@ -585,7 +623,6 @@ class Game {
     };
 
     const buyView = document.getElementById('shop-buy-view');
-    // Clear and Add category buttons to buy view
     let tabs = buyView.querySelector('.cat-tabs');
     if (!tabs) {
       tabs = document.createElement('div');
@@ -662,7 +699,7 @@ class Game {
 
   checkAnimalUnlock() {
     if (this.level > 1 && this.level >= this.nextUnlockLevel) { 
-      this.nextUnlockLevel = this.level + Math.floor(Math.random() * 8) + 1;
+      this.nextUnlockLevel = this.level + Math.floor(Math.random() * 5) + 1; // 1-5 levels away
       this.saveProfile();
       const animal = this.getAnimalForLevel(); 
       if (animal) this.startCatchingSequence(animal); 
