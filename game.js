@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v6.0 – game.js
+//  DyslexiQuest v6.1 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 const QUEST_TEMPLATES = [
@@ -331,9 +331,8 @@ class Game {
     this.avatarModel = u.avatarModel || AVATAR_MODELS.male;
     this.nextUnlockLevel = u.nextUnlockLevel;
     if (this.nextUnlockLevel === undefined || this.nextUnlockLevel === null) {
-      // If user has no animals or is starting fresh, align to the next available even level
-      // e.g. if level 1, next is 2. If level 30, next is 30 (trigger immediate).
-      this.nextUnlockLevel = Math.ceil(Math.max(2, this.level) / 2) * 2;
+      // If missing, start right now (at current level)
+      this.nextUnlockLevel = this.level;
     }
     this.coins = u.coins || 0;
     this.unlockedAvatars = u.unlockedAvatars || [AVATAR_MODELS.male, AVATAR_MODELS.female];
@@ -504,7 +503,7 @@ class Game {
     this.checkDailyRefresh(); this.updateGameplayVisuals(); this.setFont(this.dyslexicFont);
     
     // Check if we are overdue for a treasure (like if the user is level 30 but has none)
-    if (this.level > 1 && this.level >= this.nextUnlockLevel) {
+    if (this.level >= this.nextUnlockLevel) {
       this.checkAnimalUnlock();
     } else {
       this.newTarget(); 
@@ -946,10 +945,9 @@ class Game {
   }
 
   checkAnimalUnlock() {
-    // Starting at level 2, unlock a treasure on every even level
-    if (this.level >= 2 && this.level >= this.nextUnlockLevel) { 
-      // Force alignment to next even level
-      this.nextUnlockLevel = (Math.floor(this.level / 2) + 1) * 2;
+    // Unlock a treasure on every single level (1, 2, 3, 4...)
+    if (this.level >= this.nextUnlockLevel) { 
+      this.nextUnlockLevel = this.level + 1;
       this.saveProfile();
       const animal = this.getAnimalForLevel(); 
       if (animal) this.startCatchingSequence(animal); 
