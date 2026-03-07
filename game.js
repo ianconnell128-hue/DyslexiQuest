@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v4.4 – game.js
+//  DyslexiQuest v4.5 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── 3-D collectible characters ──────────────────────────────────────────────
@@ -531,7 +531,7 @@ class Game {
     const target = this.targetWord.word.toLowerCase(), fb = document.getElementById('speech-feedback');
     if (fb) fb.innerHTML = `I heard: <b style="color:var(--primary)">"${t}"</b>`;
     if (t === target || t.includes(target)) {
-      this.playSFX('correct'); this.streak++; this.score += 150; this.xp += 1;
+      this.playSFX('correct'); this.streak++; this.score += 150; this.xp += 5;
       if (fb) fb.innerHTML = '<span style="color:var(--accent)">YES! ✨</span>';
       this.updateStats(); this.saveProfile(); setTimeout(() => this.levelUpOrNext(), 1500);
     } else {
@@ -588,7 +588,7 @@ class Game {
     this.attemptsForCurrentWord++;
     if (isCorrect) {
       this.canClick = false; this.playSFX('correct'); card.classList.add('correct-zoom');
-      this.xp += 1;
+      this.xp += 5;
       this.streak = (this.attemptsForCurrentWord === 1) ? this.streak + 1 : 0;
       this.score += 100; this.updateStats(); this.saveProfile(); setTimeout(() => this.levelUpOrNext(), 1500);
     } else {
