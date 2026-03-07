@@ -729,8 +729,158 @@ class Game {
   }
 
   checkAnimalUnlock() {
-    if (this.level > 1) { const animal = this.getAnimalForLevel(); if (animal) this.showUnlockScreen(animal); else this.newTarget(); }
+    if (this.level > 1) { 
+      const animal = this.getAnimalForLevel(); 
+      if (animal) this.startCatchingSequence(animal); 
+      else this.newTarget(); 
+    }
     else this.newTarget();
+  }
+
+  startCatchingSequence(animal) {
+    this.playSFX('levelUp');
+    const screen = document.getElementById('catching-screen');
+    const model = document.getElementById('catch-model');
+    const challengeArea = document.getElementById('catch-challenge-area');
+    const actionArea = document.getElementById('capture-action-area');
+    
+    model.src = animal.model;
+    challengeArea.style.display = 'block';
+    actionArea.style.display = 'none';
+    screen.style.display = 'flex';
+
+    this.renderCatchingChallenge(animal);
+  }
+
+  renderCatchingChallenge(animal) {
+    const pool = this.buildPool();
+    const target = pool[Math.floor(Math.random() * pool.length)];
+    const distractors = pool.filter(w => w.word !== target.word).slice(0, 3);
+    let cards = [target, ...distractors];
+    for (let i = cards.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [cards[i], cards[j]] = [cards[j], cards[i]]; }
+
+    const prompt = document.getElementById('catch-word-prompt');
+    const area = document.getElementById('catch-game-area');
+    area.innerHTML = '';
+    prompt.textContent = "Listen and Find!";
+    
+    setTimeout(() => this.speak(target.word), 500);
+
+    cards.forEach(wordData => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `${getWordShapeHTML(wordData.word)}<div class="card-word">${wordData.word}</div>`;
+      card.addEventListener('click', () => {
+        if (wordData.word === target.word) {
+          this.playSFX('correct');
+          document.getElementById('catch-challenge-area').style.display = 'none';
+          document.getElementById('capture-action-area').style.display = 'block';
+          document.getElementById('shoot-power-btn').onclick = () => this.fireCapturePower(animal);
+        } else {
+          this.playSFX('wrong');
+          card.style.opacity = '0.3';
+          this.speak(target.word);
+        }
+      });
+      area.appendChild(card);
+    });
+  }
+
+  fireCapturePower(animal) {
+    this.playSFX('click');
+    const btn = document.getElementById('shoot-power-btn');
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+
+    const modelRect = document.getElementById('catch-model').getBoundingClientRect();
+    const startX = window.innerWidth / 2;
+    const startY = window.innerHeight - 50;
+
+    // Create blue power projectile
+    const power = document.createElement('div');
+    power.className = 'blue-power';
+    power.style.left = `${startX}px`;
+    power.style.top = `${startY}px`;
+    document.body.appendChild(power);
+
+    // Animate to model
+    requestAnimationFrame(() => {
+      power.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+      power.style.left = `${modelRect.left + modelRect.width / 2}px`;
+      power.style.top = `${modelRect.top + modelRect.height / 2}px`;
+      power.style.transform = 'scale(2)';
+    });
+
+    setTimeout(() => {
+      power.remove();
+      this.condenseToSpikyBall(animal, modelRect);
+    }, 600);
+  }
+
+  condenseToSpikyBall(animal, rect) {
+    // Hide model
+    document.getElementById('catch-model').style.opacity = '0';
+    
+    // Create spiky ball
+    const ball = document.createElement('div');
+    ball.className = 'spiky-ball';
+    ball.style.background = animal.color;
+    ball.style.color = animal.color; // For spikes
+    ball.style.left = `${rect.left + rect.width / 2 - 40}px`;
+    ball.style.top = `${rect.top + rect.height / 2 - 40}px`;
+    ball.style.transform = 'scale(0)';
+    
+    // Add spikes
+    for (let i = 0; i < 12; i++) {
+      const spike = document.createElement('div');
+      spike.className = 'spike';
+      spike.style.transform = `rotate(${i * 30}deg)`;
+      ball.appendChild(spike);
+    }
+    
+    document.body.appendChild(ball);
+
+    // Animate ball appearing
+    requestAnimationFrame(() => {
+      ball.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+      ball.style.transform = 'scale(1)';
+    });
+
+    setTimeout(() => {
+      this.animateBallToChest(ball, animal);
+    }, 1000);
+  }
+
+  animateBallToChest(ball, animal) {
+    const endRect = document.getElementById('chest-container').getBoundingClientRect();
+    
+    ball.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+    ball.style.left = `${endRect.left}px`;
+    ball.style.top = `${endRect.top}px`;
+    ball.style.transform = 'scale(0.3) rotate(360deg)';
+    ball.style.opacity = '0.5';
+
+    setTimeout(() => {
+      ball.remove();
+      document.getElementById('catching-screen').style.display = 'none';
+      document.getElementById('catch-model').style.opacity = '1';
+      
+      // Finalize unlock
+      const usedNames = this.unlockedAnimals.map(u => u.petName), availableNames = PET_NAMES.filter(n => !usedNames.includes(n));
+      const petName = availableNames[Math.floor(Math.random() * availableNames.length)] || `${animal.name} #${this.unlockedAnimals.length + 1}`;
+      this.unlockedAnimals.push({ animalName: animal.name, petName: petName, level: this.level });
+      this.updateCollectionButton(); this.saveProfile();
+      
+      // Visual feedback on chest
+      document.getElementById('chest-container').style.transform = 'scale(1.5) rotate(15deg)';
+      setTimeout(() => { 
+        document.getElementById('chest-container').style.transform = 'scale(1) rotate(0deg)'; 
+        const badge = document.getElementById('chest-badge'); 
+        if (badge) { badge.style.display = 'block'; badge.textContent = this.unlockedAnimals.length; } 
+      }, 200);
+      
+      this.newTarget();
+    }, 800);
   }
 
   showStoreScreen() {
@@ -766,29 +916,7 @@ class Game {
   }
 
   showUnlockScreen(animal) {
-    const usedNames = this.unlockedAnimals.map(u => u.petName), availableNames = PET_NAMES.filter(n => !usedNames.includes(n));
-    const petName = availableNames[Math.floor(Math.random() * availableNames.length)] || `${animal.name} #${this.unlockedAnimals.length + 1}`;
-    this.unlockedAnimals.push({ animalName: animal.name, petName: petName, level: this.level });
-    this.updateCollectionButton(); this.saveProfile();
-    const content = document.getElementById('unlock-content');
-    content.innerHTML = `<div class="unlock-title">NEW TREASURE UNLOCKED!</div><div class="rarity-display rarity-${animal.rarity.toLowerCase()}">${animal.rarity}</div><h2 style="font-size:2.5em;margin:10px 0">${petName}</h2><p style="color:var(--text-light); margin-bottom:20px;">The ${animal.name}</p><div class="unlock-animal-container" id="prize-model-container"><model-viewer id="prize-model" src="${animal.model}" shadow-intensity="1" camera-controls auto-rotate ar style="width:100%;height:100%;--poster-color:#ffffff" class="unlock-animal-model" alt="${animal.name}"></model-viewer></div><button id="continue-unlock-btn" class="unlock-btn">Add to Treasures!</button>`;
-    document.getElementById('continue-unlock-btn').addEventListener('click', () => { this.playSFX('click'); this.animatePrizeToChest(); });
-    document.getElementById('unlock-screen').style.display = 'flex';
-  }
-
-  animatePrizeToChest() {
-    const startRect = document.getElementById('prize-model-container').getBoundingClientRect();
-    const endRect = document.getElementById('chest-container').getBoundingClientRect();
-    const flyer = document.createElement('div');
-    flyer.style.position = 'absolute'; flyer.style.top = `${startRect.top}px`; flyer.style.left = `${startRect.left}px`; flyer.style.width = `${startRect.width}px`; flyer.style.height = `${startRect.height}px`; flyer.style.background = 'radial-gradient(circle, var(--primary) 0%, transparent 70%)'; flyer.style.borderRadius = '50%'; flyer.style.zIndex = '10001'; flyer.style.transition = 'all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-    flyer.innerHTML = `<div style="font-size: 3rem; display:flex; align-items:center; justify-content:center; height:100%;">✨</div>`;
-    document.getElementById('flying-prize-container').appendChild(flyer); document.getElementById('flying-prize-container').style.display = 'block'; document.getElementById('unlock-screen').style.display = 'none';
-    requestAnimationFrame(() => { flyer.style.top = `${endRect.top}px`; flyer.style.left = `${endRect.left}px`; flyer.style.width = '40px'; flyer.style.height = '40px'; flyer.style.opacity = '0.5'; flyer.style.transform = 'rotate(360deg)'; });
-    setTimeout(() => {
-      document.getElementById('chest-container').style.transform = 'scale(1.5) rotate(15deg)';
-      setTimeout(() => { document.getElementById('chest-container').style.transform = 'scale(1) rotate(0deg)'; const badge = document.getElementById('chest-badge'); if (badge) { badge.style.display = 'block'; badge.textContent = this.unlockedAnimals.length; } }, 200);
-      flyer.remove(); document.getElementById('flying-prize-container').style.display = 'none'; this.newTarget();
-    }, 800);
+    this.startCatchingSequence(animal);
   }
 
   showCollectionScreen() {

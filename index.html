@@ -486,6 +486,61 @@
       border-radius: 24px;
       overflow: hidden;
     }
+
+    /* ── Catching Mechanic ── */
+    #catching-screen {
+      background: radial-gradient(circle at center, #ffffff 0%, #f1f5f9 100%);
+    }
+
+    .blue-power {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: #3b82f6;
+      border-radius: 50%;
+      filter: blur(8px);
+      box-shadow: 0 0 20px #60a5fa, 0 0 40px #3b82f6;
+      z-index: 10002;
+      pointer-events: none;
+    }
+
+    .spiky-ball {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      z-index: 10003;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset -10px -10px 20px rgba(0,0,0,0.2);
+    }
+
+    .spike {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 15px solid currentColor;
+      transform-origin: 50% 40px; /* Offset to sit on edge of 80px ball */
+    }
+
+    .charge-button {
+      background: #3b82f6 !important;
+      color: white !important;
+      font-size: 1.5rem !important;
+      padding: 25px !important;
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.5) !important;
+      border: none !important;
+      animation: pulse-blue 2s infinite;
+    }
+
+    @keyframes pulse-blue {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+      70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(59, 130, 246, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+    }
   </style>
 </head>
 <body>
@@ -549,7 +604,7 @@
     </div>
     
     <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f1f1f1; font-size: 0.8rem; color: var(--text-light); text-align: left;">
-      <h4 style="margin: 0 0 5px 0; color: var(--text);">About DyslexiQuest (v2.5)</h4>
+      <h4 style="margin: 0 0 5px 0; color: var(--text);">About DyslexiQuest (v2.6)</h4>
       <p style="margin: 0 0 15px 0;">A multisensory adventure designed to help students master sight words.</p>
       
       <h4 style="margin: 0 0 5px 0; color: var(--text);">3D Model Credits</h4>
@@ -561,7 +616,7 @@
     </div>
 
     <div style="font-size: 0.75rem; color: var(--text-light); text-align: center; margin-top: 20px;">
-      v2.5 • Created for Mastery
+      v2.6 • Created for Mastery
     </div>
   </aside>
 
@@ -666,6 +721,27 @@
   <!-- Animal unlock screen -->
   <div id="unlock-screen" class="unlock-screen" style="display:none">
     <div id="unlock-content" class="unlock-content"></div>
+  </div>
+
+  <!-- Catching Screen -->
+  <div id="catching-screen" class="collection-screen" style="display:none">
+    <div id="catching-content" class="collection-content" style="max-width: 600px;">
+      <h2 style="font-family:'Outfit'; font-size: 2rem; color: #3b82f6; margin-bottom: 5px;">A Wild Treasure!</h2>
+      <p id="catch-instruction" style="color:var(--text-light); margin-bottom: 20px;">Complete the challenge to power up your capture!</p>
+      
+      <div id="catch-model-container" class="unlock-animal-container" style="height: 200px; background: transparent;">
+        <model-viewer id="catch-model" shadow-intensity="1" auto-rotate style="width:100%; height:100%;"></model-viewer>
+      </div>
+
+      <div id="catch-challenge-area" style="background: #f8fafc; padding: 20px; border-radius: 24px; margin-bottom: 20px;">
+        <div id="catch-word-prompt" style="font-family:'Outfit'; font-size: 1.8rem; font-weight: 800; margin-bottom: 15px;">Powering up...</div>
+        <div id="catch-game-area" class="game-area" style="margin-top: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;"></div>
+      </div>
+
+      <div id="capture-action-area" style="display: none;">
+        <button id="shoot-power-btn" class="charge-button">✨ SHOOT BLUE POWER! ✨</button>
+      </div>
+    </div>
   </div>
 
   <!-- Treasures screen -->
