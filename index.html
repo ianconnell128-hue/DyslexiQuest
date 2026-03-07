@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DyslexiQuest v2</title>
+  <title>DyslexiQuest v5.3</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Lexend:wght@400;500;700;800&display=swap');
 
@@ -257,46 +257,43 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      align-items: stretch;
-      gap: 15px;
+      align-items: center;
+      gap: 25px;
       margin-top: 40px;
-      padding: 0 10px;
+      padding: 20px;
       width: 100%;
       box-sizing: border-box;
     }
 
-    @media (min-width: 800px) {
-      .game-area { gap: 25px; }
-    }
-
     .card {
-      flex: 0 1 240px;
-      min-width: 160px;
-      min-height: 220px;
-      background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
-      border-radius: 30px;
+      width: 240px;
+      height: 300px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 35px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 25px;
+      padding: 30px;
       cursor: pointer;
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      border: 3px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 10px 25px rgba(67, 56, 202, 0.2);
+      border: 4px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
       position: relative;
       overflow: hidden;
+      margin: 10px;
     }
 
     .card:hover { 
-      transform: translateY(-12px) scale(1.02); 
-      box-shadow: 0 20px 35px rgba(67, 56, 202, 0.3); 
-      border-color: rgba(255, 255, 255, 0.3); 
+      transform: translateY(-12px) scale(1.03); 
+      box-shadow: 0 25px 45px rgba(0,0,0,0.3); 
+      border-color: rgba(255, 255, 255, 0.4); 
     }
 
     .card.correct-zoom {
       animation: correct-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      background: linear-gradient(135deg, #4ecdc4 0%, #45b7af 100%);
+      border-color: rgba(255, 255, 255, 0.6);
       z-index: 100;
     }
 
@@ -306,43 +303,45 @@
       100% { transform: scale(1.1); }
     }
 
-    .word-shape-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      height: 40px;
-      margin-bottom: 15px;
-      width: 100%;
+    .shape-svg {
+      width: 130px;
+      height: 130px;
+      margin-bottom: 20px;
+      opacity: 0.95;
+      filter: drop-shadow(0 8px 15px rgba(0,0,0,0.3));
     }
 
-    .shape-block {
-      background: white;
-      opacity: 0.3;
-      border-radius: 4px;
-      width: 12px;
-      transition: all 0.3s ease;
+    .shape-svg path {
+      fill: none;
+      stroke: white;
+      stroke-width: 10;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10;
     }
-
-    /* Block heights based on letter anatomy */
-    .shape-block.tall { height: 30px; } 
-    .shape-block.mid  { height: 16px; } 
-    .shape-block.low  { height: 30px; transform: translateY(6px); }
 
     .card-word {
       font-family: 'Outfit', sans-serif;
-      font-size: 2.2rem;
+      font-size: 2.6rem;
       color: white;
-      font-weight: 800;
+      font-weight: 900;
       text-align: center;
       line-height: 1.1;
-      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      letter-spacing: 0.02em;
+      text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+      letter-spacing: 0.04em;
     }
 
     body.font-dyslexic .card-word {
       font-family: 'Lexend', sans-serif;
-      font-weight: 600;
+      font-weight: 700;
+    }
+
+    @media (max-width: 600px) {
+      .game-area { gap: 15px; padding: 10px; }
+      .card { width: 150px; height: 200px; padding: 15px; border-radius: 28px; margin: 5px; }
+      .card-word { font-size: 1.6rem; }
+      .shape-svg { width: 90px; height: 90px; margin-bottom: 10px; }
+      .shape-svg path { stroke-width: 8; }
     }
 
     /* Notebook Line Simulation (Disabled) */

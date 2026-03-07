@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v5.2 – game.js
+//  DyslexiQuest v5.3 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 const QUEST_TEMPLATES = [
@@ -199,16 +199,17 @@ const FALLBACK_WORDS = {
   fr: { 1: ['jai','dit','le','la','je','vois','un','une'], 2: ['mon','est','regarde','suis','ma','dans','peux'], 3: ['aussi','non','va','maman','papa','en','mes'] }
 };
 
-function getWordShapeHTML(word) {
-  const ascenders = 'bdfhklitABCDEFGHIJKLMNOPQRSTUVWXYZ', descenders = 'gpqyfj'; 
-  let html = '<div class="word-shape-container">';
-  [...word].forEach(char => {
-    let type = 'mid';
-    if (ascenders.includes(char)) type = 'tall';
-    else if (descenders.includes(char)) type = 'low';
-    html += `<div class="shape-block ${type}"></div>`;
-  });
-  return html + '</div>';
+function generateShape(word) {
+  const codes = [...word].map(c => c.charCodeAt(0)), sum = codes.reduce((a, b) => a + b, 0), len = word.length;
+  const cx = 100, cy = 100, r = 55 + (sum % 20), bump = 15 + (len * 3);
+  const paths = [
+    `M${cx - r},${cy + r} Q${cx - bump},${cy - r - 10} ${cx},${cy - r} Q${cx + bump},${cy - r - 10} ${cx + r},${cy + r}`,
+    `M${cx - r},${cy} Q${cx - 20},${cy - r} ${cx},${cy} Q${cx + 20},${cy + r} ${cx + r},${cy}`,
+    `M${cx - r},${cy + r} L${cx},${cy - r} L${cx + r},${cy + r} M${cx - r + 10},${cy + r} L${cx + r - 10},${cy + r}`,
+    `M${cx},${cy - r} Q${cx + r + 20},${cy} ${cx},${cy + r} Q${cx - r - 20},${cy} ${cx},${cy - r}`,
+    `M${cx - r},${cy + r} Q${cx - 30},${cy} ${cx},${cy - r - 10} Q${cx + 30},${cy} ${cx + r},${cy + r}`,
+  ];
+  return paths[sum % paths.length];
 }
 
 function parseLevels(text) {
@@ -218,7 +219,10 @@ function parseLevels(text) {
     const levelNum = parseInt(chunks[i], 10), body = chunks[i + 1] || '', tokens = body.match(/[a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ'\-]{1,}/g) || [], seen = new Set(), words = [];
     for (const t of tokens) {
       const w = t.trim().toLowerCase();
-      if (w.length >= 2 && !seen.has(w) && !/^(niveau|level|titre|title|terminaisons)$/i.test(w)) { seen.add(w); words.push({ word: w }); }
+      if (w.length >= 2 && !seen.has(w) && !/^(niveau|level|titre|title|terminaisons)$/i.test(w)) { 
+        seen.add(w); 
+        words.push({ word: w, shape: generateShape(w) }); 
+      }
     }
     if (words.length > 0) result[levelNum] = words;
   }
@@ -628,7 +632,9 @@ class Game {
       else { document.getElementById('mic-permission-view').style.display = 'none'; document.getElementById('talk-active-view').style.display = 'flex'; }
       const displayWord = this.formatWordContextually(this.targetWord.word);
       const targetCard = document.getElementById('speech-target-card');
-      if (targetCard) targetCard.innerHTML = `<div class="card" style="margin:0 auto; flex:none; width:100%;">${getWordShapeHTML(displayWord)}<div class="card-word ruled" style="font-size: 2.5rem;">${displayWord}</div></div>`;
+      if (targetCard) targetCard.innerHTML = `<div class="card" style="margin:0 auto; flex:none; width:100%;">
+        <svg class="shape-svg" viewBox="0 0 200 200"><path d="${this.targetWord.shape || generateShape(this.targetWord.word)}"/></svg>
+        <div class="card-word ruled" style="font-size: 2.5rem;">${displayWord}</div></div>`;
       const feedback = document.getElementById('speech-feedback');
       if (feedback) feedback.textContent = "Click the mic when ready!";
     } else { setTimeout(() => this.speak(), 500); this.renderCards(); }
@@ -645,7 +651,9 @@ class Game {
     cards.forEach(wordData => {
       const card = document.createElement('div'); card.className = 'card';
       const displayWord = this.formatWordContextually(wordData.word);
-      card.innerHTML = `<div class="particles" style="display:none"></div><div class="feedback"></div>${getWordShapeHTML(displayWord)}<div class="card-word ${roundIsRuled ? 'ruled' : ''}">${displayWord}</div>`;
+      card.innerHTML = `<div class="particles" style="display:none"></div><div class="feedback"></div>
+        <svg class="shape-svg" viewBox="0 0 200 200"><path d="${wordData.shape || generateShape(wordData.word)}"/></svg>
+        <div class="card-word ${roundIsRuled ? 'ruled' : ''}">${displayWord}</div>`;
       card.addEventListener('click', (e) => this.onCardClick(e, wordData)); gameArea.appendChild(card);
     });
   }
@@ -955,7 +963,7 @@ class Game {
     cards.forEach(wordData => {
       const card = document.createElement('div');
       card.className = 'card';
-      card.innerHTML = `${getWordShapeHTML(wordData.word)}<div class="card-word">${wordData.word}</div>`;
+      card.innerHTML = `<svg class="shape-svg" viewBox="0 0 200 200"><path d="${wordData.shape || generateShape(wordData.word)}"/></svg><div class="card-word">${wordData.word}</div>`;
       card.addEventListener('click', () => {
         if (wordData.word === target.word) {
           this.playSFX('correct');
