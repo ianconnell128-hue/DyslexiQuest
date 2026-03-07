@@ -698,7 +698,7 @@
     </div>
     
     <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f1f1f1; font-size: 0.8rem; color: var(--text-light); text-align: left;">
-      <h4 style="margin: 0 0 5px 0; color: var(--text);">About DyslexiQuest (v3.9)</h4>
+      <h4 style="margin: 0 0 5px 0; color: var(--text);">About DyslexiQuest (v4.0)</h4>
       <p style="margin: 0 0 15px 0;">A multisensory adventure designed to help students master sight words.</p>
       
       <h4 style="margin: 0 0 5px 0; color: var(--text);">3D Model Credits</h4>
@@ -710,7 +710,7 @@
     </div>
 
     <div style="font-size: 0.75rem; color: var(--text-light); text-align: center; margin-top: 20px;">
-      v3.9 • Created for Mastery
+      v4.0 • Created for Mastery
     </div>
   </aside>
 
@@ -850,11 +850,13 @@
   </div>
 
   <!-- Catching Screen -->
-  <div id="catching-screen" class="collection-screen" style="display:none; padding: 0;">
-    <!-- 3D Environment Background (Multiple Trees) -->
-    <model-viewer id="catch-env-1" src="https://raw.githubusercontent.com/jagenjo/GTR_Framework/master/data/prefabs/tree.glb" style="position: absolute; width: 100%; height: 100%; z-index: -1; opacity: 0.8;" disable-zoom auto-rotate scale="3 3 3" camera-orbit="45deg 80deg 10m"></model-viewer>
-    <model-viewer id="catch-env-2" src="https://raw.githubusercontent.com/jagenjo/GTR_Framework/master/data/prefabs/tree.glb" style="position: absolute; width: 100%; height: 100%; z-index: -1; opacity: 0.6; left: -20%;" disable-zoom auto-rotate scale="2 2 2" camera-orbit="120deg 85deg 12m"></model-viewer>
-    <model-viewer id="catch-env-3" src="https://raw.githubusercontent.com/jagenjo/GTR_Framework/master/data/prefabs/tree.glb" style="position: absolute; width: 100%; height: 100%; z-index: -1; opacity: 0.6; right: -20%;" disable-zoom auto-rotate scale="2 2 2" camera-orbit="200deg 85deg 12m"></model-viewer>
+  <div id="catching-screen" class="collection-screen" style="display:none; padding: 0; background: url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;">
+    <!-- 3D Environment Background (Small Trees) -->
+    <model-viewer id="catch-env-1" src="https://raw.githubusercontent.com/jagenjo/GTR_Framework/master/data/prefabs/tree.glb" style="position: absolute; width: 100px; height: 100px; z-index: 3; bottom: 80px; left: 5%;" disable-zoom auto-rotate scale="0.5 0.5 0.5" camera-orbit="45deg 80deg 10m"></model-viewer>
+    <model-viewer id="catch-env-2" src="https://raw.githubusercontent.com/jagenjo/GTR_Framework/master/data/prefabs/tree.glb" style="position: absolute; width: 80px; height: 80px; z-index: 3; bottom: 90px; left: 25%;" disable-zoom auto-rotate scale="0.4 0.4 0.4" camera-orbit="120deg 85deg 12m"></model-viewer>
+    <model-viewer id="catch-env-3" src="https://raw.githubusercontent.com/jagenjo/GTR_Framework/master/data/prefabs/tree.glb" style="position: absolute; width: 90px; height: 90px; z-index: 3; bottom: 85px; right: 10%;" disable-zoom auto-rotate scale="0.45 0.45 0.45" camera-orbit="200deg 85deg 12m"></model-viewer>
+    <model-viewer id="catch-env-4" src="https://raw.githubusercontent.com/jagenjo/GTR_Framework/master/data/prefabs/tree.glb" style="position: absolute; width: 70px; height: 70px; z-index: 3; bottom: 95px; right: 30%;" disable-zoom auto-rotate scale="0.35 0.35 0.35" camera-orbit="10deg 85deg 15m"></model-viewer>
+    <model-viewer id="catch-env-5" src="https://raw.githubusercontent.com/jagenjo/GTR_Framework/master/data/prefabs/tree.glb" style="position: absolute; width: 60px; height: 60px; z-index: 3; bottom: 100px; left: 40%;" disable-zoom auto-rotate scale="0.3 0.3 0.3" camera-orbit="90deg 85deg 10m"></model-viewer>
     
     <div id="catching-content" class="collection-content" style="max-width: 600px; z-index: 10; margin-top: 40px; background: rgba(255, 255, 255, 0.85); border-radius: 24px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
       <h2 style="font-family:'Outfit'; font-size: 2rem; color: #3b82f6; margin-bottom: 5px;">A Wild Treasure!</h2>

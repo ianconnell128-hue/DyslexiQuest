@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v3.9 – game.js
+//  DyslexiQuest v4.0 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── 3-D collectible characters ──────────────────────────────────────────────
@@ -104,6 +104,23 @@ const GEAR_SHOP = [
   { id: 'shirt_14', name: 'Graphic Tee', cat: 'Shirts', model: MODELS.michelle, price: 15 },
   { id: 'shirt_15', name: 'Winter Parka', cat: 'Shirts', model: MODELS.cesium, price: 35 },
 
+  // PANTS (15 items)
+  { id: 'pants_1', name: 'Cargo Pants', cat: 'Pants', model: MODELS.soldier, price: 18 },
+  { id: 'pants_2', name: 'Work Pants', cat: 'Pants', model: MODELS.soldier, price: 25 },
+  { id: 'pants_3', name: 'Hiker Pants', cat: 'Pants', model: MODELS.cesium, price: 190 },
+  { id: 'pants_4', name: 'Jeans', cat: 'Pants', model: MODELS.soldier, price: 15 },
+  { id: 'pants_5', name: 'Shorts', cat: 'Pants', model: MODELS.michelle, price: 10 },
+  { id: 'pants_6', name: 'Leggings', cat: 'Pants', model: MODELS.michelle, price: 12 },
+  { id: 'pants_7', name: 'Armor Skirt', cat: 'Pants', model: MODELS.figure, price: 50 },
+  { id: 'pants_8', name: 'Space Pants', cat: 'Pants', model: MODELS.astro, price: 60 },
+  { id: 'pants_9', name: 'Elite Slacks', cat: 'Pants', model: MODELS.soldier, price: 40 },
+  { id: 'pants_10', name: 'Joggers', cat: 'Pants', model: MODELS.cesium, price: 20 },
+  { id: 'pants_11', name: 'Royal Pants', cat: 'Pants', model: MODELS.figure, price: 70 },
+  { id: 'pants_12', name: 'Pilot Trousers', cat: 'Pants', model: MODELS.astro, price: 55 },
+  { id: 'pants_13', name: 'Combat Pants', cat: 'Pants', model: MODELS.soldier, price: 35 },
+  { id: 'pants_14', name: 'Denim Shorts', cat: 'Pants', model: MODELS.michelle, price: 15 },
+  { id: 'pants_15', name: 'Thermal Pants', cat: 'Pants', model: MODELS.cesium, price: 30 },
+
   // SHOES (15 items)
   { id: 'shoes_1', name: 'Red Boots', cat: 'Shoes', model: MODELS.figure, price: 12 },
   { id: 'shoes_2', name: 'Runners', cat: 'Shoes', model: MODELS.figure, price: 40 },
@@ -139,7 +156,7 @@ const GEAR_SHOP = [
   { id: 'set_15', name: 'Ultimate God Set', cat: 'Sets', model: MODELS.figure, price: 1000 }
 ];
 
-const SHOP_CATEGORIES = ['Hats', 'Shirts', 'Shoes', 'Sets'];
+const SHOP_CATEGORIES = ['Hats', 'Shirts', 'Pants', 'Shoes', 'Sets'];
 
 const AVATAR_MODELS = {
   male: MODELS.soldier,
