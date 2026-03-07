@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v6.6 – game.js
+//  DyslexiQuest v6.7 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 const QUEST_TEMPLATES = [
@@ -508,13 +508,16 @@ class Game {
     this.checkDailyRefresh(); this.updateGameplayVisuals(); this.setFont(this.dyslexicFont);
     this.setMusic(this.musicEnabled);
     
-    // Check if we are overdue for a treasure (like if the user is level 30 but has none)
-    if (this.level >= this.nextUnlockLevel) {
-      this.checkAnimalUnlock();
-    } else {
-      this.newTarget(); 
+    // Check if we are overdue for a treasure (e.g. Level 30 with 0 animals)
+    if (this.level >= 2 && (this.level % 2 === 0)) {
+      const animal = this.getAnimalForLevel();
+      if (animal) {
+        this.startCatchingSequence(animal);
+        return;
+      }
     }
     
+    this.newTarget(); 
     document.addEventListener('click', () => { 
       if (this.musicEnabled) this.bgm.play().catch(() => {}); 
     }, { once: true });
@@ -953,8 +956,7 @@ class Game {
 
     // If it's an even level (2, 4, 6...), go STRAIGHT to the capture forest
     if (this.level >= 2 && (this.level % 2 === 0)) {
-      this.checkAnimalUnlock();
-      return;
+      if (this.checkAnimalUnlock()) return;
     }
 
     const newLevelEl = document.getElementById('new-level');
@@ -972,14 +974,17 @@ class Game {
 
   checkAnimalUnlock() {
     // Starting at level 2, unlock a treasure on every even level (2, 4, 6, 8...)
-    if (this.level >= 2 && (this.level % 2 === 0) && this.level >= this.nextUnlockLevel) { 
+    if (this.level >= 2 && (this.level % 2 === 0)) { 
       this.nextUnlockLevel = this.level + 2;
       this.saveProfile();
       const animal = this.getAnimalForLevel(); 
-      if (animal) this.startCatchingSequence(animal); 
-      else this.newTarget(); 
+      if (animal) {
+        this.startCatchingSequence(animal);
+        return true;
+      }
     }
-    else this.newTarget();
+    this.newTarget();
+    return false;
   }
 
   startCatchingSequence(animal) {
