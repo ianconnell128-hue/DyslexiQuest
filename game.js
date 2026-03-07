@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v5.0 – game.js
+//  DyslexiQuest v5.1 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 const QUEST_TEMPLATES = [
@@ -236,6 +236,7 @@ class Game {
     this.avatarColors = { skin: COLORS.skin[0], hair: COLORS.hair[0], eye: COLORS.eye[0] };
     this.activeQuests = []; this.lastQuestRefresh = null;
     this.equippedPet = null; this.bgm = new Audio(BGM_URL); this.bgm.loop = true; this.bgm.volume = 0.2;
+    this.dyslexicFont = false;
     this.wordBank = { en: {}, fr: {} }; this.users = JSON.parse(localStorage.getItem('dyslexiquest_users')) || {};
     this.currentUser = null; this.canClick = true; this.attemptsForCurrentWord = 0; this.currentAudio = null;
     this.recognition = null; this.isListening = false; this.sounds = {};
@@ -329,7 +330,7 @@ class Game {
     this.unlockedAvatars = u.unlockedAvatars || [AVATAR_MODELS.male, AVATAR_MODELS.female];
     this.avatarColors = u.avatarColors || { skin: COLORS.skin[0], hair: COLORS.hair[0], eye: COLORS.eye[0] };
     this.activeQuests = u.activeQuests || []; this.lastQuestRefresh = u.lastQuestRefresh || null;
-    this.equippedPet = u.equippedPet || null;
+    this.equippedPet = u.equippedPet || null; this.dyslexicFont = u.dyslexicFont || false;
     this.startGameplay();
   }
 
@@ -356,7 +357,7 @@ class Game {
       gender: this.gender, avatarModel: this.avatarModel, nextUnlockLevel: this.nextUnlockLevel,
       coins: this.coins, unlockedAvatars: this.unlockedAvatars, avatarColors: this.avatarColors,
       activeQuests: this.activeQuests, lastQuestRefresh: this.lastQuestRefresh,
-      equippedPet: this.equippedPet
+      equippedPet: this.equippedPet, dyslexicFont: this.dyslexicFont
     };
     localStorage.setItem('dyslexiquest_users', JSON.stringify(this.users));
   }
@@ -491,8 +492,29 @@ class Game {
   startGameplay() { 
     document.getElementById('start-overlay').style.display = 'none'; 
     this.updateStats(); this.updateCollectionButton(); this.populateVoiceList(); 
-    this.checkDailyRefresh(); this.updateGameplayVisuals(); this.newTarget(); 
+    this.checkDailyRefresh(); this.updateGameplayVisuals(); this.setFont(this.dyslexicFont); this.newTarget(); 
     document.addEventListener('click', () => { this.bgm.play().catch(() => {}); }, { once: true });
+  }
+
+  setFont(isDyslexic) {
+    this.dyslexicFont = isDyslexic;
+    document.body.classList.toggle('font-dyslexic', isDyslexic);
+    document.getElementById('font-standard-btn')?.classList.toggle('active', !isDyslexic);
+    document.getElementById('font-dyslexic-btn')?.classList.toggle('active', isDyslexic);
+    this.saveProfile();
+  }
+
+  triggerAvatarReaction(type) {
+    const avatar = document.getElementById('gameplay-visuals');
+    if (!avatar) return;
+    if (type === 'correct') {
+      avatar.style.transform = 'translateY(-30px) scale(1.1)';
+      setTimeout(() => avatar.style.transform = 'translateY(0) scale(1)', 300);
+    } else {
+      avatar.style.transform = 'translateX(-10px)';
+      setTimeout(() => avatar.style.transform = 'translateX(10px)', 100);
+      setTimeout(() => avatar.style.transform = 'translateX(0)', 200);
+    }
   }
 
   updateGameplayVisuals() {
@@ -572,10 +594,13 @@ class Game {
       this.updateQuestProgress('correct_words', 1);
       this.updateQuestProgress('use_talk', 1);
       this.updateQuestProgress('streak', this.streak);
+      this.triggerAvatarReaction('correct');
       if (fb) fb.innerHTML = '<span style="color:var(--accent)">YES! ✨</span>';
       this.updateStats(); this.saveProfile(); setTimeout(() => this.levelUpOrNext(), 1500);
     } else {
-      this.playSFX('wrong'); this.streak = 0; if (fb) fb.innerHTML = `<span style="color:var(--secondary)">NO, I heard "${t}".</span>`;
+      this.playSFX('wrong'); this.streak = 0; 
+      this.triggerAvatarReaction('wrong');
+      if (fb) fb.innerHTML = `<span style="color:var(--secondary)">NO, I heard "${t}".</span>`;
       setTimeout(() => { if (this.isTalkMode) this.speak(); }, 1500); this.updateStats();
     }
   }
@@ -634,9 +659,11 @@ class Game {
       this.streak = (this.attemptsForCurrentWord === 1) ? this.streak + 1 : 0;
       this.updateQuestProgress('correct_words', 1);
       this.updateQuestProgress('streak', this.streak);
+      this.triggerAvatarReaction('correct');
       this.score += 100; this.updateStats(); this.saveProfile(); setTimeout(() => this.levelUpOrNext(), 1500);
     } else {
       this.streak = 0; this.canClick = false; this.playSFX('wrong'); card.style.opacity = '0.3';
+      this.triggerAvatarReaction('wrong');
       document.getElementById('game-area').style.opacity = '0.6';
       setTimeout(() => { this.canClick = true; document.getElementById('game-area').style.opacity = '1'; this.speak(); }, 1500);
     }
@@ -1202,7 +1229,9 @@ class Game {
     document.getElementById('new-game').addEventListener('click', () => { if(confirm("Reset progress?")) this.reset(); });
     document.getElementById('delete-profile-btn').addEventListener('click', () => this.deleteCurrentProfile());
     document.getElementById('store-btn').addEventListener('click', () => this.showStoreScreen());
-    document.getElementById('quests-btn')?.addEventListener('click', () => this.showQuestsScreen());
+    document.getElementById('quests-btn-top')?.addEventListener('click', () => this.showQuestsScreen());
+    document.getElementById('font-standard-btn')?.addEventListener('click', () => this.setFont(false));
+    document.getElementById('font-dyslexic-btn')?.addEventListener('click', () => this.setFont(true));
     document.getElementById('close-quests-btn')?.addEventListener('click', () => { this.playSFX('click'); document.getElementById('quests-screen').style.display = 'none'; });
     document.getElementById('shop-btn').addEventListener('click', () => this.showShopScreen());
     document.getElementById('shop-btn-sidebar')?.addEventListener('click', () => this.showShopScreen());
