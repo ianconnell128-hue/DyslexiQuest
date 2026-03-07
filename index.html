@@ -347,14 +347,23 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 30px;
+      justify-content: flex-start; /* Better for scrolling */
+      padding: 40px 20px;
       text-align: center;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Keep content centered if it fits */
+    #loading-overlay > *, #start-overlay > *, .modal > *, .unlock-screen > *, .collection-screen > * {
+      margin-top: auto;
+      margin-bottom: auto;
     }
 
     .modal-content, .unlock-content, .collection-content {
       max-width: 500px;
       width: 100%;
+      padding: 20px 0;
     }
 
     .spinner {
@@ -561,16 +570,16 @@
     <h2 style="margin-top: 20px; font-family: 'Outfit';">DyslexiQuest</h2>
   </div>
 
-  <div id="start-overlay" style="display:none; flex-direction: column; justify-content: center; align-items: center; background: rgba(253, 253, 253, 0.98); z-index: 9999;">
+  <div id="start-overlay" style="display:none; background: rgba(253, 253, 253, 0.98); z-index: 9999;">
     <h1 style="font-family: 'Outfit'; margin-bottom: 20px; color: var(--primary);">Welcome to DyslexiQuest!</h1>
     
-    <div id="profile-select-view" style="width: 100%; max-width: 400px; display: none; text-align: left;">
+    <div id="profile-select-view" style="width: 100%; max-width: 400px; display: none; text-align: left; margin: auto;">
       <h3 style="margin-bottom: 15px; color: var(--text);">Who is playing?</h3>
-      <div id="profile-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; max-height: 250px; overflow-y: auto;"></div>
+      <div id="profile-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; max-height: 300px; overflow-y: auto;"></div>
       <button id="show-new-profile-btn" style="background: transparent; color: var(--primary); border: 2px dashed var(--primary);">+ New Player</button>
     </div>
 
-    <div id="profile-create-view" style="width: 100%; max-width: 400px; text-align: left;">
+    <div id="profile-create-view" style="width: 100%; max-width: 400px; text-align: left; margin: auto;">
       <!-- Step 1: Name -->
       <div id="create-step-1">
         <h3 style="margin-bottom: 15px; color: var(--text);">What is your name, adventurer?</h3>
@@ -643,14 +652,14 @@
   </div>
 
   <!-- Level-up modal -->
-  <div id="level-up-modal" class="modal" style="display:none !important">
+  <div id="level-up-modal" class="modal" style="display:none">
     <div class="modal-content">
-      <h2>LEVEL UP!</h2>
-      <p>You reached Level <span id="new-level">2</span>!</p>
-      <div class="modal-progress">
-        <div class="modal-progress-fill" id="modal-progress-fill"></div>
+      <h2 style="font-family:'Outfit'; font-size: 2.5rem; color: var(--primary); margin-bottom: 10px;">LEVEL UP!</h2>
+      <p style="font-size: 1.2rem; color: var(--text-light); margin-bottom: 20px;">You reached Level <span id="new-level" style="font-weight:800; color: var(--text);">2</span>!</p>
+      <div class="modal-progress" style="background: #f1f5f9; height: 12px; border-radius: 10px; overflow: hidden; margin-bottom: 30px;">
+        <div class="modal-progress-fill" id="modal-progress-fill" style="height: 100%; width: 100%; background: var(--accent);"></div>
       </div>
-      <button id="continue-btn" class="unlock-btn">Continue Adventure!</button>
+      <button id="continue-btn" class="unlock-btn" style="background: var(--primary); color: white; padding: 18px 40px; border-radius: 20px; font-size: 1.1rem; border: none; width: auto; margin: 0 auto;">Continue Adventure!</button>
     </div>
   </div>
 
