@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v3.3 – game.js
+//  DyslexiQuest v3.5 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── 3-D collectible characters ──────────────────────────────────────────────
@@ -61,62 +61,70 @@ const RARITY_WEIGHTS = { 'Common': 60, 'Uncommon': 25, 'Rare': 10, 'Epic': 4, 'L
 const RARITY_ORDER = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Mythic'];
 const SELL_PRICES = { 'Common': 15, 'Uncommon': 25, 'Rare': 45, 'Epic': 55, 'Legendary': 65, 'Mythic': 80 };
 
+const MODELS = {
+  soldier: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Soldier.glb',
+  michelle: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Michelle.glb',
+  cesium: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb',
+  figure: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb',
+  astro: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb'
+};
+
 const GEAR_SHOP = [
-  { id: 'hat_red', name: 'Red Cap', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb', price: 5 },
-  { id: 'hat_blue', name: 'Blue Beanie', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb', price: 5 },
-  { id: 'glasses_cool', name: 'Sunnies', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb', price: 10 },
-  { id: 'shoes_fast', name: 'Runners', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb', price: 10 },
-  { id: 'shirt_green', name: 'Nature Tee', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb', price: 15 },
-  { id: 'shirt_star', name: 'Star Tee', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb', price: 15 },
-  { id: 'vest_explorer', name: 'Travel Vest', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', price: 20 },
-  { id: 'pants_camo', name: 'Camo Pants', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Soldier.glb', price: 20 },
-  { id: 'gloves_power', name: 'Power Mits', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/RobotExpressive.glb', price: 25 },
-  { id: 'boots_heavy', name: 'Work Boots', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Soldier.glb', price: 25 },
-  { id: 'suit_scout', name: 'Boy Scout', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', price: 30 },
-  { id: 'suit_guide', name: 'Tour Guide', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', price: 30 },
-  { id: 'suit_hiker', name: 'Hiker Pack', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', price: 35 },
-  { id: 'suit_park', name: 'Ranger', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', price: 35 },
-  { id: 'gear_belt', name: 'Tool Belt', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/RobotExpressive.glb', price: 40 },
-  { id: 'gear_watch', name: 'Smart Watch', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Xbot.glb', price: 40 },
-  { id: 'suit_soldier', name: 'Soldier', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Soldier.glb', price: 45 },
-  { id: 'suit_marine', name: 'Marine', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Soldier.glb', price: 45 },
-  { id: 'suit_pilot', name: 'Flight Suit', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Soldier.glb', price: 50 },
-  { id: 'suit_general', name: 'Commander', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Soldier.glb', price: 50 },
-  { id: 'suit_astro', name: 'Astronaut', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', price: 60 },
-  { id: 'suit_cosmo', name: 'Cosmonaut', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', price: 60 },
-  { id: 'suit_rover', name: 'Moon Rover', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', price: 65 },
-  { id: 'suit_alien', name: 'Alien Suit', model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/alien.glb', price: 65 },
-  { id: 'suit_bot', name: 'Bot Suit', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', price: 70 },
-  { id: 'suit_mech', name: 'Mech Suit', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', price: 70 },
-  { id: 'suit_iron', name: 'Iron Hero', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', price: 75 },
-  { id: 'suit_gold_bot', name: 'Gold Bot', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', price: 75 },
-  { id: 'suit_cyborg', name: 'Cyborg', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Xbot.glb', price: 80 },
-  { id: 'suit_android', name: 'Android', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Xbot.glb', price: 80 },
-  { id: 'suit_ghost', name: 'Ghost', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Xbot.glb', price: 85 },
-  { id: 'suit_shadow', name: 'Shadow', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Xbot.glb', price: 85 },
-  { id: 'suit_hero_base', name: 'Hero Base', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb', price: 90 },
-  { id: 'suit_gown', name: 'Gown', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb', price: 90 },
-  { id: 'suit_knight', name: 'Knight', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb', price: 100 },
-  { id: 'suit_ninja', name: 'Ninja', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Xbot.glb', price: 100 },
-  { id: 'suit_samurai', name: 'Samurai', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Xbot.glb', price: 110 },
-  { id: 'suit_wizard', name: 'Wizard', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BrainStem/glTF-Binary/BrainStem.glb', price: 110 },
-  { id: 'suit_science', name: 'Scientist', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BrainStem/glTF-Binary/BrainStem.glb', price: 120 },
-  { id: 'suit_doctor', name: 'Doctor', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BrainStem/glTF-Binary/BrainStem.glb', price: 120 },
-  { id: 'suit_alpha', name: 'Alpha Suit', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', price: 150 },
-  { id: 'suit_omega', name: 'Omega Suit', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', price: 150 },
-  { id: 'suit_mythic_1', name: 'Mythic Gown', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb', price: 200 },
-  { id: 'suit_mythic_2', name: 'Mythic Hero', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Soldier.glb', price: 200 },
-  { id: 'suit_dragon', name: 'Dragon Rider', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', price: 250 },
-  { id: 'suit_cyber', name: 'Cyber Hero', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Xbot.glb', price: 250 },
-  { id: 'suit_gold', name: 'Gold Hero', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', price: 300 },
-  { id: 'suit_royal', name: 'Royal Armor', model: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Soldier.glb', price: 300 },
-  { id: 'suit_ancient', name: 'Ancient', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BrainStem/glTF-Binary/BrainStem.glb', price: 400 },
-  { id: 'suit_divine', name: 'Divine Hero', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb', price: 500 }
+  { id: 'item_1', name: 'Scout Hat', model: MODELS.cesium, price: 5 },
+  { id: 'item_2', name: 'Pink Ribbon', model: MODELS.michelle, price: 5 },
+  { id: 'item_3', name: 'Blue Scarf', model: MODELS.soldier, price: 8 },
+  { id: 'item_4', name: 'Goggles', model: MODELS.astro, price: 10 },
+  { id: 'item_5', name: 'Red Boots', model: MODELS.figure, price: 12 },
+  { id: 'item_6', name: 'Green Shirt', model: MODELS.cesium, price: 15 },
+  { id: 'item_7', name: 'Yellow Vest', model: MODELS.soldier, price: 18 },
+  { id: 'item_8', name: 'Blue Cape', model: MODELS.figure, price: 20 },
+  { id: 'item_9', name: 'Iron Gloves', model: MODELS.soldier, price: 25 },
+  { id: 'item_10', name: 'Star Badge', model: MODELS.astro, price: 30 },
+  { id: 'item_11', name: 'Explorer', model: MODELS.cesium, price: 35 },
+  { id: 'item_12', name: 'Dancer', model: MODELS.figure, price: 40 },
+  { id: 'item_13', name: 'Marine', model: MODELS.soldier, price: 45 },
+  { id: 'item_14', name: 'Superstar', model: MODELS.michelle, price: 50 },
+  { id: 'item_15', name: 'Cadet', model: MODELS.astro, price: 55 },
+  { id: 'item_16', name: 'Elite Guard', model: MODELS.soldier, price: 60 },
+  { id: 'item_17', name: 'Royal Hero', model: MODELS.figure, price: 65 },
+  { id: 'item_18', name: 'Astro Pilot', model: MODELS.astro, price: 70 },
+  { id: 'item_19', name: 'General', model: MODELS.soldier, price: 75 },
+  { id: 'item_20', name: 'Commander', model: MODELS.astro, price: 80 },
+  { id: 'item_21', name: 'Shadow Suit', model: MODELS.soldier, price: 85 },
+  { id: 'item_22', name: 'Light Gown', model: MODELS.figure, price: 90 },
+  { id: 'item_23', name: 'Cyber Hero', model: MODELS.soldier, price: 95 },
+  { id: 'item_24', name: 'Robo Pilot', model: MODELS.astro, price: 100 },
+  { id: 'item_25', name: 'Fire Suit', model: MODELS.cesium, price: 110 },
+  { id: 'item_26', name: 'Ice Gown', model: MODELS.figure, price: 120 },
+  { id: 'item_27', name: 'Gold Armor', model: MODELS.soldier, price: 130 },
+  { id: 'item_28', name: 'Star Gazer', model: MODELS.astro, price: 140 },
+  { id: 'item_29', name: 'Mythic Soul', model: MODELS.michelle, price: 150 },
+  { id: 'item_30', name: 'Alpha Hero', model: MODELS.soldier, price: 160 },
+  { id: 'item_31', name: 'Omega Wing', model: MODELS.figure, price: 170 },
+  { id: 'item_32', name: 'Nova Suit', model: MODELS.astro, price: 180 },
+  { id: 'item_33', name: 'Primal Garb', model: MODELS.cesium, price: 190 },
+  { id: 'item_34', name: 'Ghost Wrap', model: MODELS.soldier, price: 200 },
+  { id: 'item_35', name: 'Sun Gown', model: MODELS.figure, price: 210 },
+  { id: 'item_36', name: 'Moon Suit', model: MODELS.astro, price: 220 },
+  { id: 'item_37', name: 'Sky Rider', model: MODELS.cesium, price: 230 },
+  { id: 'item_38', name: 'Earth Hero', model: MODELS.soldier, price: 240 },
+  { id: 'item_39', name: 'Wind Gown', model: MODELS.figure, price: 250 },
+  { id: 'item_40', name: 'Titan Armor', model: MODELS.soldier, price: 260 },
+  { id: 'item_41', name: 'Divine Suit', model: MODELS.michelle, price: 270 },
+  { id: 'item_42', name: 'Stellar Garb', model: MODELS.astro, price: 280 },
+  { id: 'item_43', name: 'Ancient Wrap', model: MODELS.cesium, price: 290 },
+  { id: 'item_44', name: 'Future Hero', model: MODELS.soldier, price: 300 },
+  { id: 'item_45', name: 'Magic Gown', model: MODELS.figure, price: 350 },
+  { id: 'item_46', name: 'Grand Master', model: MODELS.cesium, price: 400 },
+  { id: 'item_47', name: 'Galaxy King', model: MODELS.astro, price: 450 },
+  { id: 'item_48', name: 'Universe Hero', model: MODELS.soldier, price: 500 },
+  { id: 'item_49', name: 'Legendary One', model: MODELS.michelle, price: 750 },
+  { id: 'item_50', name: 'Ultimate God', model: MODELS.figure, price: 1000 }
 ];
 
 const AVATAR_MODELS = {
-  male: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb',
-  female: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb'
+  male: MODELS.soldier,
+  female: MODELS.michelle
 };
 
 const COLORS = {
@@ -630,8 +638,7 @@ class Game {
 
   checkAnimalUnlock() {
     if (this.level > 1 && this.level >= this.nextUnlockLevel) { 
-      // Super random: Could be the next level or up to 8 levels away!
-      this.nextUnlockLevel = this.level + Math.floor(Math.random() * 8) + 1; 
+      this.nextUnlockLevel = this.level + Math.floor(Math.random() * 8) + 1; // 1-8 levels from now
       this.saveProfile();
       const animal = this.getAnimalForLevel(); 
       if (animal) this.startCatchingSequence(animal); 
@@ -788,38 +795,6 @@ class Game {
       
       this.newTarget();
     }, 800);
-  }
-
-  showStoreScreen() {
-    this.playSFX('click'); const container = document.getElementById('store-trade-list'); container.innerHTML = '';
-    const counts = {}; RARITY_ORDER.forEach(r => counts[r] = 0);
-    this.unlockedAnimals.forEach(ua => { const data = ANIMALS.find(a => a.name === ua.animalName); if (data) counts[data.rarity]++; });
-    RARITY_ORDER.slice(0, -1).forEach((rarity, index) => {
-      const nextRarity = RARITY_ORDER[index + 1], count = counts[rarity], canTrade = count >= 3;
-      const row = document.createElement('div'); row.className = 'collection-card'; row.style.flexDirection = 'row'; row.style.justifyContent = 'space-between'; row.style.width = '100%'; row.style.padding = '20px';
-      row.innerHTML = `<div style="text-align: left;"><div style="font-weight: 800; color: var(--text);">Trade 3 ${rarity}s</div><div style="font-size: 0.8rem; color: var(--text-light);">You have: <b>${count}</b></div></div><div style="font-size: 1.5rem;">→</div><div style="text-align: right;"><div class="rarity-display rarity-${nextRarity.toLowerCase()}" style="margin-bottom: 5px;">${nextRarity}</div><button class="${canTrade ? 'accent' : ''}" style="width: auto; padding: 8px 20px; font-size: 0.9rem;" ${canTrade ? '' : 'disabled'}>Trade In!</button></div>`;
-      if (canTrade) row.querySelector('button').addEventListener('click', () => this.performTrade(rarity, nextRarity));
-      container.appendChild(row);
-    });
-    document.getElementById('store-screen').style.display = 'flex';
-  }
-
-  performTrade(fromRarity, toRarity) {
-    if (!confirm(`Trade 3 of your ${fromRarity} treasures for 1 random ${toRarity} treasure?`)) return;
-    let removedCount = 0; const newUnlocked = [];
-    for (const ua of this.unlockedAnimals) {
-      const data = ANIMALS.find(a => a.name === ua.animalName);
-      if (removedCount < 3 && data && data.rarity === fromRarity) { removedCount++; continue; }
-      newUnlocked.push(ua);
-    }
-    if (removedCount === 3) {
-      this.unlockedAnimals = newUnlocked; const pool = ANIMALS.filter(a => a.rarity === toRarity);
-      const prize = pool[Math.floor(Math.random() * pool.length)];
-      const availableNames = PET_NAMES.filter(n => !this.unlockedAnimals.some(u => u.petName === n));
-      const petName = availableNames[Math.floor(Math.random() * availableNames.length)] || `${prize.name} Elite`;
-      this.unlockedAnimals.push({ animalName: prize.name, petName: petName, level: this.level });
-      this.saveProfile(); this.updateCollectionButton(); document.getElementById('store-screen').style.display = 'none'; this.showUnlockScreen(prize); 
-    }
   }
 
   showUnlockScreen(animal) { this.startCatchingSequence(animal); }
