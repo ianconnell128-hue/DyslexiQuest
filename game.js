@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v3.7 – game.js
+//  DyslexiQuest v3.8 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── 3-D collectible characters ──────────────────────────────────────────────
@@ -335,7 +335,7 @@ class Game {
       const filtered = this.unlockedAvatars.filter(modelUrl => {
         const gearInfo = GEAR_SHOP.find(g => g.model === modelUrl);
         if (modelUrl === AVATAR_MODELS.male || modelUrl === AVATAR_MODELS.female) {
-          return cat === 'Sets'; // Base models are full sets
+          return cat === 'Sets';
         }
         return gearInfo && gearInfo.cat === cat;
       });
@@ -392,12 +392,12 @@ class Game {
       document.getElementById('create-step-1').style.display = 'none';
       screen.style.display = 'block';
     } else {
-      // Add category tabs to My Gear
-      let tabs = screen.querySelector('.my-gear-tabs');
+      const content = screen.querySelector('.collection-content');
+      let tabs = content.querySelector('.my-gear-tabs');
       if (!tabs) {
         tabs = document.createElement('div');
         tabs.className = 'my-gear-tabs cat-tabs';
-        tabs.style.display = 'flex'; tabs.style.gap = '5px'; tabs.style.overflowX = 'auto'; tabs.style.marginBottom = '10px'; tabs.style.padding = '5px';
+        tabs.style.display = 'flex'; tabs.style.gap = '5px'; tabs.style.overflowX = 'auto'; tabs.style.marginBottom = '15px'; tabs.style.padding = '5px';
         SHOP_CATEGORIES.forEach(cat => {
           const btn = document.createElement('button');
           btn.textContent = cat; btn.style.fontSize = '0.7rem'; btn.style.padding = '8px'; btn.style.width = 'auto';
@@ -410,7 +410,7 @@ class Game {
           if (cat === 'Sets') btn.classList.add('active');
           tabs.appendChild(btn);
         });
-        screen.insertBefore(tabs, gearList);
+        content.insertBefore(tabs, gearList.parentNode);
       } else {
         [...tabs.children].forEach(b => b.classList.remove('active'));
         tabs.children[SHOP_CATEGORIES.indexOf('Sets')].classList.add('active');
