@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v4.9 – game.js
+//  DyslexiQuest v5.0 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 const QUEST_TEMPLATES = [
@@ -9,6 +9,8 @@ const QUEST_TEMPLATES = [
   { id: 'use_talk', text: 'Use Talk Mode {target} times', targets: [5, 10], reward: 150 },
   { id: 'streak', text: 'Get a streak of {target}', targets: [5, 10], reward: 250 }
 ];
+
+const BGM_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
 
 // ── 3-D collectible characters ──────────────────────────────────────────────
 const ANIMALS = [
@@ -233,6 +235,7 @@ class Game {
     this.coins = 0; this.unlockedAvatars = [AVATAR_MODELS.male, AVATAR_MODELS.female];
     this.avatarColors = { skin: COLORS.skin[0], hair: COLORS.hair[0], eye: COLORS.eye[0] };
     this.activeQuests = []; this.lastQuestRefresh = null;
+    this.equippedPet = null; this.bgm = new Audio(BGM_URL); this.bgm.loop = true; this.bgm.volume = 0.2;
     this.wordBank = { en: {}, fr: {} }; this.users = JSON.parse(localStorage.getItem('dyslexiquest_users')) || {};
     this.currentUser = null; this.canClick = true; this.attemptsForCurrentWord = 0; this.currentAudio = null;
     this.recognition = null; this.isListening = false; this.sounds = {};
@@ -326,6 +329,7 @@ class Game {
     this.unlockedAvatars = u.unlockedAvatars || [AVATAR_MODELS.male, AVATAR_MODELS.female];
     this.avatarColors = u.avatarColors || { skin: COLORS.skin[0], hair: COLORS.hair[0], eye: COLORS.eye[0] };
     this.activeQuests = u.activeQuests || []; this.lastQuestRefresh = u.lastQuestRefresh || null;
+    this.equippedPet = u.equippedPet || null;
     this.startGameplay();
   }
 
@@ -351,7 +355,8 @@ class Game {
       selectedVoiceURI: this.selectedVoiceURI, micTested: this.micTested,
       gender: this.gender, avatarModel: this.avatarModel, nextUnlockLevel: this.nextUnlockLevel,
       coins: this.coins, unlockedAvatars: this.unlockedAvatars, avatarColors: this.avatarColors,
-      activeQuests: this.activeQuests, lastQuestRefresh: this.lastQuestRefresh
+      activeQuests: this.activeQuests, lastQuestRefresh: this.lastQuestRefresh,
+      equippedPet: this.equippedPet
     };
     localStorage.setItem('dyslexiquest_users', JSON.stringify(this.users));
   }
@@ -483,7 +488,27 @@ class Game {
     document.getElementById('sidebar-overlay').style.display = 'none'; this.showProfileSelect();
   }
 
-  startGameplay() { document.getElementById('start-overlay').style.display = 'none'; this.updateStats(); this.updateCollectionButton(); this.populateVoiceList(); this.checkDailyRefresh(); this.newTarget(); }
+  startGameplay() { 
+    document.getElementById('start-overlay').style.display = 'none'; 
+    this.updateStats(); this.updateCollectionButton(); this.populateVoiceList(); 
+    this.checkDailyRefresh(); this.updateGameplayVisuals(); this.newTarget(); 
+    document.addEventListener('click', () => { this.bgm.play().catch(() => {}); }, { once: true });
+  }
+
+  updateGameplayVisuals() {
+    const avatar = document.getElementById('main-avatar-viewer');
+    const pet = document.getElementById('main-pet-viewer');
+    if (avatar) avatar.src = this.avatarModel;
+    if (pet) {
+      if (this.equippedPet) {
+        const petData = ANIMALS.find(a => a.name === this.equippedPet.animalName);
+        pet.src = petData ? petData.model : '';
+        pet.style.display = 'block';
+      } else {
+        pet.style.display = 'none';
+      }
+    }
+  }
 
   populateVoiceList() {
     const voiceSelect = document.getElementById('voice-select'); if (!voiceSelect || !window.speechSynthesis) return;
@@ -1118,6 +1143,20 @@ class Game {
     document.getElementById('detail-model').src = animalData.model;
     document.getElementById('detail-story').textContent = animalData.story || "Mysterious treasure.";
     document.getElementById('detail-powers').textContent = animalData.powers || "Magic properties.";
+    
+    const equipBtn = document.getElementById('equip-pet-btn');
+    if (equipBtn) {
+      const isEquipped = this.equippedPet && this.equippedPet.petName === userAnimal.petName;
+      equipBtn.textContent = isEquipped ? 'Equipped ✓' : 'Equip as Pet ✨';
+      equipBtn.onclick = () => {
+        this.playSFX('correct');
+        this.equippedPet = isEquipped ? null : userAnimal;
+        this.saveProfile();
+        this.updateGameplayVisuals();
+        this.showTreasureDetail(userAnimal);
+      };
+    }
+
     document.getElementById('close-detail-btn').onclick = () => { this.playSFX('click'); modal.style.display = 'none'; };
     modal.style.display = 'flex';
   }
