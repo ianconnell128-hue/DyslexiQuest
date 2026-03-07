@@ -432,9 +432,10 @@ const SELL_PRICES = {
 };
 
 const GEAR_SHOP = [
-  { id: 'suit_explorer', name: 'Explorer Suit', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', price: 150 },
-  { id: 'suit_space', name: 'Space Suit', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', price: 300 },
-  { id: 'suit_robot', name: 'Robot Armor', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', price: 500 }
+  { id: 'suit_explorer', name: 'Explorer', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', price: 30 },
+  { id: 'suit_space', name: 'Space Suit', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', price: 60 },
+  { id: 'suit_robot', name: 'Robot Suit', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', price: 100 },
+  { id: 'suit_hero', name: 'Gown', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb', price: 150 }
 ];
 
 const AVATAR_MODELS = {
@@ -624,6 +625,7 @@ class Game {
     this.playSFX('click');
     const screen = isOnboarding ? document.getElementById('create-step-avatar') : document.getElementById('avatar-designer-screen');
     const modelViewer = isOnboarding ? document.getElementById('create-avatar-preview') : document.getElementById('avatar-preview-model');
+    const gearList = document.getElementById('my-gear-list');
     
     const updatePreview = () => {
       modelViewer.src = this.avatarModel;
@@ -667,18 +669,31 @@ class Game {
       document.getElementById('create-step-1').style.display = 'none';
       screen.style.display = 'block';
     } else {
-      const available = this.unlockedAvatars;
-      let modelIndex = available.indexOf(this.avatarModel);
-      if (modelIndex === -1) modelIndex = 0;
+      // Render My Gear
+      if (gearList) {
+        gearList.innerHTML = '';
+        this.unlockedAvatars.forEach(modelUrl => {
+          const gearInfo = GEAR_SHOP.find(g => g.model === modelUrl) || { name: 'Base' };
+          if (modelUrl === AVATAR_MODELS.male || modelUrl === AVATAR_MODELS.female) {
+            gearInfo.name = modelUrl === AVATAR_MODELS.male ? 'Base Boy' : 'Base Girl';
+          }
+          
+          const btn = document.createElement('button');
+          btn.style.width = '80px'; btn.style.height = '80px'; btn.style.flexShrink = '0';
+          btn.style.padding = '5px'; btn.style.fontSize = '0.7rem'; btn.style.border = '2px solid #e2e8f0';
+          btn.style.borderRadius = '12px'; btn.style.background = 'white';
+          btn.innerHTML = `<div style="height:40px"><model-viewer src="${modelUrl}" auto-rotate style="width:100%;height:100%"></model-viewer></div><div>${gearInfo.name}</div>`;
+          btn.onclick = () => {
+            this.avatarModel = modelUrl;
+            this.playSFX('click');
+            updatePreview();
+            [...gearList.children].forEach(b => b.style.borderColor = '#e2e8f0');
+            btn.style.borderColor = 'var(--primary)';
+          };
+          gearList.appendChild(btn);
+        });
+      }
 
-      document.getElementById('prev-avatar-btn').onclick = () => {
-        this.playSFX('click'); modelIndex = (modelIndex - 1 + available.length) % available.length; 
-        this.avatarModel = available[modelIndex]; updatePreview();
-      };
-      document.getElementById('next-avatar-btn').onclick = () => {
-        this.playSFX('click'); modelIndex = (modelIndex + 1) % available.length; 
-        this.avatarModel = available[modelIndex]; updatePreview();
-      };
       document.getElementById('save-avatar-btn').onclick = () => {
         this.playSFX('click'); this.saveProfile(); screen.style.display = 'none';
       };
