@@ -4,69 +4,419 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── 3-D collectible characters ──────────────────────────────────────────────
-// A curated set of child-friendly, high-quality 3D models.
+// A curated set of child-friendly, high-quality 3D models with stories and powers.
 const ANIMALS = [
   // COMMON (60%) - 15 entries
-  { name: 'Red Fox', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb', color: '#94a3b8', rarity: 'Common' },
-  { name: 'Yellow Duck', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF-Binary/Duck.glb', color: '#94a3b8', rarity: 'Common' },
-  { name: 'Wild Horse', model: 'https://modelviewer.dev/shared-assets/models/Horse.glb', color: '#94a3b8', rarity: 'Common' },
-  { name: 'Paper Plane', model: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/examples/scenegraph-layer/airplane.glb', color: '#94a3b8', rarity: 'Common' },
-  { name: 'Toy Sedan', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/ToyCar/glTF-Binary/ToyCar.glb', color: '#94a3b8', rarity: 'Common' },
-  { name: 'Happy Avocado', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Avocado/glTF-Binary/Avocado.glb', color: '#94a3b8', rarity: 'Common' },
-  { name: 'Magic Cube', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF-Binary/Box.glb', color: '#94a3b8', rarity: 'Common' },
-  { name: 'Smiley Emoji', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/SmilingFace/glTF-Binary/SmilingFace.glb', color: '#94a3b8', rarity: 'Common' },
-  { name: 'Silver Fox', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb', color: '#94a3b8', rarity: 'Common' },
-  { name: 'Rubber Ducky', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF-Binary/Duck.glb', color: '#94a3b8', rarity: 'Common' },
-  { name: 'Pony', model: 'https://modelviewer.dev/shared-assets/models/Horse.glb', color: '#94a3b8', rarity: 'Common' },
-  { name: 'Toy Racer', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/ToyCar/glTF-Binary/ToyCar.glb', color: '#94a3b8', rarity: 'Common' },
-  { name: 'Cool Plane', model: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/examples/scenegraph-layer/airplane.glb', color: '#94a3b8', rarity: 'Common' },
-  { name: 'Giggly Avocado', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Avocado/glTF-Binary/Avocado.glb', color: '#94a3b8', rarity: 'Common' },
-  { name: 'Mystery Box', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF-Binary/Box.glb', color: '#94a3b8', rarity: 'Common' },
+  { 
+    name: 'Red Fox', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb', 
+    color: '#94a3b8', 
+    rarity: 'Common',
+    story: 'A clever forest dweller who knows every secret path in the woods.',
+    powers: 'Super Speed & Night Vision'
+  },
+  { 
+    name: 'Yellow Duck', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF-Binary/Duck.glb', 
+    color: '#94a3b8', 
+    rarity: 'Common',
+    story: 'The bravest swimmer in the pond, always ready for a splashy adventure.',
+    powers: 'Water Shield & Happy Quack'
+  },
+  { 
+    name: 'Wild Horse', 
+    model: 'https://modelviewer.dev/shared-assets/models/Horse.glb', 
+    color: '#94a3b8', 
+    rarity: 'Common',
+    story: 'Galloping through the meadows, this horse dreams of reaching the mountains.',
+    powers: 'Mighty Gallop & Infinite Stamina'
+  },
+  { 
+    name: 'Paper Plane', 
+    model: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/examples/scenegraph-layer/airplane.glb', 
+    color: '#94a3b8', 
+    rarity: 'Common',
+    story: 'Crafted from a magical notebook, it can fly forever on a gentle breeze.',
+    powers: 'Glide Glide & Wind Rider'
+  },
+  { 
+    name: 'Toy Sedan', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/ToyCar/glTF-Binary/ToyCar.glb', 
+    color: '#94a3b8', 
+    rarity: 'Common',
+    story: 'A small car with a big heart, perfect for racing across the playroom floor.',
+    powers: 'Turbo Boost & Tight Turns'
+  },
+  { 
+    name: 'Happy Avocado', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Avocado/glTF-Binary/Avocado.glb', 
+    color: '#94a3b8', 
+    rarity: 'Common',
+    story: 'Always smiling because it knows it’s full of healthy healthy fats!',
+    powers: 'Super Nutrition & Green Glow'
+  },
+  { 
+    name: 'Magic Cube', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF-Binary/Box.glb', 
+    color: '#94a3b8', 
+    rarity: 'Common',
+    story: 'A mysterious box that hums with energy when you solve a puzzle.',
+    powers: 'Mystery Gifting & Geometry Blast'
+  },
+  { 
+    name: 'Smiley Emoji', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/SmilingFace/glTF-Binary/SmilingFace.glb', 
+    color: '#94a3b8', 
+    rarity: 'Common',
+    story: 'Spread happiness wherever it goes. It’s impossible to be sad near it.',
+    powers: 'Joy Aura & Friendship Link'
+  },
+  { 
+    name: 'Silver Fox', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb', 
+    color: '#94a3b8', 
+    rarity: 'Common',
+    story: 'A rare winter fox whose fur sparkles like fresh snow.',
+    powers: 'Ice Camouflage & Frost Breath'
+  },
+  { 
+    name: 'Rubber Ducky', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF-Binary/Duck.glb', 
+    color: '#94a3b8', 
+    rarity: 'Common',
+    story: 'A champion of the bathtub, feared by bubbles everywhere.',
+    powers: 'Bubble Blast & Unsinkable'
+  },
+  { 
+    name: 'Pony', 
+    model: 'https://modelviewer.dev/shared-assets/models/Horse.glb', 
+    color: '#94a3b8', 
+    rarity: 'Common',
+    story: 'Small but strong, this pony loves carrying treasures through the fields.',
+    powers: 'Mini-Sprint & Lucky Charm'
+  },
+  { 
+    name: 'Toy Racer', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/ToyCar/glTF-Binary/ToyCar.glb', 
+    color: '#94a3b8', 
+    rarity: 'Common',
+    story: 'Built for speed, this racer has won the Living Room Grand Prix ten times.',
+    powers: 'Nitrous Kick & Drift King'
+  },
+  { 
+    name: 'Cool Plane', 
+    model: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/examples/scenegraph-layer/airplane.glb', 
+    color: '#94a3b8', 
+    rarity: 'Common',
+    story: 'An expert at loop-de-loops and sky-writing your name.',
+    powers: 'Sonic Boom & Sky Dive'
+  },
+  { 
+    name: 'Giggly Avocado', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Avocado/glTF-Binary/Avocado.glb', 
+    color: '#94a3b8', 
+    rarity: 'Common',
+    story: 'It just heard a really good joke and can’t stop laughing.',
+    powers: 'Laughter Pulse & Vitamin Boost'
+  },
+  { 
+    name: 'Mystery Box', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF-Binary/Box.glb', 
+    color: '#94a3b8', 
+    rarity: 'Common',
+    story: 'No one knows what is inside, but it shakes whenever you learn a new word.',
+    powers: 'Surprise Surge & Hidden Treasure'
+  },
 
   // UNCOMMON (25%) - 12 entries
-  { name: 'Dune Buggy', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Buggy/glTF-Binary/Buggy.glb', color: '#3b82f6', rarity: 'Uncommon' },
-  { name: 'Great White Shark', model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/shark.glb', color: '#3b82f6', rarity: 'Uncommon' },
-  { name: 'Helper Bot', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', color: '#3b82f6', rarity: 'Uncommon' },
-  { name: 'Little Alien', model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/alien.glb', color: '#3b82f6', rarity: 'Uncommon' },
-  { name: 'T-Rex', model: 'https://raw.githubusercontent.com/adityakeyal/blender-models/main/Trex.glb', color: '#3b82f6', rarity: 'Uncommon' },
-  { name: 'Giant Fish', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BarramundiFish/glTF-Binary/BarramundiFish.glb', color: '#3b82f6', rarity: 'Uncommon' },
-  { name: 'Off-Roader', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Buggy/glTF-Binary/Buggy.glb', color: '#3b82f6', rarity: 'Uncommon' },
-  { name: 'Hammerhead', model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/shark.glb', color: '#3b82f6', rarity: 'Uncommon' },
-  { name: 'Friendly Bot', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', color: '#3b82f6', rarity: 'Uncommon' },
-  { name: 'Martian', model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/alien.glb', color: '#3b82f6', rarity: 'Uncommon' },
-  { name: 'Dino King', model: 'https://raw.githubusercontent.com/adityakeyal/blender-models/main/Trex.glb', color: '#3b82f6', rarity: 'Uncommon' },
-  { name: 'Neon Fish', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BarramundiFish/glTF-Binary/BarramundiFish.glb', color: '#3b82f6', rarity: 'Uncommon' },
+  { 
+    name: 'Dune Buggy', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Buggy/glTF-Binary/Buggy.glb', 
+    color: '#3b82f6', 
+    rarity: 'Uncommon',
+    story: 'A rugged vehicle built for the toughest deserts on Mars.',
+    powers: 'Sand Stormer & Jump Jets'
+  },
+  { 
+    name: 'Great White Shark', 
+    model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/shark.glb', 
+    color: '#3b82f6', 
+    rarity: 'Uncommon',
+    story: 'The king of the ocean, searching for the legendary Lost City of Atlantis.',
+    powers: 'Hydro Bite & Deep Dive'
+  },
+  { 
+    name: 'Helper Bot', 
+    model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', 
+    color: '#3b82f6', 
+    rarity: 'Uncommon',
+    story: 'Designed to help students, this bot can translate any language.',
+    powers: 'Logic Pulse & Multi-Tool'
+  },
+  { 
+    name: 'Little Alien', 
+    model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/alien.glb', 
+    color: '#3b82f6', 
+    rarity: 'Uncommon',
+    story: 'A friendly visitor from the Andromeda Galaxy who loves earth candy.',
+    powers: 'Gravity Hop & Star Signal'
+  },
+  { 
+    name: 'T-Rex', 
+    model: 'https://raw.githubusercontent.com/adityakeyal/blender-models/main/Trex.glb', 
+    color: '#3b82f6', 
+    rarity: 'Uncommon',
+    story: 'The mightiest dinosaur, though his arms are a bit too short for high-fives.',
+    powers: 'Primal Roar & Earth Quake'
+  },
+  { 
+    name: 'Giant Fish', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BarramundiFish/glTF-Binary/BarramundiFish.glb', 
+    color: '#3b82f6', 
+    rarity: 'Uncommon',
+    story: 'A fish so big it once swallowed a small treasure chest by accident.',
+    powers: 'Mega Splash & Scaly Armor'
+  },
+  { 
+    name: 'Off-Roader', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Buggy/glTF-Binary/Buggy.glb', 
+    color: '#3b82f6', 
+    rarity: 'Uncommon',
+    story: 'Can climb mountains and cross rivers without breaking a sweat.',
+    powers: 'All-Terrain Grip & Winch Pull'
+  },
+  { 
+    name: 'Hammerhead', 
+    model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/shark.glb', 
+    color: '#3b82f6', 
+    rarity: 'Uncommon',
+    story: 'Uses its wide head like a metal detector to find hidden gold.',
+    powers: 'Sonar Scan & Metal Munch'
+  },
+  { 
+    name: 'Friendly Bot', 
+    model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', 
+    color: '#3b82f6', 
+    rarity: 'Uncommon',
+    story: 'Always ready with a wave and a digital smile.',
+    powers: 'Data Sync & Electric Fist'
+  },
+  { 
+    name: 'Martian', 
+    model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/alien.glb', 
+    color: '#3b82f6', 
+    rarity: 'Uncommon',
+    story: 'He came to Earth to find the perfect pizza recipe.',
+    powers: 'Telepathy & Hover Boots'
+  },
+  { 
+    name: 'Dino King', 
+    model: 'https://raw.githubusercontent.com/adityakeyal/blender-models/main/Trex.glb', 
+    color: '#3b82f6', 
+    rarity: 'Uncommon',
+    story: 'Wears a crown made of fossilized leaves and ancient bones.',
+    powers: 'Stomp Wave & Command Roar'
+  },
+  { 
+    name: 'Neon Fish', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BarramundiFish/glTF-Binary/BarramundiFish.glb', 
+    color: '#3b82f6', 
+    rarity: 'Uncommon',
+    story: 'Glows in the dark, lighting the way for lost submarines.',
+    powers: 'Glow Flare & Speed Fin'
+  },
 
   // RARE (10%) - 10 entries
-  { name: 'Star Voyager', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#a855f7', rarity: 'Rare' },
-  { name: 'Cosmic Pilot', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', color: '#a855f7', rarity: 'Rare' },
-  { name: 'Party BoomBox', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoomBox/glTF-Binary/BoomBox.glb', color: '#a855f7', rarity: 'Rare' },
-  { name: 'Galaxy Ranger', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#a855f7', rarity: 'Rare' },
-  { name: 'Lunar Walker', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', color: '#a855f7', rarity: 'Rare' },
-  { name: 'Music Master', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoomBox/glTF-Binary/BoomBox.glb', color: '#a855f7', rarity: 'Rare' },
-  { name: 'Orbit Scout', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#a855f7', rarity: 'Rare' },
-  { name: 'Jet Setter', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', color: '#a855f7', rarity: 'Rare' },
-  { name: 'Beat Box', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoomBox/glTF-Binary/BoomBox.glb', color: '#a855f7', rarity: 'Rare' },
-  { name: 'Star Runner', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#a855f7', rarity: 'Rare' },
+  { 
+    name: 'Star Voyager', 
+    model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', 
+    color: '#a855f7', 
+    rarity: 'Rare',
+    story: 'An astronaut who has visited every planet in the solar system.',
+    powers: 'Zero Gravity & Comet Dash'
+  },
+  { 
+    name: 'Cosmic Pilot', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', 
+    color: '#a855f7', 
+    rarity: 'Rare',
+    story: 'A pioneer of space flight, testing the fastest rockets ever built.',
+    powers: 'Light Speed & Solar Shield'
+  },
+  { 
+    name: 'Party BoomBox', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoomBox/glTF-Binary/BoomBox.glb', 
+    color: '#a855f7', 
+    rarity: 'Rare',
+    story: 'It only plays the most epic victory songs when you level up.',
+    powers: 'Bass Blast & Dance Party'
+  },
+  { 
+    name: 'Galaxy Ranger', 
+    model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', 
+    color: '#a855f7', 
+    rarity: 'Rare',
+    story: 'Protects the galaxy from space pirates and black holes.',
+    powers: 'Plasma Ray & Nebula Cloak'
+  },
+  { 
+    name: 'Lunar Walker', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', 
+    color: '#a855f7', 
+    rarity: 'Rare',
+    story: 'His footprints were the first ones left on the far side of the moon.',
+    powers: 'Moon Jump & Crater Slide'
+  },
+  { 
+    name: 'Music Master', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoomBox/glTF-Binary/BoomBox.glb', 
+    color: '#a855f7', 
+    rarity: 'Rare',
+    story: 'Can turn any sound into a beautiful symphony.',
+    powers: 'Sonic Wave & Rhythm Lock'
+  },
+  { 
+    name: 'Orbit Scout', 
+    model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', 
+    color: '#a855f7', 
+    rarity: 'Rare',
+    story: 'Scouts out new planets where kids can play all day long.',
+    powers: 'Planet Scan & Rocket Pack'
+  },
+  { 
+    name: 'Jet Setter', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb', 
+    color: '#a855f7', 
+    rarity: 'Rare',
+    story: 'Always on the move, flying from one adventure to the next.',
+    powers: 'Jet Stream & High Altitude'
+  },
+  { 
+    name: 'Beat Box', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoomBox/glTF-Binary/BoomBox.glb', 
+    color: '#a855f7', 
+    rarity: 'Rare',
+    story: 'A boombox that can actually talk! Its voice is a heavy bass line.',
+    powers: 'Sound Barrier & Echo Trap'
+  },
+  { 
+    name: 'Star Runner', 
+    model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', 
+    color: '#a855f7', 
+    rarity: 'Rare',
+    story: 'Race through the rings of Saturn for fun every weekend.',
+    powers: 'Ring Dash & Astro Glide'
+  },
 
   // EPIC (4%) - 6 entries
-  { name: 'Titan Helmet', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb', color: '#f97316', rarity: 'Epic' },
-  { name: 'Turbo Buggy', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Buggy/glTF-Binary/Buggy.glb', color: '#f97316', rarity: 'Epic' },
-  { name: 'Super Robot', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', color: '#f97316', rarity: 'Epic' },
-  { name: 'Iron Helmet', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb', color: '#f97316', rarity: 'Epic' },
-  { name: 'Racer Buggy', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Buggy/glTF-Binary/Buggy.glb', color: '#f97316', rarity: 'Epic' },
-  { name: 'Ultra Bot', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', color: '#f97316', rarity: 'Epic' },
+  { 
+    name: 'Titan Helmet', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb', 
+    color: '#f97316', 
+    rarity: 'Epic',
+    story: 'Worn by the defender of the Floating Cities in the clouds.',
+    powers: 'Titan Strength & Sky Strike'
+  },
+  { 
+    name: 'Turbo Buggy', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Buggy/glTF-Binary/Buggy.glb', 
+    color: '#f97316', 
+    rarity: 'Epic',
+    story: 'Equipped with an experimental engine fueled by pure joy.',
+    powers: 'Warp Speed & Mega Jump'
+  },
+  { 
+    name: 'Super Robot', 
+    model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', 
+    color: '#f97316', 
+    rarity: 'Epic',
+    story: 'The ultimate guardian of the DyslexiQuest Academy.',
+    powers: 'Laser Eyes & Flight Mode'
+  },
+  { 
+    name: 'Iron Helmet', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb', 
+    color: '#f97316', 
+    rarity: 'Epic',
+    story: 'Found in an ancient ruin, it still glows with a mysterious orange light.',
+    powers: 'Iron Defense & Light Burst'
+  },
+  { 
+    name: 'Racer Buggy', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Buggy/glTF-Binary/Buggy.glb', 
+    color: '#f97316', 
+    rarity: 'Epic',
+    story: 'Specially modified to drive on vertical walls and even ceilings.',
+    powers: 'Wall Climb & Tire Grip'
+  },
+  { 
+    name: 'Ultra Bot', 
+    model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', 
+    color: '#f97316', 
+    rarity: 'Epic',
+    story: 'The most advanced robot ever built, with 1,000 different gadgets.',
+    powers: 'Gadget Storm & AI Overdrive'
+  },
 
   // LEGENDARY (0.9%) - 4 entries
-  { name: 'Neil Armstrong', model: 'https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb', color: '#eab308', rarity: 'Legendary' },
-  { name: 'Ancient Dragon', model: 'https://assets.babylonjs.com/meshes/Georgia-Tech-Dragon/dragonUV.glb', color: '#eab308', rarity: 'Legendary' },
-  { name: 'Gold Fox', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb', color: '#eab308', rarity: 'Legendary' },
-  { name: 'Fire Dragon', model: 'https://assets.babylonjs.com/meshes/Georgia-Tech-Dragon/dragonUV.glb', color: '#eab308', rarity: 'Legendary' },
+  { 
+    name: 'Neil Armstrong', 
+    model: 'https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb', 
+    color: '#eab308', 
+    rarity: 'Legendary',
+    story: 'A true hero of humanity, the first person to walk on another world.',
+    powers: 'Legacy of Discovery & Star Navigation'
+  },
+  { 
+    name: 'Ancient Dragon', 
+    model: 'https://assets.babylonjs.com/meshes/Georgia-Tech-Dragon/dragonUV.glb', 
+    color: '#eab308', 
+    rarity: 'Legendary',
+    story: 'Woken from a thousand-year sleep by the sound of learning.',
+    powers: 'Fire Storm & Ancient Wisdom'
+  },
+  { 
+    name: 'Gold Fox', 
+    model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb', 
+    color: '#eab308', 
+    rarity: 'Legendary',
+    story: 'A fox made of pure solid gold, said to bring infinite luck.',
+    powers: 'Golden Touch & Fortune Gaze'
+  },
+  { 
+    name: 'Fire Dragon', 
+    model: 'https://assets.babylonjs.com/meshes/Georgia-Tech-Dragon/dragonUV.glb', 
+    color: '#eab308', 
+    rarity: 'Legendary',
+    story: 'This dragon’s breath can light up the entire night sky.',
+    powers: 'Inferno Blast & Magma Wing'
+  },
 
   // MYTHIC (0.1%) - 3 entries
-  { name: 'Alpha Astronaut', model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', color: '#ef4444', rarity: 'Mythic' },
-  { name: 'Deep Space Shark', model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/shark.glb', color: '#ef4444', rarity: 'Mythic' },
-  { name: 'Cyber Dino', model: 'https://raw.githubusercontent.com/adityakeyal/blender-models/main/Trex.glb', color: '#ef4444', rarity: 'Mythic' }
+  { 
+    name: 'Alpha Astronaut', 
+    model: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', 
+    color: '#ef4444', 
+    rarity: 'Mythic',
+    story: 'The legendary first explorer of the Multiverse.',
+    powers: 'Dimension Shift & Reality Warp'
+  },
+  { 
+    name: 'Deep Space Shark', 
+    model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/shark.glb', 
+    color: '#ef4444', 
+    rarity: 'Mythic',
+    story: 'A shark that swims through the stars as if they were water.',
+    powers: 'Black Hole Gulp & Nebula Swim'
+  },
+  { 
+    name: 'Cyber Dino', 
+    model: 'https://raw.githubusercontent.com/adityakeyal/blender-models/main/Trex.glb', 
+    color: '#ef4444', 
+    rarity: 'Mythic',
+    story: 'A prehistoric T-Rex upgraded with futuristic cyber-armor.',
+    powers: 'Cyber Roar & Digital Stomp'
+  }
 ];
 
 const RARITY_WEIGHTS = { 'Common': 60, 'Uncommon': 25, 'Rare': 10, 'Epic': 4, 'Legendary': 0.9, 'Mythic': 0.1 };
@@ -398,7 +748,7 @@ class Game {
   }
 
   performTrade(fromRarity, toRarity) {
-    if (!confirm(`Trade 3 of your ${fromRarity} pets for 1 random ${toRarity} pet?`)) return;
+    if (!confirm(`Trade 3 of your ${fromRarity} treasures for 1 random ${toRarity} treasure?`)) return;
     let removedCount = 0; const newUnlocked = [];
     for (const ua of this.unlockedAnimals) {
       const data = ANIMALS.find(a => a.name === ua.animalName);
@@ -421,7 +771,7 @@ class Game {
     this.unlockedAnimals.push({ animalName: animal.name, petName: petName, level: this.level });
     this.updateCollectionButton(); this.saveProfile();
     const content = document.getElementById('unlock-content');
-    content.innerHTML = `<div class="unlock-title">NEW PET UNLOCKED!</div><div class="rarity-display rarity-${animal.rarity.toLowerCase()}">${animal.rarity}</div><h2 style="font-size:2.5em;margin:10px 0">${petName}</h2><p style="color:var(--text-light); margin-bottom:20px;">The ${animal.name}</p><div class="unlock-animal-container" id="prize-model-container"><model-viewer id="prize-model" src="${animal.model}" shadow-intensity="1" camera-controls auto-rotate ar style="width:100%;height:100%;--poster-color:#ffffff" class="unlock-animal-model" alt="${animal.name}"></model-viewer></div><button id="continue-unlock-btn" class="unlock-btn">Add to Collection!</button>`;
+    content.innerHTML = `<div class="unlock-title">NEW TREASURE UNLOCKED!</div><div class="rarity-display rarity-${animal.rarity.toLowerCase()}">${animal.rarity}</div><h2 style="font-size:2.5em;margin:10px 0">${petName}</h2><p style="color:var(--text-light); margin-bottom:20px;">The ${animal.name}</p><div class="unlock-animal-container" id="prize-model-container"><model-viewer id="prize-model" src="${animal.model}" shadow-intensity="1" camera-controls auto-rotate ar style="width:100%;height:100%;--poster-color:#ffffff" class="unlock-animal-model" alt="${animal.name}"></model-viewer></div><button id="continue-unlock-btn" class="unlock-btn">Add to Treasures!</button>`;
     document.getElementById('continue-unlock-btn').addEventListener('click', () => { this.playSFX('click'); this.animatePrizeToChest(); });
     document.getElementById('unlock-screen').style.display = 'flex';
   }
@@ -444,18 +794,37 @@ class Game {
   showCollectionScreen() {
     this.playSFX('click'); const badge = document.getElementById('chest-badge'); if (badge) badge.style.display = 'none';
     const content = document.getElementById('collection-content');
-    content.innerHTML = `<h2 style="font-size:3em;margin-bottom:20px; font-family:'Outfit'; color:var(--primary);">Your Treasure</h2><div id="collection-list" style="text-align:left; display:flex; flex-direction:column; gap:30px; margin-bottom:30px; max-height:60vh; overflow-y:auto; padding-right:10px;"></div><button id="close-collection-btn" class="primary" style="border-radius:20px; padding:15px 40px; width:auto; margin:0 auto;">Close Treasure</button>`;
+    content.innerHTML = `<h2 style="font-size:3em;margin-bottom:20px; font-family:'Outfit'; color:var(--primary);">Your Treasures</h2><div id="collection-list" style="text-align:left; display:flex; flex-direction:column; gap:30px; margin-bottom:30px; max-height:60vh; overflow-y:auto; padding-right:10px;"></div><button id="close-collection-btn" class="primary" style="border-radius:20px; padding:15px 40px; width:auto; margin:0 auto;">Close Treasures</button>`;
     const list = document.getElementById('collection-list'), grid = document.createElement('div'); grid.className = 'collection-grid';
     [...this.unlockedAnimals].reverse().forEach(ua => {
       const animalData = ANIMALS.find(a => a.name === ua.animalName); if (!animalData) return;
-      const card = document.createElement('div'); card.className = 'collection-card';
+      const card = document.createElement('div'); card.className = 'collection-card'; card.style.cursor = 'pointer';
       card.innerHTML = `<div class="rarity-display rarity-${animalData.rarity.toLowerCase()}" style="margin-bottom:5px;">${animalData.rarity}</div><div style="font-weight:800; color:var(--primary); font-size:1.1rem;">${ua.petName}</div><div class="collection-animal-container" style="height:120px; width:100%;"><model-viewer src="${animalData.model}" shadow-intensity="1" camera-controls auto-rotate style="width:100%; height:100%; --poster-color:#ffffff"></model-viewer></div><div style="font-weight:700; font-size:0.8rem; text-transform:uppercase; color:var(--text-light);">${animalData.name}</div><div style="font-size:0.7rem; font-weight:800; background:#f1f5f9; padding:4px 10px; border-radius:10px; margin-top:5px;">LVL ${ua.level}</div>`;
+      card.addEventListener('click', () => this.showTreasureDetail(ua));
       grid.appendChild(card);
     });
     if (this.unlockedAnimals.length === 0) list.innerHTML = `<p style="text-align:center; color:var(--text-light);">Keep playing to unlock treasure!</p>`;
     else list.appendChild(grid);
     document.getElementById('close-collection-btn').addEventListener('click', () => { this.playSFX('click'); document.getElementById('animal-collection-screen').style.display = 'none'; });
     document.getElementById('animal-collection-screen').style.display = 'flex';
+  }
+
+  showTreasureDetail(userAnimal) {
+    this.playSFX('click');
+    const animalData = ANIMALS.find(a => a.name === userAnimal.animalName);
+    if (!animalData) return;
+
+    const modal = document.getElementById('treasure-detail-screen');
+    document.getElementById('detail-rarity').textContent = animalData.rarity;
+    document.getElementById('detail-rarity').className = `rarity-display rarity-${animalData.rarity.toLowerCase()}`;
+    document.getElementById('detail-pet-name').textContent = userAnimal.petName;
+    document.getElementById('detail-animal-name').textContent = `The ${animalData.name}`;
+    document.getElementById('detail-model').src = animalData.model;
+    document.getElementById('detail-story').textContent = animalData.story || "A mysterious treasure from a distant land.";
+    document.getElementById('detail-powers').textContent = animalData.powers || "Unknown magic properties.";
+
+    document.getElementById('close-detail-btn').onclick = () => { this.playSFX('click'); modal.style.display = 'none'; };
+    modal.style.display = 'flex';
   }
 
   setLang(l) { this.isFrench = (l === 'fr'); this.saveProfile(); this.populateVoiceList(); document.getElementById('new-player-en').classList.toggle('active', !this.isFrench); document.getElementById('new-player-fr').classList.toggle('active', this.isFrench); this.newTarget(); }

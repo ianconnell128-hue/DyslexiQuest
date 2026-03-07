@@ -526,7 +526,7 @@
         </div>
       </div>
 
-      <button id="collection-btn" class="primary">My Pets (<span id="collection-count">0</span>)</button>
+      <button id="collection-btn" class="primary">My Treasures (<span id="collection-count">0</span>)</button>
       <button id="store-btn" class="accent">Treasure Store</button>
       <button id="flash-cards-btn">Shuffle Deck</button>
       
@@ -549,7 +549,7 @@
     </div>
     
     <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f1f1f1; font-size: 0.8rem; color: var(--text-light); text-align: left;">
-      <h4 style="margin: 0 0 5px 0; color: var(--text);">About DyslexiQuest (v2.3)</h4>
+      <h4 style="margin: 0 0 5px 0; color: var(--text);">About DyslexiQuest (v2.4)</h4>
       <p style="margin: 0 0 15px 0;">A multisensory adventure designed to help students master sight words.</p>
       
       <h4 style="margin: 0 0 5px 0; color: var(--text);">3D Model Credits</h4>
@@ -561,7 +561,7 @@
     </div>
 
     <div style="font-size: 0.75rem; color: var(--text-light); text-align: center; margin-top: 20px;">
-      v2.3 • Created for Mastery
+      v2.4 • Created for Mastery
     </div>
   </aside>
 
@@ -668,9 +668,32 @@
     <div id="unlock-content" class="unlock-content"></div>
   </div>
 
-  <!-- Collection screen -->
+  <!-- Treasures screen -->
   <div id="animal-collection-screen" class="collection-screen" style="display:none">
     <div id="collection-content" class="collection-content"></div>
+  </div>
+
+  <!-- Treasure Detail screen -->
+  <div id="treasure-detail-screen" class="collection-screen" style="display:none">
+    <div id="treasure-detail-content" class="collection-content">
+      <div id="detail-rarity" class="rarity-display" style="margin-bottom: 10px;"></div>
+      <h2 id="detail-pet-name" style="font-size:2.5em; margin:5px 0; font-family:'Outfit';"></h2>
+      <p id="detail-animal-name" style="color:var(--text-light); font-weight:700; text-transform:uppercase; font-size:0.9rem; margin-bottom:20px;"></p>
+      
+      <div class="unlock-animal-container" style="height: 250px; margin-bottom: 20px;">
+        <model-viewer id="detail-model" shadow-intensity="1" camera-controls auto-rotate style="width:100%; height:100%; --poster-color:#ffffff"></model-viewer>
+      </div>
+
+      <div style="text-align: left; background: #f8fafc; padding: 20px; border-radius: 20px; margin-bottom: 20px;">
+        <h4 style="margin: 0 0 8px 0; color: var(--primary);">Back Story</h4>
+        <p id="detail-story" style="font-size: 0.95rem; line-height: 1.5; margin: 0 0 15px 0; color: var(--text);"></p>
+        
+        <h4 style="margin: 0 0 8px 0; color: var(--primary);">Special Powers</h4>
+        <p id="detail-powers" style="font-size: 0.95rem; line-height: 1.5; margin: 0; color: var(--text); font-weight: 600;"></p>
+      </div>
+
+      <button id="close-detail-btn" class="primary" style="border-radius:20px; padding:15px 40px; width:auto; margin:0 auto;">Back to Treasures</button>
+    </div>
   </div>
 
   <!-- Store / Trade-in screen -->
