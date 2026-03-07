@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v6.4 – game.js
+//  DyslexiQuest v6.5 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 const QUEST_TEMPLATES = [
@@ -1053,7 +1053,7 @@ class Game {
     power.style.background = 'linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)';
     power.style.left = `${startX}px`;
     power.style.top = `${startY}px`;
-    document.body.appendChild(power);
+    document.getElementById('catching-screen').appendChild(power);
 
     requestAnimationFrame(() => {
       power.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
@@ -1074,7 +1074,7 @@ class Game {
     swirl.className = 'rainbow-swirl';
     swirl.style.left = `${rect.left + rect.width / 2}px`;
     swirl.style.top = `${rect.top + rect.height / 2}px`;
-    document.body.appendChild(swirl);
+    document.getElementById('catching-screen').appendChild(swirl);
 
     modelViewer.style.transition = 'opacity 1s';
     modelViewer.style.opacity = '0';
@@ -1088,10 +1088,11 @@ class Game {
   showShardBall(animal, rect, avatarViewer) {
     const ball = document.createElement('div');
     ball.className = 'shard-ball';
-    ball.style.background = `linear-gradient(135deg, #fff 0%, ${animal.color || '#3b82f6'} 50%, #fff 100%)`;
-    ball.style.left = `${rect.left + rect.width / 2 - 40}px`;
-    ball.style.top = `${rect.top + rect.height / 2 - 40}px`;
-    document.body.appendChild(ball);
+    ball.style.background = `linear-gradient(135deg, #fff 0%, ${animal.color || '#3b82f6'} 33%, #fff 50%, ${animal.color || '#3b82f6'} 66%, #fff 100%)`;
+    ball.style.left = `${rect.left + rect.width / 2 - 50}px`;
+    ball.style.top = `${rect.top + rect.height / 2 - 50}px`;
+    // Append to catching-screen to keep it above background but below content if needed
+    document.getElementById('catching-screen').appendChild(ball);
 
     avatarViewer.style.transition = 'right 1.5s ease-in-out';
     avatarViewer.style.right = 'calc(100% - 35%)';
@@ -1104,7 +1105,7 @@ class Game {
   pickUpBall(ball, avatarViewer, animal) {
     const avatarRect = avatarViewer.getBoundingClientRect();
     ball.style.transition = 'all 0.5s ease-in';
-    ball.style.left = `${avatarRect.left + avatarRect.width / 2 - 40}px`;
+    ball.style.left = `${avatarRect.left + avatarRect.width / 2 - 50}px`;
     ball.style.top = `${avatarRect.top + avatarRect.height / 3}px`;
     ball.style.transform = 'scale(0.2)';
     ball.style.opacity = '0';
@@ -1116,7 +1117,7 @@ class Game {
   }
 
   finalizeCapture(animal, avatarViewer) {
-    avatarViewer.style.right = '15%';
+    avatarViewer.style.right = '5%';
     setTimeout(() => {
       const screen = document.getElementById('catching-screen');
       if (screen) screen.style.display = 'none';

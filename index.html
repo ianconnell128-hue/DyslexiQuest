@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DyslexiQuest v6.4</title>
+  <title>DyslexiQuest v6.5</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Lexend:wght@400;500;700;800&family=Open+Sans:wght@400;600;700;800&display=swap');
 
@@ -625,13 +625,13 @@
 
     .rainbow-swirl {
       position: absolute;
-      width: 200px;
-      height: 200px;
+      width: 250px;
+      height: 250px;
       border-radius: 50%;
       background: conic-gradient(red, orange, yellow, green, blue, indigo, violet, red);
-      z-index: 100;
+      z-index: 20000;
       pointer-events: none;
-      box-shadow: 0 0 30px rgba(255,255,255,0.9);
+      box-shadow: 0 0 50px rgba(255,255,255,1);
       animation: rainbow-swirl-anim 2s ease-in-out forwards;
     }
 
@@ -647,22 +647,22 @@
     }
 
     @keyframes shard-shimmer {
-      0% { background-position: -200% 0; transform: scale(1) rotate(0deg); filter: brightness(1); }
-      50% { transform: scale(1.15) rotate(15deg); filter: brightness(1.5); }
-      100% { background-position: 200% 0; transform: scale(1) rotate(0deg); filter: brightness(1); }
+      0% { background-position: -200% 0; transform: scale(1) rotate(0deg); filter: brightness(1) drop-shadow(0 0 10px white); }
+      50% { transform: scale(1.2) rotate(180deg); filter: brightness(2) drop-shadow(0 0 30px white); }
+      100% { background-position: 200% 0; transform: scale(1) rotate(360deg); filter: brightness(1) drop-shadow(0 0 10px white); }
     }
 
     .shard-ball {
       position: absolute;
-      width: 80px;
-      height: 80px;
-      z-index: 100;
+      width: 100px;
+      height: 100px;
+      z-index: 20001;
       clip-path: polygon(50% 0%, 90% 20%, 100% 50%, 90% 80%, 50% 100%, 10% 80%, 0% 50%, 10% 20%);
-      background: linear-gradient(135deg, #fff 0%, #3b82f6 50%, #fff 100%);
-      background-size: 200% 200%;
-      animation: shard-shimmer 2s infinite linear;
-      box-shadow: 0 0 30px rgba(255,255,255,0.9), inset 0 0 15px rgba(255,255,255,0.6);
-      border: 2px solid white;
+      background: linear-gradient(135deg, #fff 0%, #3b82f6 33%, #fff 50%, #3b82f6 66%, #fff 100%);
+      background-size: 300% 300%;
+      animation: shard-shimmer 1.5s infinite linear;
+      box-shadow: 0 0 40px rgba(255,255,255,1), inset 0 0 20px rgba(255,255,255,0.8);
+      border: 3px solid white;
     }
 
     .blue-power {
