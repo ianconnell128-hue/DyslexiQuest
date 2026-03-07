@@ -437,10 +437,10 @@ const GEAR_SHOP = [
   { id: 'suit_robot', name: 'Robot Armor', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', price: 500 }
 ];
 
-const AVATAR_MODELS = [
-  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb',
-  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb'
-];
+const AVATAR_MODELS = {
+  male: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb',
+  female: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb'
+};
 
 const COLORS = {
   skin: ['#fde68a', '#fbbf24', '#d97706', '#92400e', '#451a03'],
@@ -497,8 +497,9 @@ class Game {
     this.level = 1; this.score = 0; this.streak = 0; this.xp = 0; this.maxXP = 100;
     this.isFrench = false; this.isTalkMode = false; this.micGranted = false; this.micTested = false; this.isTestMode = false;
     this.targetWord = null; this.unlockedAnimals = []; this.currentPool = []; this.selectedVoiceURI = null;
-    this.avatarModel = AVATAR_MODELS[0]; this.nextUnlockLevel = 1;
-    this.coins = 0; this.unlockedAvatars = [AVATAR_MODELS[0]];
+    this.gender = 'male';
+    this.avatarModel = AVATAR_MODELS.male; this.nextUnlockLevel = 1;
+    this.coins = 0; this.unlockedAvatars = [AVATAR_MODELS.male, AVATAR_MODELS.female];
     this.avatarColors = { skin: COLORS.skin[0], hair: COLORS.hair[0], eye: COLORS.eye[0] };
     this.wordBank = { en: {}, fr: {} }; this.users = JSON.parse(localStorage.getItem('dyslexiquest_users')) || {};
     this.currentUser = null; this.canClick = true; this.attemptsForCurrentWord = 0; this.currentAudio = null;
@@ -575,7 +576,7 @@ class Game {
         btn.addEventListener('click', () => { this.playSFX('click'); this.loadProfile(id); });
         list.appendChild(btn);
       });
-    } else { selectView.style.display = 'none'; createView.style.display = 'block'; document.getElementById('create-step-1').style.display = 'block'; document.getElementById('create-step-2').style.display = 'none'; }
+    } else { selectView.style.display = 'none'; createView.style.display = 'block'; document.getElementById('create-step-1').style.display = 'block'; document.getElementById('create-step-avatar').style.display = 'none'; document.getElementById('create-step-2').style.display = 'none'; }
   }
 
   loadProfile(id) {
@@ -584,10 +585,11 @@ class Game {
     this.maxXP = Math.min(100 + (this.level - 1) * 50, 500); this.isFrench = u.isFrench || false;
     this.unlockedAnimals = u.unlockedAnimals || []; this.selectedVoiceURI = u.selectedVoiceURI || null;
     this.micTested = u.micTested || false;
-    this.avatarModel = u.avatarModel || AVATAR_MODELS[0];
+    this.gender = u.gender || 'male';
+    this.avatarModel = u.avatarModel || AVATAR_MODELS.male;
     this.nextUnlockLevel = u.nextUnlockLevel || (this.level + Math.floor(Math.random() * 2) + 3);
     this.coins = u.coins || 0;
-    this.unlockedAvatars = u.unlockedAvatars || [AVATAR_MODELS[0]];
+    this.unlockedAvatars = u.unlockedAvatars || [AVATAR_MODELS.male, AVATAR_MODELS.female];
     this.avatarColors = u.avatarColors || { skin: COLORS.skin[0], hair: COLORS.hair[0], eye: COLORS.eye[0] };
     this.startGameplay();
   }
@@ -597,10 +599,10 @@ class Game {
     const id = Date.now().toString();
     this.users[id] = { 
       name: name, level: 1, score: 0, streak: 0, xp: 0, 
-      isFrench: document.getElementById('new-player-fr').classList.contains('active'), 
+      isFrench: document.getElementById('new-player-en').classList.contains('active'), 
       unlockedAnimals: [], selectedVoiceURI: null, micTested: false,
-      avatarModel: this.avatarModel, nextUnlockLevel: Math.floor(Math.random() * 2) + 4,
-      coins: 0, unlockedAvatars: [this.avatarModel], avatarColors: this.avatarColors
+      gender: this.gender, avatarModel: this.avatarModel, nextUnlockLevel: Math.floor(Math.random() * 2) + 4,
+      coins: 0, unlockedAvatars: this.unlockedAvatars, avatarColors: this.avatarColors
     };
     localStorage.setItem('dyslexiquest_users', JSON.stringify(this.users)); this.loadProfile(id);
   }
@@ -612,7 +614,7 @@ class Game {
       level: this.level, score: this.score, streak: this.streak, xp: this.xp, 
       isFrench: this.isFrench, unlockedAnimals: this.unlockedAnimals, 
       selectedVoiceURI: this.selectedVoiceURI, micTested: this.micTested,
-      avatarModel: this.avatarModel, nextUnlockLevel: this.nextUnlockLevel,
+      gender: this.gender, avatarModel: this.avatarModel, nextUnlockLevel: this.nextUnlockLevel,
       coins: this.coins, unlockedAvatars: this.unlockedAvatars, avatarColors: this.avatarColors
     };
     localStorage.setItem('dyslexiquest_users', JSON.stringify(this.users));
@@ -622,51 +624,63 @@ class Game {
     this.playSFX('click');
     const screen = isOnboarding ? document.getElementById('create-step-avatar') : document.getElementById('avatar-designer-screen');
     const modelViewer = isOnboarding ? document.getElementById('create-avatar-preview') : document.getElementById('avatar-preview-model');
-    const available = this.unlockedAvatars;
-    let modelIndex = available.indexOf(this.avatarModel);
-    if (modelIndex === -1) modelIndex = 0;
     
     const updatePreview = () => {
-      modelViewer.src = available[modelIndex];
-      // Note: Applying colors via material properties in <model-viewer> is possible 
-      // but requires specific material names. We'll simulate it by storing them.
+      modelViewer.src = this.avatarModel;
     };
     updatePreview();
 
-    const renderColors = (type, targetId) => {
-      const container = document.getElementById(targetId);
-      if (!container) return;
-      container.innerHTML = '';
-      COLORS[type].forEach(c => {
-        const swatch = document.createElement('div');
-        swatch.className = `color-swatch ${this.avatarColors[type] === c ? 'active' : ''}`;
-        swatch.style.background = c;
-        swatch.onclick = () => {
-          this.avatarColors[type] = c;
-          [...container.children].forEach(s => s.classList.remove('active'));
-          swatch.classList.add('active');
-          this.playSFX('click');
-        };
-        container.appendChild(swatch);
-      });
+    const setGender = (g) => {
+      this.gender = g;
+      this.avatarModel = AVATAR_MODELS[g];
+      document.getElementById('avatar-gender-male').classList.toggle('active', g === 'male');
+      document.getElementById('avatar-gender-female').classList.toggle('active', g === 'female');
+      updatePreview();
+      this.playSFX('click');
     };
 
     if (isOnboarding) {
+      document.getElementById('avatar-gender-male').onclick = () => setGender('male');
+      document.getElementById('avatar-gender-female').onclick = () => setGender('female');
+      
+      const renderColors = (type, targetId) => {
+        const container = document.getElementById(targetId);
+        if (!container) return;
+        container.innerHTML = '';
+        COLORS[type].forEach(c => {
+          const swatch = document.createElement('div');
+          swatch.className = `color-swatch ${this.avatarColors[type] === c ? 'active' : ''}`;
+          swatch.style.background = c;
+          swatch.onclick = () => {
+            this.avatarColors[type] = c;
+            [...container.children].forEach(s => s.classList.remove('active'));
+            swatch.classList.add('active');
+            this.playSFX('click');
+          };
+          container.appendChild(swatch);
+        });
+      };
+
       renderColors('skin', 'skin-colors');
       renderColors('hair', 'hair-colors');
       renderColors('eye', 'eye-colors');
       document.getElementById('create-step-1').style.display = 'none';
       screen.style.display = 'block';
     } else {
-      // Designers screen might need its own color pickers or just use the same logic
+      const available = this.unlockedAvatars;
+      let modelIndex = available.indexOf(this.avatarModel);
+      if (modelIndex === -1) modelIndex = 0;
+
       document.getElementById('prev-avatar-btn').onclick = () => {
-        this.playSFX('click'); modelIndex = (modelIndex - 1 + available.length) % available.length; updatePreview();
+        this.playSFX('click'); modelIndex = (modelIndex - 1 + available.length) % available.length; 
+        this.avatarModel = available[modelIndex]; updatePreview();
       };
       document.getElementById('next-avatar-btn').onclick = () => {
-        this.playSFX('click'); modelIndex = (modelIndex + 1) % available.length; updatePreview();
+        this.playSFX('click'); modelIndex = (modelIndex + 1) % available.length; 
+        this.avatarModel = available[modelIndex]; updatePreview();
       };
       document.getElementById('save-avatar-btn').onclick = () => {
-        this.playSFX('click'); this.avatarModel = available[modelIndex]; this.saveProfile(); screen.style.display = 'none';
+        this.playSFX('click'); this.saveProfile(); screen.style.display = 'none';
       };
       screen.style.display = 'flex';
     }
@@ -943,7 +957,7 @@ class Game {
     const avatar = document.getElementById('catching-player-avatar');
     
     model.src = animal.model;
-    avatar.src = this.avatarModel || AVATAR_MODELS[0];
+    avatar.src = this.avatarModel || AVATAR_MODELS.male;
     
     challengeArea.style.display = 'block';
     actionArea.style.display = 'none';
@@ -1115,9 +1129,7 @@ class Game {
     }
   }
 
-  showUnlockScreen(animal) {
-    this.startCatchingSequence(animal);
-  }
+  showUnlockScreen(animal) { this.startCatchingSequence(animal); }
 
   showCollectionScreen() {
     this.playSFX('click');
@@ -1156,9 +1168,7 @@ class Game {
           card.innerHTML = `
             <div class="rarity-display rarity-${item.data.rarity.toLowerCase()}" style="margin-bottom:5px;">${item.data.rarity}</div>
             <div style="font-weight:800; color:var(--primary); font-size:1.1rem;">${item.ua.petName}</div>
-            <div class="collection-animal-container" style="height:120px; width:100%;">
-              <model-viewer src="${item.data.model}" shadow-intensity="1" camera-controls auto-rotate style="width:100%; height:100%; --poster-color:#ffffff"></model-viewer>
-            </div>
+            <div class="collection-animal-container" style="height:120px; width:100%;"><model-viewer src="${item.data.model}" shadow-intensity="1" camera-controls auto-rotate style="width:100%; height:100%; --poster-color:#ffffff"></model-viewer></div>
             <div style="font-weight:700; font-size:0.8rem; text-transform:uppercase; color:var(--text-light);">${item.data.name}</div>
             <div style="font-size:0.7rem; font-weight:800; background:#f1f5f9; padding:4px 10px; border-radius:10px; margin-top:5px;">LVL ${item.ua.level}</div>
           `;
