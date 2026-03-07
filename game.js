@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v4.6 – game.js
+//  DyslexiQuest v4.8 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── 3-D collectible characters ──────────────────────────────────────────────
@@ -313,7 +313,7 @@ class Game {
     this.micTested = u.micTested || false;
     this.gender = u.gender || 'male';
     this.avatarModel = u.avatarModel || AVATAR_MODELS.male;
-    this.nextUnlockLevel = u.nextUnlockLevel || (this.level + Math.floor(Math.random() * 3) + 1);
+    this.nextUnlockLevel = u.nextUnlockLevel || (this.level + 2);
     this.coins = u.coins || 0;
     this.unlockedAvatars = u.unlockedAvatars || [AVATAR_MODELS.male, AVATAR_MODELS.female];
     this.avatarColors = u.avatarColors || { skin: COLORS.skin[0], hair: COLORS.hair[0], eye: COLORS.eye[0] };
@@ -327,7 +327,7 @@ class Game {
       name: name, level: 1, score: 0, streak: 0, xp: 0, 
       isFrench: document.getElementById('new-player-en').classList.contains('active'), 
       unlockedAnimals: [], selectedVoiceURI: null, micTested: false,
-      gender: this.gender, avatarModel: this.avatarModel, nextUnlockLevel: Math.floor(Math.random() * 3) + 2,
+      gender: this.gender, avatarModel: this.avatarModel, nextUnlockLevel: 2,
       coins: 0, unlockedAvatars: this.unlockedAvatars, avatarColors: this.avatarColors
     };
     localStorage.setItem('dyslexiquest_users', JSON.stringify(this.users)); this.loadProfile(id);
@@ -752,7 +752,7 @@ class Game {
 
   checkAnimalUnlock() {
     if (this.level > 1 && this.level >= this.nextUnlockLevel) { 
-      this.nextUnlockLevel = this.level + Math.floor(Math.random() * 3) + 1; // 1-3 levels away
+      this.nextUnlockLevel = this.level + 2;
       this.saveProfile();
       const animal = this.getAnimalForLevel(); 
       if (animal) this.startCatchingSequence(animal); 
