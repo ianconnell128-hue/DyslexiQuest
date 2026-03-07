@@ -277,24 +277,13 @@
       display: inline-block;
     }
 
-    /* Notebook Line Simulation */
+    /* Notebook Line Simulation (Disabled) */
     .card-word.ruled {
       padding: 0 10px;
       display: inline-block;
       line-height: 1;
       position: relative;
-      z-index: 1; /* Create a new stacking context */
-    }
-
-    .card-word.ruled::after {
-      content: '';
-      position: absolute;
-      bottom: 4px; 
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background-color: #94a3b8;
-      z-index: -1; /* This now stays within the .card-word context, above the card bg */
+      z-index: 1;
     }
 
     /* ── Buttons & Controls ── */
@@ -698,7 +687,7 @@
     </div>
     
     <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f1f1f1; font-size: 0.8rem; color: var(--text-light); text-align: left;">
-      <h4 style="margin: 0 0 5px 0; color: var(--text);">About DyslexiQuest (v4.3)</h4>
+      <h4 style="margin: 0 0 5px 0; color: var(--text);">About DyslexiQuest (v4.4)</h4>
       <p style="margin: 0 0 15px 0;">A multisensory adventure designed to help students master sight words.</p>
       
       <h4 style="margin: 0 0 5px 0; color: var(--text);">3D Model Credits</h4>
@@ -710,7 +699,7 @@
     </div>
 
     <div style="font-size: 0.75rem; color: var(--text-light); text-align: center; margin-top: 20px;">
-      v4.3 • Created for Mastery
+      v4.4 • Created for Mastery
     </div>
   </aside>
 
