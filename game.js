@@ -171,7 +171,7 @@ function parseLevels(text) {
 
 class Game {
   constructor() {
-    this.level = 1; this.score = 0; this.streak = 0; this.xp = 0; this.maxXP = 100;
+    this.level = 1; this.score = 0; this.streak = 0; this.xp = 0; this.maxXP = 5;
     this.isFrench = false; this.isTalkMode = false; this.micGranted = false; this.micTested = false; this.isTestMode = false;
     this.targetWord = null; this.unlockedAnimals = []; this.currentPool = []; this.selectedVoiceURI = null;
     this.gender = 'male';
@@ -259,7 +259,7 @@ class Game {
   loadProfile(id) {
     this.currentUser = id; const u = this.users[id];
     this.level = u.level || 1; this.score = u.score || 0; this.streak = u.streak || 0; this.xp = u.xp || 0;
-    this.maxXP = Math.min(100 + (this.level - 1) * 50, 500); this.isFrench = u.isFrench || false;
+    this.maxXP = 5; this.isFrench = u.isFrench || false;
     this.unlockedAnimals = u.unlockedAnimals || []; this.selectedVoiceURI = u.selectedVoiceURI || null;
     this.micTested = u.micTested || false;
     this.gender = u.gender || 'male';
@@ -444,7 +444,7 @@ class Game {
     const target = this.targetWord.word.toLowerCase(), fb = document.getElementById('speech-feedback');
     if (fb) fb.innerHTML = `I heard: <b style="color:var(--primary)">"${t}"</b>`;
     if (t === target || t.includes(target)) {
-      this.playSFX('correct'); this.streak++; this.score += 150; this.xp += 30 * this.level;
+      this.playSFX('correct'); this.streak++; this.score += 150; this.xp += 1;
       if (fb) fb.innerHTML = '<span style="color:var(--accent)">YES! ✨</span>';
       this.updateStats(); this.saveProfile(); setTimeout(() => this.levelUpOrNext(), 1500);
     } else {
@@ -501,7 +501,7 @@ class Game {
     this.attemptsForCurrentWord++;
     if (isCorrect) {
       this.canClick = false; this.playSFX('correct'); card.classList.add('correct-zoom');
-      this.xp += (this.attemptsForCurrentWord === 1) ? 25 * this.level : 10 * this.level;
+      this.xp += 1;
       this.streak = (this.attemptsForCurrentWord === 1) ? this.streak + 1 : 0;
       this.score += 100; this.updateStats(); this.saveProfile(); setTimeout(() => this.levelUpOrNext(), 1500);
     } else {
@@ -615,7 +615,7 @@ class Game {
   }
 
   levelUp() {
-    this.playSFX('levelUp'); this.level++; this.maxXP = Math.min(100 + (this.level - 1) * 50, 500); this.xp = 0;
+    this.playSFX('levelUp'); this.level++; this.maxXP = 5; this.xp = 0;
     this.updateStats(); this.saveProfile(); document.getElementById('new-level').textContent = this.level;
     document.getElementById('level-up-modal').style.display = 'flex';
   }
@@ -698,8 +698,9 @@ class Game {
     btn.style.opacity = '0.5';
 
     const modelRect = document.getElementById('catch-model').getBoundingClientRect();
-    const startX = window.innerWidth / 2;
-    const startY = window.innerHeight - 50;
+    const avatarRect = document.getElementById('catching-player-avatar').getBoundingClientRect();
+    const startX = avatarRect.left + avatarRect.width / 2;
+    const startY = avatarRect.top + avatarRect.height / 2;
 
     // Create blue power projectile
     const power = document.createElement('div');
@@ -896,7 +897,7 @@ class Game {
 
   setLang(l) { this.isFrench = (l === 'fr'); this.saveProfile(); this.populateVoiceList(); document.getElementById('new-player-en').classList.toggle('active', !this.isFrench); document.getElementById('new-player-fr').classList.toggle('active', this.isFrench); this.newTarget(); }
   setMode(m) { this.isTalkMode = (m === 'talk'); document.getElementById('mode-listen').classList.toggle('active', !this.isTalkMode); document.getElementById('mode-talk').classList.toggle('active', this.isTalkMode); this.newTarget(); }
-  reset() { this.level = 1; this.score = 0; this.streak = 0; this.xp = 0; this.maxXP = 100; this.unlockedAnimals = []; this.saveProfile(); this.updateStats(); this.updateCollectionButton(); this.newTarget(); }
+  reset() { this.level = 1; this.score = 0; this.streak = 0; this.xp = 0; this.maxXP = 5; this.unlockedAnimals = []; this.saveProfile(); this.updateStats(); this.updateCollectionButton(); this.newTarget(); }
 
   bindEvents() {
     document.getElementById('next-to-avatar-btn')?.addEventListener('click', () => this.showAvatarDesigner(true));
