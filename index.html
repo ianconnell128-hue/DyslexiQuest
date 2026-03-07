@@ -255,9 +255,10 @@
 
     .game-area {
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
       align-items: stretch;
-      gap: 10px;
+      gap: 15px;
       margin-top: 40px;
       padding: 0 10px;
       width: 100%;
@@ -265,61 +266,83 @@
     }
 
     @media (min-width: 800px) {
-      .game-area { gap: 20px; }
+      .game-area { gap: 25px; }
     }
 
     .card {
-      flex: 1 1 0;
-      min-width: 0; /* Allow cards to shrink below content width */
-      aspect-ratio: 1;
-      background: white;
-      border-radius: clamp(15px, 4vw, 35px);
+      flex: 0 1 240px;
+      min-width: 160px;
+      min-height: 220px;
+      background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+      border-radius: 30px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: clamp(8px, 2vw, 20px);
+      padding: 25px;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border: 1px solid #f0f0f0;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 25px rgba(67, 56, 202, 0.2);
+      position: relative;
+      overflow: hidden;
     }
 
-    .card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border-color: var(--primary); }
+    .card:hover { 
+      transform: translateY(-12px) scale(1.02); 
+      box-shadow: 0 20px 35px rgba(67, 56, 202, 0.3); 
+      border-color: rgba(255, 255, 255, 0.3); 
+    }
+
+    .card.correct-zoom {
+      animation: correct-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      z-index: 100;
+    }
+
+    @keyframes correct-pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1.1); }
+    }
 
     .word-shape-container {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 3px;
-      height: 50px;
-      margin-bottom: 12px;
+      gap: 4px;
+      height: 40px;
+      margin-bottom: 15px;
       width: 100%;
     }
 
     .shape-block {
-      background: var(--primary);
-      opacity: 0.15;
+      background: white;
+      opacity: 0.3;
       border-radius: 4px;
-      width: clamp(8px, 2vw, 14px);
+      width: 12px;
       transition: all 0.3s ease;
     }
 
     /* Block heights based on letter anatomy */
-    .shape-block.tall { height: 35px; } /* Ascenders: t, d, f, h, k, l, b & Capitals */
-    .shape-block.mid  { height: 20px; } /* Standard: a, c, e, m, n, o, r, s, u, v, w, x, z */
-    .shape-block.low  { height: 35px; transform: translateY(8px); } /* Descenders: g, j, p, q, y */
+    .shape-block.tall { height: 30px; } 
+    .shape-block.mid  { height: 16px; } 
+    .shape-block.low  { height: 30px; transform: translateY(6px); }
 
     .card-word {
       font-family: 'Outfit', sans-serif;
-      font-size: clamp(1.2rem, 4vw, 2rem);
-      color: var(--text);
+      font-size: 2.2rem;
+      color: white;
       font-weight: 800;
       text-align: center;
-      line-height: 1;
-      margin-top: 5px;
-      position: relative;
-      display: inline-block;
+      line-height: 1.1;
+      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      letter-spacing: 0.02em;
+    }
+
+    body.font-dyslexic .card-word {
+      font-family: 'Lexend', sans-serif;
+      font-weight: 600;
     }
 
     /* Notebook Line Simulation (Disabled) */
@@ -418,19 +441,13 @@
       .game-container { padding: 20px 10px; }
       #word-prompt { margin: 30px 0 20px; font-size: 2.2rem; }
 
-      .game-area { 
-        display: grid; 
-        grid-template-columns: 1fr 1fr; 
-        gap: 12px; 
-        padding: 0 5px;
-      }
-
-      .card { border-radius: 20px; padding: 15px; aspect-ratio: 1; }
-      .card-word { font-size: 1.4rem; }
-      .word-shape-container { height: 35px; margin-bottom: 8px; }
-      .shape-block.tall { height: 25px; }
-      .shape-block.mid { height: 14px; }
-      .shape-block.low { height: 25px; transform: translateY(6px); }
+      .card { min-width: 140px; min-height: 180px; padding: 15px; border-radius: 24px; }
+      .card-word { font-size: 1.6rem; }
+      .word-shape-container { height: 30px; margin-bottom: 10px; }
+      .shape-block { width: 9px; }
+      .shape-block.tall { height: 22px; }
+      .shape-block.mid { height: 12px; }
+      .shape-block.low { height: 22px; transform: translateY(5px); }
 
       /* Modals & Screens */
       #loading-overlay, #start-overlay, .modal, .unlock-screen, .collection-screen {
