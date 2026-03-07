@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v4.5 – game.js
+//  DyslexiQuest v4.6 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── 3-D collectible characters ──────────────────────────────────────────────
@@ -46,7 +46,7 @@ const ANIMALS = [
   { name: 'Turbo Buggy', env: 'land', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Buggy/glTF-Binary/Buggy.glb', color: '#f97316', rarity: 'Epic', story: 'Warp engine.', powers: 'Jump' },
   { name: 'Super Robot', env: 'land', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', color: '#f97316', rarity: 'Epic', story: 'Guardian.', powers: 'Laser' },
   { name: 'Iron Helmet', env: 'land', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb', color: '#f97316', rarity: 'Epic', story: 'Ancient.', powers: 'Light' },
-  { name: 'Racer Buggy', env: 'land', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Buggy/glTF-Binary/Buggy.glb', color: '#f97316', rarity: 'Epic', story: 'Wall climber.', powers: 'Tire' },
+  { name: 'Racer Buggy', env: 'land', model: 'https://raw.githubusercontent.com/Buggy/glTF-Binary/Buggy.glb', color: '#f97316', rarity: 'Epic', story: 'Wall climber.', powers: 'Tire' },
   { name: 'Ultra Bot', env: 'land', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', color: '#f97316', rarity: 'Epic', story: 'Advanced.', powers: 'AI' },
   { name: 'Neil Armstrong', env: 'space', model: 'https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb', color: '#eab308', rarity: 'Legendary', story: 'True hero.', powers: 'History' },
   { name: 'Ancient Dragon', env: 'land', model: 'https://assets.babylonjs.com/meshes/Georgia-Tech-Dragon/dragonUV.glb', color: '#eab308', rarity: 'Legendary', story: 'Ancient wisdom.', powers: 'Fire' },
@@ -240,18 +240,20 @@ class Game {
       this.recognition.onstart = () => {
         this.isListening = true; const targetBtn = this.isTestMode ? 'mic-test-btn' : 'mic-btn';
         const micBtn = document.getElementById(targetBtn), feedbackId = this.isTestMode ? 'mic-test-feedback' : 'speech-feedback';
-        const feedback = document.getElementById(feedbackId);
+        const feedback = feedbackId ? document.getElementById(feedbackId) : null;
         if (micBtn) micBtn.classList.add('mic-listening');
         if (feedback) feedback.innerHTML = '<span style="color:var(--danger)">👂 Listening... Speak now!</span>';
       };
       this.recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript.toLowerCase().trim(), isFinal = event.results[0].isFinal;
-        const feedback = document.getElementById(this.isTestMode ? 'mic-test-feedback' : 'speech-feedback');
+        const feedbackId = this.isTestMode ? 'mic-test-feedback' : 'speech-feedback';
+        const feedback = feedbackId ? document.getElementById(feedbackId) : null;
         if (feedback && !isFinal) feedback.innerHTML = `Hearing: <b style="color:var(--primary)">"${transcript}..."</b>`;
         if (isFinal) { if (this.isTestMode) this.handleTestResult(transcript); else this.handleSpeechResult(transcript); }
       };
       this.recognition.onerror = (event) => {
-        const feedback = document.getElementById(this.isTestMode ? 'mic-test-feedback' : 'speech-feedback');
+        const feedbackId = this.isTestMode ? 'mic-test-feedback' : 'speech-feedback';
+        const feedback = feedbackId ? document.getElementById(feedbackId) : null;
         if (feedback) {
           if (event.error === 'no-speech') feedback.textContent = "Didn't hear anything!";
           else if (event.error === 'not-allowed') { feedback.textContent = "Allow mic access!"; this.micGranted = false; this.showMicPermissionOnboarding(); }
@@ -562,8 +564,10 @@ class Game {
       else if (!this.micTested) { document.getElementById('mic-permission-view').style.display = 'none'; document.getElementById('mic-test-view').style.display = 'flex'; }
       else { document.getElementById('mic-permission-view').style.display = 'none'; document.getElementById('talk-active-view').style.display = 'flex'; }
       const displayWord = this.formatWordContextually(this.targetWord.word);
-      document.getElementById('speech-target-card').innerHTML = `<div class="card" style="margin:0 auto; flex:none; width:100%;">${getWordShapeHTML(displayWord)}<div class="card-word ruled" style="font-size: 2.5rem;">${displayWord}</div></div>`;
-      document.getElementById('speech-feedback').textContent = "Click the mic when ready!";
+      const targetCard = document.getElementById('speech-target-card');
+      if (targetCard) targetCard.innerHTML = `<div class="card" style="margin:0 auto; flex:none; width:100%;">${getWordShapeHTML(displayWord)}<div class="card-word ruled" style="font-size: 2.5rem;">${displayWord}</div></div>`;
+      const feedback = document.getElementById('speech-feedback');
+      if (feedback) feedback.textContent = "Click the mic when ready!";
     } else { setTimeout(() => this.speak(), 500); this.renderCards(); }
   }
 
@@ -602,7 +606,8 @@ class Game {
 
   updateStats() {
     document.getElementById('level').textContent = this.level; document.getElementById('score').textContent = this.score;
-    document.getElementById('coins').textContent = this.coins;
+    const coinsEl = document.getElementById('coins');
+    if (coinsEl) coinsEl.textContent = this.coins;
     const streakEl = document.getElementById('streak');
     if (streakEl) {
       streakEl.textContent = this.streak; streakEl.classList.toggle('on-fire', this.streak >= 3);
@@ -715,7 +720,7 @@ class Game {
 
   performBuyGear(item) {
     if (this.coins < item.price) {
-      alert("Not enough DyslexiCoins!");
+      alert("Not enough money!");
       return;
     }
     if (!confirm(`Buy "${item.name}" for $${item.price}?`)) return;
@@ -730,8 +735,11 @@ class Game {
   levelUp() {
     this.playSFX('levelUp'); this.level++; 
     this.maxXP = 5 + (this.level - 1) * 5; this.xp = 0;
-    this.updateStats(); this.saveProfile(); document.getElementById('new-level').textContent = this.level;
-    document.getElementById('level-up-modal').style.display = 'flex';
+    this.updateStats(); this.saveProfile();
+    const newLevelEl = document.getElementById('new-level');
+    if (newLevelEl) newLevelEl.textContent = this.level;
+    const levelUpModal = document.getElementById('level-up-modal');
+    if (levelUpModal) levelUpModal.style.display = 'flex';
   }
 
   getAnimalForLevel() { 
@@ -761,12 +769,12 @@ class Game {
     const actionArea = document.getElementById('capture-action-area');
     const avatar = document.getElementById('catching-player-avatar');
     
-    model.src = animal.model;
-    avatar.src = this.avatarModel || AVATAR_MODELS.male;
+    if (model) model.src = animal.model;
+    if (avatar) avatar.src = this.avatarModel || AVATAR_MODELS.male;
     
-    challengeArea.style.display = 'block';
-    actionArea.style.display = 'none';
-    screen.style.display = 'flex';
+    if (challengeArea) challengeArea.style.display = 'block';
+    if (actionArea) actionArea.style.display = 'none';
+    if (screen) screen.style.display = 'flex';
 
     this.renderCatchingChallenge(animal);
   }
@@ -780,8 +788,8 @@ class Game {
 
     const prompt = document.getElementById('catch-word-prompt');
     const area = document.getElementById('catch-game-area');
-    area.innerHTML = '';
-    prompt.textContent = "Listen and Find!";
+    if (area) area.innerHTML = '';
+    if (prompt) prompt.textContent = "Listen and Find!";
     
     setTimeout(() => this.speak(target.word), 500);
 
@@ -792,104 +800,125 @@ class Game {
       card.addEventListener('click', () => {
         if (wordData.word === target.word) {
           this.playSFX('correct');
-          document.getElementById('catch-challenge-area').style.display = 'none';
-          document.getElementById('capture-action-area').style.display = 'block';
-          document.getElementById('shoot-power-btn').onclick = () => this.fireCapturePower(animal);
+          const challengeArea = document.getElementById('catch-challenge-area');
+          if (challengeArea) challengeArea.style.display = 'none';
+          const actionArea = document.getElementById('capture-action-area');
+          if (actionArea) actionArea.style.display = 'block';
+          const shootBtn = document.getElementById('shoot-power-btn');
+          if (shootBtn) shootBtn.onclick = () => this.fireCapturePower(animal);
         } else {
           this.playSFX('wrong');
           card.style.opacity = '0.3';
           this.speak(target.word);
         }
       });
-      area.appendChild(card);
+      if (area) area.appendChild(card);
     });
   }
 
   fireCapturePower(animal) {
     this.playSFX('click');
     const btn = document.getElementById('shoot-power-btn');
-    btn.disabled = true;
-    btn.style.opacity = '0.5';
+    if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
 
-    const modelRect = document.getElementById('catch-model').getBoundingClientRect();
-    const avatarRect = document.getElementById('catching-player-avatar').getBoundingClientRect();
+    const modelViewer = document.getElementById('catch-model');
+    const avatarViewer = document.getElementById('catching-player-avatar');
+    const modelRect = modelViewer.getBoundingClientRect();
+    const avatarRect = avatarViewer.getBoundingClientRect();
     const startX = avatarRect.left + avatarRect.width / 2;
     const startY = avatarRect.top + avatarRect.height / 2;
 
     const power = document.createElement('div');
     power.className = 'blue-power';
+    power.style.background = 'linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)';
     power.style.left = `${startX}px`;
     power.style.top = `${startY}px`;
     document.body.appendChild(power);
 
     requestAnimationFrame(() => {
-      power.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+      power.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
       power.style.left = `${modelRect.left + modelRect.width / 2}px`;
       power.style.top = `${modelRect.top + modelRect.height / 2}px`;
-      power.style.transform = 'scale(2)';
+      power.style.transform = 'scale(2) rotate(360deg)';
     });
 
     setTimeout(() => {
       power.remove();
-      this.condenseToSpikyBall(animal, modelRect);
-    }, 600);
+      this.wrapTreasureInSwirl(animal, modelViewer, avatarViewer);
+    }, 800);
   }
 
-  condenseToSpikyBall(animal, rect) {
-    document.getElementById('catch-model').style.opacity = '0';
-    const ball = document.createElement('div');
-    ball.className = 'spiky-ball';
-    ball.style.background = animal.color;
-    ball.style.color = animal.color;
-    ball.style.left = `${rect.left + rect.width / 2 - 40}px`;
-    ball.style.top = `${rect.top + rect.height / 2 - 40}px`;
-    ball.style.transform = 'scale(0)';
-    
-    for (let i = 0; i < 12; i++) {
-      const spike = document.createElement('div');
-      spike.className = 'spike';
-      spike.style.transform = `rotate(${i * 30}deg)`;
-      ball.appendChild(spike);
-    }
-    document.body.appendChild(ball);
+  wrapTreasureInSwirl(animal, modelViewer, avatarViewer) {
+    const rect = modelViewer.getBoundingClientRect();
+    const swirl = document.createElement('div');
+    swirl.className = 'rainbow-swirl';
+    swirl.style.left = `${rect.left + rect.width / 2}px`;
+    swirl.style.top = `${rect.top + rect.height / 2}px`;
+    document.body.appendChild(swirl);
 
-    requestAnimationFrame(() => {
-      ball.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-      ball.style.transform = 'scale(1)';
-    });
+    modelViewer.style.transition = 'opacity 1s';
+    modelViewer.style.opacity = '0';
 
     setTimeout(() => {
-      this.animateBallToChest(ball, animal);
-    }, 1000);
+      swirl.remove();
+      this.showShardBall(animal, rect, avatarViewer);
+    }, 2000);
   }
 
-  animateBallToChest(ball, animal) {
-    const endRect = document.getElementById('chest-container').getBoundingClientRect();
-    ball.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-    ball.style.left = `${endRect.left}px`;
-    ball.style.top = `${endRect.top}px`;
-    ball.style.transform = 'scale(0.3) rotate(360deg)';
-    ball.style.opacity = '0.5';
+  showShardBall(animal, rect, avatarViewer) {
+    const ball = document.createElement('div');
+    ball.className = 'shard-ball';
+    ball.style.background = `linear-gradient(135deg, #fff 0%, ${animal.color || '#3b82f6'} 50%, #fff 100%)`;
+    ball.style.left = `${rect.left + rect.width / 2 - 40}px`;
+    ball.style.top = `${rect.top + rect.height / 2 - 40}px`;
+    document.body.appendChild(ball);
+
+    avatarViewer.style.transition = 'right 1.5s ease-in-out';
+    avatarViewer.style.right = 'calc(100% - 35%)';
+
+    setTimeout(() => {
+      this.pickUpBall(ball, avatarViewer, animal);
+    }, 1600);
+  }
+
+  pickUpBall(ball, avatarViewer, animal) {
+    const avatarRect = avatarViewer.getBoundingClientRect();
+    ball.style.transition = 'all 0.5s ease-in';
+    ball.style.left = `${avatarRect.left + avatarRect.width / 2 - 40}px`;
+    ball.style.top = `${avatarRect.top + avatarRect.height / 3}px`;
+    ball.style.transform = 'scale(0.2)';
+    ball.style.opacity = '0';
 
     setTimeout(() => {
       ball.remove();
-      document.getElementById('catching-screen').style.display = 'none';
-      document.getElementById('catch-model').style.opacity = '1';
+      this.finalizeCapture(animal, avatarViewer);
+    }, 500);
+  }
+
+  finalizeCapture(animal, avatarViewer) {
+    avatarViewer.style.right = '15%';
+    setTimeout(() => {
+      const screen = document.getElementById('catching-screen');
+      if (screen) screen.style.display = 'none';
+      const model = document.getElementById('catch-model');
+      if (model) model.style.opacity = '1';
       
       const usedNames = this.unlockedAnimals.map(u => u.petName), availableNames = PET_NAMES.filter(n => !usedNames.includes(n));
       const petName = availableNames[Math.floor(Math.random() * availableNames.length)] || `${animal.name} #${this.unlockedAnimals.length + 1}`;
       this.unlockedAnimals.push({ animalName: animal.name, petName: petName, level: this.level });
       this.updateCollectionButton(); this.saveProfile();
       
-      document.getElementById('chest-container').style.transform = 'scale(1.5) rotate(15deg)';
-      setTimeout(() => { 
-        document.getElementById('chest-container').style.transform = 'scale(1) rotate(0deg)'; 
-        const badge = document.getElementById('chest-badge'); 
-        if (badge) { badge.style.display = 'block'; badge.textContent = this.unlockedAnimals.length; } 
-      }, 200);
-      
+      const chest = document.getElementById('chest-container');
+      if (chest) {
+        chest.style.transform = 'scale(1.5) rotate(15deg)';
+        setTimeout(() => { 
+          chest.style.transform = 'scale(1) rotate(0deg)'; 
+          const badge = document.getElementById('chest-badge'); 
+          if (badge) { badge.style.display = 'block'; badge.textContent = this.unlockedAnimals.length; } 
+        }, 200);
+      }
       this.newTarget();
-    }, 800);
+    }, 1000);
   }
 
   showStoreScreen() {
