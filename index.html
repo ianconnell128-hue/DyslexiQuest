@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DyslexiQuest v6.1</title>
+  <title>DyslexiQuest v6.2</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Lexend:wght@400;500;700;800&family=Open+Sans:wght@400;600;700;800&display=swap');
 
@@ -635,10 +635,21 @@
       animation: rainbow-swirl-anim 2s ease-in-out forwards;
     }
 
+    .dirt-ground {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 120px;
+      background: #78350f; /* Dark brown dirt */
+      z-index: 2;
+      border-top: 4px solid #451a03;
+    }
+
     @keyframes shard-shimmer {
-      0% { background-position: -200% 0; transform: scale(1) rotate(0deg); }
-      50% { transform: scale(1.1) rotate(5deg); }
-      100% { background-position: 200% 0; transform: scale(1) rotate(0deg); }
+      0% { background-position: -200% 0; transform: scale(1) rotate(0deg); filter: brightness(1); }
+      50% { transform: scale(1.15) rotate(15deg); filter: brightness(1.5); }
+      100% { background-position: 200% 0; transform: scale(1) rotate(0deg); filter: brightness(1); }
     }
 
     .shard-ball {
@@ -649,9 +660,9 @@
       clip-path: polygon(50% 0%, 90% 20%, 100% 50%, 90% 80%, 50% 100%, 10% 80%, 0% 50%, 10% 20%);
       background: linear-gradient(135deg, #fff 0%, #3b82f6 50%, #fff 100%);
       background-size: 200% 200%;
-      animation: shard-shimmer 2s infinite ease-in-out;
-      box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
-      border: 2px solid rgba(255,255,255,0.8);
+      animation: shard-shimmer 2s infinite linear;
+      box-shadow: 0 0 30px rgba(255,255,255,0.9), inset 0 0 15px rgba(255,255,255,0.6);
+      border: 2px solid white;
     }
 
     .blue-power {
@@ -976,36 +987,36 @@
   </div>
 
   <!-- Catching Screen -->
-  <div id="catching-screen" class="collection-screen" style="display:none; padding: 0; background: url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;">
-    <!-- 3D Environment Background (Small Trees) -->
-    <model-viewer id="catch-env-1" src="https://raw.githubusercontent.com/jagenjo/GTR_Framework/master/data/prefabs/tree.glb" style="position: absolute; width: 100px; height: 100px; z-index: 3; bottom: 80px; left: 5%;" disable-zoom auto-rotate scale="0.5 0.5 0.5" camera-orbit="45deg 80deg 10m"></model-viewer>
-    <model-viewer id="catch-env-2" src="https://raw.githubusercontent.com/jagenjo/GTR_Framework/master/data/prefabs/tree.glb" style="position: absolute; width: 80px; height: 80px; z-index: 3; bottom: 90px; left: 25%;" disable-zoom auto-rotate scale="0.4 0.4 0.4" camera-orbit="120deg 85deg 12m"></model-viewer>
-    <model-viewer id="catch-env-3" src="https://raw.githubusercontent.com/jagenjo/GTR_Framework/master/data/prefabs/tree.glb" style="position: absolute; width: 90px; height: 90px; z-index: 3; bottom: 85px; right: 10%;" disable-zoom auto-rotate scale="0.45 0.45 0.45" camera-orbit="200deg 85deg 12m"></model-viewer>
-    <model-viewer id="catch-env-4" src="https://raw.githubusercontent.com/jagenjo/GTR_Framework/master/data/prefabs/tree.glb" style="position: absolute; width: 70px; height: 70px; z-index: 3; bottom: 95px; right: 30%;" disable-zoom auto-rotate scale="0.35 0.35 0.35" camera-orbit="10deg 85deg 15m"></model-viewer>
-    <model-viewer id="catch-env-5" src="https://raw.githubusercontent.com/jagenjo/GTR_Framework/master/data/prefabs/tree.glb" style="position: absolute; width: 60px; height: 60px; z-index: 3; bottom: 100px; left: 40%;" disable-zoom auto-rotate scale="0.3 0.3 0.3" camera-orbit="90deg 85deg 10m"></model-viewer>
+  <div id="catching-screen" class="collection-screen" style="display:none; padding: 0; background: url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat; overflow: hidden;">
+    <!-- Dirt Ground -->
+    <div class="dirt-ground"></div>
     
-    <div id="catching-content" class="collection-content" style="max-width: 600px; z-index: 10; margin-top: 40px; background: rgba(255, 255, 255, 0.85); border-radius: 24px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
+    <!-- 3D Environment Background -->
+    <model-viewer id="catch-env-1" src="https://raw.githubusercontent.com/jagenjo/GTR_Framework/master/data/prefabs/tree.glb" style="position: absolute; width: 150px; height: 150px; z-index: 3; bottom: 100px; left: 5%;" disable-zoom auto-rotate scale="0.8 0.8 0.8"></model-viewer>
+    <model-viewer id="catch-env-2" src="https://raw.githubusercontent.com/jagenjo/GTR_Framework/master/data/prefabs/tree.glb" style="position: absolute; width: 120px; height: 120px; z-index: 3; bottom: 110px; left: 25%;" disable-zoom auto-rotate scale="0.6 0.6 0.6"></model-viewer>
+    <model-viewer id="catch-env-3" src="https://raw.githubusercontent.com/jagenjo/GTR_Framework/master/data/prefabs/tree.glb" style="position: absolute; width: 100px; height: 100px; z-index: 3; bottom: 105px; right: 10%;" disable-zoom auto-rotate scale="0.5 0.5 0.5"></model-viewer>
+    
+    <!-- Rocks and Grass (Represented by smaller models) -->
+    <model-viewer src="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF-Binary/Box.glb" style="position: absolute; width: 40px; height: 40px; z-index: 4; bottom: 85px; left: 40%;" disable-zoom scale="0.2 0.1 0.2"></model-viewer>
+    <model-viewer src="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF-Binary/Box.glb" style="position: absolute; width: 30px; height: 30px; z-index: 4; bottom: 90px; right: 40%;" disable-zoom scale="0.15 0.05 0.15"></model-viewer>
+
+    <!-- Avatar and Treasure Positioning (Bottom Right as requested) -->
+    <model-viewer id="catching-player-avatar" src="" auto-rotate style="position: absolute; width: 250px; height: 350px; bottom: 20px; right: 5%; z-index: 100;" disable-zoom camera-orbit="0deg 75deg 2m"></model-viewer>
+    <model-viewer id="catch-model" src="" auto-rotate style="position: absolute; width: 200px; height: 250px; bottom: 40px; right: 25%; z-index: 100;" disable-zoom camera-orbit="0deg 75deg 2m"></model-viewer>
+
+    <div id="catching-content" class="collection-content" style="max-width: 600px; z-index: 1000; margin-top: 40px; background: rgba(255, 255, 255, 0.85); border-radius: 24px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); backdrop-filter: blur(10px); position: relative;">
       <h2 style="font-family:'Outfit'; font-size: 2rem; color: #3b82f6; margin-bottom: 5px;">A Wild Treasure!</h2>
       <p id="catch-instruction" style="color:var(--text); margin-bottom: 20px; font-weight: 600;">Complete the challenge to power up your capture!</p>
-      
+
       <div id="catch-challenge-area" style="background: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 24px; margin-bottom: 20px;">
         <div id="catch-word-prompt" style="font-family:'Outfit'; font-size: 1.8rem; font-weight: 800; margin-bottom: 15px; color: var(--text);">Powering up...</div>
-        <div id="catch-game-area" class="game-area" style="margin-top: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;"></div>
+        <div id="catch-game-area" class="game-area" style="margin-top: 0; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;"></div>
       </div>
 
       <div id="capture-action-area" style="display: none; margin-bottom: 20px;">
-        <button id="shoot-power-btn" class="charge-button">✨ SHOOT BLUE POWER! ✨</button>
+        <button id="shoot-power-btn" class="charge-button" style="background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet); border: none; padding: 15px 30px; font-weight: 800; color: white; border-radius: 50px; cursor: pointer; animation: pulse-blue 2s infinite;">✨ SHOOT RAINBOW POWER! ✨</button>
       </div>
     </div>
-
-    <!-- Dirt Ground -->
-    <div style="position: absolute; bottom: 0; width: 100%; height: 100px; background: linear-gradient(to bottom, #5d4037 0%, #3e2723 100%); z-index: 2; border-top: 4px solid #4e342e;"></div>
-
-    <!-- Wild Treasure (On the ground, Left) -->
-    <model-viewer id="catch-model" shadow-intensity="1" auto-rotate style="position: absolute; bottom: 30px; left: 15%; width: 200px; height: 200px; z-index: 4;" camera-orbit="0deg 75deg auto"></model-viewer>
-
-    <!-- Player Avatar (On the ground, Right) -->
-    <model-viewer id="catching-player-avatar" shadow-intensity="1" style="position: absolute; bottom: 30px; right: 15%; width: 250px; height: 250px; z-index: 5; pointer-events: none;" camera-orbit="0deg 80deg auto"></model-viewer>
   </div>
 
   <!-- Treasures screen -->
