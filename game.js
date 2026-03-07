@@ -1,6 +1,6 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DyslexiQuest v4.2 – game.js
+//  DyslexiQuest v4.3 – game.js
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── 3-D collectible characters ──────────────────────────────────────────────
@@ -59,6 +59,7 @@ const ANIMALS = [
 
 const RARITY_WEIGHTS = { 'Common': 60, 'Uncommon': 25, 'Rare': 10, 'Epic': 4, 'Legendary': 0.9, 'Mythic': 0.1 };
 const RARITY_ORDER = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Mythic'];
+// TREASURE SELL PRICES ($ - Realistic scale)
 const SELL_PRICES = { 'Common': 50, 'Uncommon': 100, 'Rare': 250, 'Epic': 500, 'Legendary': 1000, 'Mythic': 2500 };
 
 const MODELS = {
@@ -158,7 +159,7 @@ const GEAR_SHOP = [
   { id: 'set_15', name: 'Celestial God', cat: 'Sets', model: MODELS.figure, price: 5000 }
 ];
 
-const SHOP_CATEGORIES = ['Hats', 'Shirts', 'Pants', 'Shoes', 'Sets'];
+const SHOP_CATEGORIES = ['All', 'Hats', 'Shirts', 'Pants', 'Shoes', 'Sets'];
 
 const AVATAR_MODELS = {
   male: MODELS.soldier,
@@ -348,7 +349,7 @@ class Game {
     const screen = isOnboarding ? document.getElementById('create-step-avatar') : document.getElementById('avatar-designer-screen');
     const modelViewer = isOnboarding ? document.getElementById('create-avatar-preview') : document.getElementById('avatar-preview-model');
     const gearList = document.getElementById('my-gear-list');
-    let currentMyGearCat = 'Sets';
+    let currentMyGearCat = 'All';
     
     const updatePreview = () => {
       modelViewer.src = this.avatarModel;
@@ -369,6 +370,7 @@ class Game {
       gearList.innerHTML = '';
       
       const filtered = this.unlockedAvatars.filter(modelUrl => {
+        if (cat === 'All') return true;
         const gearInfo = GEAR_SHOP.find(g => g.model === modelUrl);
         if (modelUrl === AVATAR_MODELS.male || modelUrl === AVATAR_MODELS.female) {
           return cat === 'Sets';
@@ -443,7 +445,7 @@ class Game {
             btn.classList.add('active');
             renderMyGear(cat);
           };
-          if (cat === 'Sets') btn.classList.add('active');
+          if (cat === 'All') btn.classList.add('active');
           tabs.appendChild(btn);
         });
         content.insertBefore(tabs, gearList.parentNode);
@@ -617,11 +619,11 @@ class Game {
     const screen = document.getElementById('shop-screen');
     const buyList = document.getElementById('shop-buy-list');
     const sellList = document.getElementById('shop-sell-list');
-    let currentBuyCat = 'Hats';
+    let currentBuyCat = 'All';
 
     const renderBuy = (cat) => {
       buyList.innerHTML = '';
-      const items = GEAR_SHOP.filter(g => g.cat === cat);
+      const items = cat === 'All' ? GEAR_SHOP : GEAR_SHOP.filter(g => g.cat === cat);
       items.forEach(item => {
         const isOwned = this.unlockedAvatars.includes(item.model);
         const card = document.createElement('div');
@@ -675,7 +677,7 @@ class Game {
           btn.classList.add('active');
           renderBuy(cat);
         };
-        if (cat === 'Hats') btn.classList.add('active');
+        if (cat === 'All') btn.classList.add('active');
         tabs.appendChild(btn);
       });
       buyView.insertBefore(tabs, buyList);
@@ -742,7 +744,7 @@ class Game {
 
   checkAnimalUnlock() {
     if (this.level > 1 && this.level >= this.nextUnlockLevel) { 
-      this.nextUnlockLevel = this.level + Math.floor(Math.random() * 5) + 1;
+      this.nextUnlockLevel = this.level + Math.floor(Math.random() * 5) + 1; // 1-5 levels away
       this.saveProfile();
       const animal = this.getAnimalForLevel(); 
       if (animal) this.startCatchingSequence(animal); 
