@@ -19,7 +19,8 @@ const SONGS = {
   2: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
   3: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
   4: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
-  5: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3'
+  5: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
+  6: 'https://raw.githubusercontent.com/effacestudios/Royalty-Free-Music-Pack/master/technologist.mp3'
 };
 
 // ── 3-D collectible characters ──────────────────────────────────────────────
@@ -2130,7 +2131,23 @@ class Game {
 
     // 1. "POWER GOES OUT" EFFECT (Eyes/Chest Glow)
     playerPet.classList.add('anim-power');
-    if (powerSource) powerSource.style.opacity = '1';
+    if (powerSource) {
+      powerSource.style.opacity = '1';
+      
+      // Create a vertical energy beam
+      const beam = document.createElement('div');
+      beam.className = 'power-beam';
+      powerSource.appendChild(beam);
+      
+      // Create a ripple burst
+      const burst = document.createElement('div');
+      burst.className = 'energy-burst-effect';
+      const psRect = powerSource.getBoundingClientRect();
+      burst.style.left = `50%`; burst.style.top = `50%`;
+      powerSource.appendChild(burst);
+      
+      setTimeout(() => { beam.remove(); burst.remove(); }, 800);
+    }
     
     // specialized animations
     if (power === 'Shockwave' || power === 'Earthquake' || power === 'Stomp' || (this.battleState.playerPet.animalName && this.battleState.playerPet.animalName.toLowerCase().includes('rex'))) {
