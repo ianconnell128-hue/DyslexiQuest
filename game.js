@@ -966,26 +966,47 @@ class Game {
 
   renderCards() {
     const gameArea = document.getElementById('game-area'); gameArea.innerHTML = '';
-    const distractors = this.currentPool.filter(w => w.word !== this.targetWord.word).slice(0, 4);
+
+    const targetLetter = this.targetWord.word.charAt(0).toLowerCase();
+
+    // Filter distractors that start with the same letter
+    let sameLetterPool = this.currentPool.filter(w => 
+      w.word.toLowerCase() !== this.targetWord.word.toLowerCase() && 
+      w.word.charAt(0).toLowerCase() === targetLetter
+    );
+
+    // Pick 4 distractors (same letter preferred, but fallback to any if pool is small)
+    let distractors;
+    if (sameLetterPool.length >= 4) {
+      distractors = sameLetterPool.sort(() => Math.random() - 0.5).slice(0, 4);
+    } else {
+      const otherPool = this.currentPool.filter(w => 
+        w.word.toLowerCase() !== this.targetWord.word.toLowerCase() && 
+        w.word.charAt(0).toLowerCase() !== targetLetter
+      ).sort(() => Math.random() - 0.5);
+      distractors = [...sameLetterPool, ...otherPool].slice(0, 4);
+    }
+
     let cards = [this.targetWord, ...distractors];
     for (let i = cards.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [cards[i], cards[j]] = [cards[j], cards[i]]; }
-    
+
     cards.forEach(wordData => {
       const card = document.createElement('div'); card.className = 'card';
-      
+
       // Randomize formatting for each card
       const isSentenceCase = Math.random() > 0.5;
       const isRuled = Math.random() > 0.4; // Randomly add lines
-      
+
       let displayWord = wordData.word.toLowerCase();
       if (isSentenceCase) {
         displayWord = displayWord.charAt(0).toUpperCase() + displayWord.slice(1);
       }
-      
+
       card.innerHTML = `<div class="particles" style="display:none"></div><div class="feedback"></div>
         <div class="card-word ${isRuled ? 'ruled' : ''}">${displayWord}</div>`;
-      
-      card.addEventListener('click', (e) => this.onCardClick(e, wordData)); gameArea.appendChild(card);
+
+      card.addEventListener('click', (e) => this.onCardClick(e, wordData));
+      gameArea.appendChild(card);
     });
   }
 

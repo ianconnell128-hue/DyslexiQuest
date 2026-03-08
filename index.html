@@ -1287,17 +1287,17 @@
     </div>
   </div>
 
-  <div class="game-container">
-    <div class="xp-bar-container">
+  <div class="game-container" style="display: flex; flex-direction: column; align-items: center;">
+    <div class="xp-bar-container" style="max-width: 400px;">
       <div class="xp-bar-fill" id="xp-fill"></div>
     </div>
-    <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-light); margin-top: 8px;">
+    <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-light); margin-top: 8px; text-align: center; width: 100%;">
       XP: <span id="xp">0</span> / <span id="max-xp">100</span>
     </div>
 
-    <div id="word-prompt">Loading…</div>
+    <div id="word-prompt" style="text-align: center; width: 100%;">Loading…</div>
 
-    <button id="speak-btn" class="accent" style="width: auto; margin: 0 auto; padding: 15px 40px; border-radius: 50px; font-size: 1.1rem;">
+    <button id="speak-btn" class="accent" style="width: auto; margin: 20px auto; padding: 15px 40px; border-radius: 50px; font-size: 1.1rem;">
       Listen Again
     </button>
 
