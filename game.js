@@ -966,25 +966,32 @@ class Game {
 
   renderCards() {
     const gameArea = document.getElementById('game-area'); gameArea.innerHTML = '';
-
+    
     const targetLetter = this.targetWord.word.charAt(0).toLowerCase();
+    
+    // 1. Get ALL words from the entire bank that start with the same letter
+    const globalSameLetterPool = [];
+    Object.values(this.wordBank).forEach(levelWords => {
+      levelWords.forEach(w => {
+        if (w.word.toLowerCase() !== this.targetWord.word.toLowerCase() && 
+            w.word.charAt(0).toLowerCase() === targetLetter) {
+          globalSameLetterPool.push(w);
+        }
+      });
+    });
 
-    // Filter distractors that start with the same letter
-    let sameLetterPool = this.currentPool.filter(w => 
-      w.word.toLowerCase() !== this.targetWord.word.toLowerCase() && 
-      w.word.charAt(0).toLowerCase() === targetLetter
-    );
-
-    // Pick 4 distractors (same letter preferred, but fallback to any if pool is small)
-    let distractors;
-    if (sameLetterPool.length >= 4) {
-      distractors = sameLetterPool.sort(() => Math.random() - 0.5).slice(0, 4);
+    // 2. Pick 4 distractors (Global search first for maximum consistency)
+    let distractors = [];
+    if (globalSameLetterPool.length >= 4) {
+      // Shuffle global pool and pick 4
+      distractors = globalSameLetterPool.sort(() => Math.random() - 0.5).slice(0, 4);
     } else {
-      const otherPool = this.currentPool.filter(w => 
+      // Emergency fallback if even global bank is tiny for this letter
+      const otherWords = this.currentPool.filter(w => 
         w.word.toLowerCase() !== this.targetWord.word.toLowerCase() && 
         w.word.charAt(0).toLowerCase() !== targetLetter
       ).sort(() => Math.random() - 0.5);
-      distractors = [...sameLetterPool, ...otherPool].slice(0, 4);
+      distractors = [...globalSameLetterPool, ...otherWords].slice(0, 4);
     }
 
     let cards = [this.targetWord, ...distractors];
@@ -992,10 +999,8 @@ class Game {
 
     cards.forEach(wordData => {
       const card = document.createElement('div'); card.className = 'card';
-
-      // Randomize formatting for each card
       const isSentenceCase = Math.random() > 0.5;
-      const isRuled = Math.random() > 0.4; // Randomly add lines
+      const isRuled = Math.random() > 0.4;
 
       let displayWord = wordData.word.toLowerCase();
       if (isSentenceCase) {
