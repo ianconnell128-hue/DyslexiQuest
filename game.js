@@ -480,9 +480,9 @@ class Game {
   saveProfile() {
     if (!this.currentUser) return;
     const allUsers = JSON.parse(localStorage.getItem('dyslexiquest_users')) || {};
-    allUsers[this.currentUser] = {
-      ...allUsers[this.currentUser],
+    const profile = {
       level: this.level, score: this.score, streak: this.streak, xp: this.xp,
+      cloudCode: this.users[this.currentUser].cloudCode,
       isFrench: this.isFrench, unlockedAnimals: this.unlockedAnimals,
       selectedVoiceURI: this.selectedVoiceURI, micTested: this.micTested,
       gender: this.gender, avatarModel: this.avatarModel,
@@ -491,8 +491,63 @@ class Game {
       equippedPets: this.equippedPets, notifications: this.notifications, friends: this.friends, dyslexicFont: this.dyslexicFont,
       musicEnabled: this.musicEnabled, currentSong: this.currentSong
     };
+    allUsers[this.currentUser] = {
+      ...allUsers[this.currentUser],
+      ...profile,
+      name: this.users[this.currentUser].name
+    };
     this.users = allUsers;
     localStorage.setItem('dyslexiquest_users', JSON.stringify(this.users));
+    
+    this.syncWithCloud(this.currentUser, profile);
+    this.checkForCloudBeams();
+  }
+
+  async syncWithCloud(id, data) {
+    if (!data.cloudCode) return;
+    try {
+      await fetch('https://api.restful-api.dev/objects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `dq_v7_${data.cloudCode}`,
+          data: { ...data, name: this.users[id].name, id: id, networkId: this.networkId, lastSeen: Date.now() }
+        })
+      });
+    } catch (e) { console.warn("Cloud sync failed", e); }
+  }
+
+  async checkForCloudBeams() {
+    if (!this.currentUser) return;
+    const myCode = this.users[this.currentUser].cloudCode;
+    try {
+      const response = await fetch('https://api.restful-api.dev/objects');
+      const all = await response.json();
+      const beams = all.filter(obj => obj.name && obj.name.startsWith(`dq_beam_${myCode}_`));
+      
+      for (const beam of beams) {
+        const notif = beam.data;
+        if (!this.notifications.some(n => n.id === notif.id)) {
+          this.notifications.unshift(notif);
+          this.updateStats(); 
+          fetch(`https://api.restful-api.dev/objects/${beam.id}`, { method: 'DELETE' }).catch(() => {});
+        }
+      }
+      if (beams.length > 0) this.saveProfile();
+    } catch(e) {}
+  }
+
+  async beamNotification(targetCode, notif) {
+    try {
+      await fetch('https://api.restful-api.dev/objects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `dq_beam_${targetCode}_${Date.now()}`,
+          data: { ...notif, id: Date.now(), timestamp: new Date().toISOString() }
+        })
+      });
+    } catch(e) { console.error("Beam failed", e); }
   }
 
   showAvatarDesigner(isOnboarding = false) {
@@ -636,12 +691,18 @@ class Game {
     document.getElementById('sidebar-overlay').style.display = 'none'; this.showProfileSelect();
   }
 
-  startGameplay() { 
+  async startGameplay() { 
     document.getElementById('start-overlay').style.display = 'none'; 
     this.updateStats(); this.updateCollectionButton(); this.populateVoiceList(); 
     this.checkDailyRefresh(); this.updateGameplayVisuals(); this.setFont(this.dyslexicFont);
     this.setMusic(this.musicEnabled);
     
+    try {
+      const res = await fetch('https://api.ipify.org?format=json');
+      const data = await res.json();
+      this.networkId = [...data.ip].reduce((acc, char) => ((acc << 5) - acc) + char.charCodeAt(0), 0).toString(16);
+    } catch(e) { this.networkId = 'local'; }
+
     // Check if we are overdue for a treasure (e.g. Level 30 with 0 animals)
     if (this.level >= 2 && (this.level % 2 === 0)) {
       const animal = this.getAnimalForLevel();
@@ -1136,13 +1197,50 @@ class Game {
     }
   }
 
+  async loadFromCloud() {
+    const code = prompt("Enter your 5-DIGIT Cloud Code:");
+    if (!code || code.length !== 5) {
+      if (code) alert("Please enter a 5-digit code!");
+      return;
+    }
+
+    this.playSFX('click');
+    document.getElementById('loading-overlay').style.display = 'flex';
+    
+    try {
+      const response = await fetch(`https://api.restful-api.dev/objects`);
+      const allObjects = await response.json();
+      
+      const matches = allObjects.filter(obj => obj.name === `dq_v7_${code}`);
+      if (matches.length > 0) {
+        matches.sort((a, b) => b.id.localeCompare(a.id));
+        const cloudUser = matches[0].data;
+        
+        this.users = JSON.parse(localStorage.getItem('dyslexiquest_users')) || {};
+        const localId = cloudUser.id || Date.now().toString();
+        this.users[localId] = cloudUser;
+        localStorage.setItem('dyslexiquest_users', JSON.stringify(this.users));
+        
+        alert(`Welcome back, ${cloudUser.name}! Profile loaded! ☁️✨`);
+        this.showProfileSelect();
+      } else {
+        alert("Hero not found in the cloud! Double check your code.");
+      }
+    } catch (e) {
+      alert("Cloud connection busy. Try one more time!");
+    } finally {
+      this.hideLoading();
+    }
+  }
+
   showBattleHub() {
     this.playSFX('click');
     const screen = document.getElementById('battle-mode-screen');
     const list = document.getElementById('battle-hub-list');
     if (!screen || !list) return;
 
-    list.innerHTML = '';
+    list.innerHTML = '<div class="spinner" style="margin: 20px auto;"></div>';
+    
     const otherUsers = Object.keys(this.users).filter(id => id !== this.currentUser);
     const friendIds = this.friends || [];
 
@@ -1174,55 +1272,92 @@ class Game {
       list.appendChild(btn);
     };
 
-    // 1. NPC Battle (The Original)
-    createOption("WILD ARENA", "Fight a random powerful opponent!", "🦁", "#ef4444", () => {
-      this.startBattleSequence('pet');
-    });
+    // Fetch Cloud for "Nearby" people
+    fetch('https://api.restful-api.dev/objects')
+      .then(r => r.json())
+      .then(all => {
+        list.innerHTML = '';
+        
+        // 1. WILD ARENA (Always first)
+        createOption("WILD ARENA", "Fight a random powerful opponent!", "🦁", "#ef4444", () => {
+          this.startBattleSequence('pet');
+        });
 
-    // 2. Added Friends
-    if (friendIds.length > 0) {
-      const friendsHeader = document.createElement('div');
-      friendsHeader.style.margin = '10px 0 5px';
-      friendsHeader.style.fontSize = '0.7rem';
-      friendsHeader.style.fontWeight = '800';
-      friendsHeader.style.color = 'var(--text-light)';
-      friendsHeader.textContent = 'ADDED FRIENDS';
-      list.appendChild(friendsHeader);
+        // 2. People on your Wi-Fi!
+        const nearby = all.filter(obj => 
+          obj.name && obj.name.startsWith('dq_v7_') && 
+          obj.data.networkId === this.networkId && 
+          obj.data.id !== this.currentUser &&
+          (Date.now() - obj.data.lastSeen < 3600000) // Seen in last hour
+        );
 
-      friendIds.forEach(fid => {
-        const friend = this.users[fid];
-        if (friend) {
-          createOption(friend.name, `Level ${friend.level} Friend`, "🤝", "#0ea5e9", () => {
-            const pet = (friend.equippedPets && friend.equippedPets.length > 0) ? friend.equippedPets[0] : (friend.unlockedAnimals && friend.unlockedAnimals.length > 0 ? friend.unlockedAnimals[0] : null);
-            if (!pet) { alert("This friend has no animals!"); return; }
-            const data = ANIMALS.find(a => a.name === pet.animalName);
-            this.startBattleSequence('pet', { ...data, name: pet.petName, hp: 100 + (friend.level * 10) });
+        if (nearby.length > 0) {
+          const nearbyHeader = document.createElement('div');
+          nearbyHeader.style.margin = '10px 0 5px';
+          nearbyHeader.style.fontSize = '0.7rem';
+          nearbyHeader.style.fontWeight = '800';
+          nearbyHeader.style.color = 'var(--primary)';
+          nearbyHeader.textContent = '📍 ON YOUR WI-FI';
+          list.appendChild(nearbyHeader);
+
+          nearby.forEach(obj => {
+            const p = obj.data;
+            createOption(p.name, `Level ${p.level} Nearby Explorer`, "📶", "#10b981", () => {
+              const pet = (p.equippedPets && p.equippedPets.length > 0) ? p.equippedPets[0] : (p.unlockedAnimals && p.unlockedAnimals.length > 0 ? p.unlockedAnimals[0] : null);
+              if (!pet) { alert("They have no animals!"); return; }
+              const data = ANIMALS.find(a => a.name === pet.animalName);
+              this.startBattleSequence('pet', { ...data, name: pet.petName, hp: 100 + (p.level * 10) });
+            });
           });
         }
-      });
-    }
 
-    // 3. Local People
-    const localOthers = otherUsers.filter(id => !friendIds.includes(id));
-    if (localOthers.length > 0) {
-      const localHeader = document.createElement('div');
-      localHeader.style.margin = '10px 0 5px';
-      localHeader.style.fontSize = '0.7rem';
-      localHeader.style.fontWeight = '800';
-      localHeader.style.color = 'var(--text-light)';
-      localHeader.textContent = 'LOCAL PEOPLE';
-      list.appendChild(localHeader);
+        // 3. Added Friends
+        if (friendIds.length > 0) {
+          const friendsHeader = document.createElement('div');
+          friendsHeader.style.margin = '10px 0 5px';
+          friendsHeader.style.fontSize = '0.7rem';
+          friendsHeader.style.fontWeight = '800';
+          friendsHeader.style.color = 'var(--text-light)';
+          friendsHeader.textContent = 'ADDED FRIENDS';
+          list.appendChild(friendsHeader);
 
-      localOthers.forEach(id => {
-        const local = this.users[id];
-        createOption(local.name, `Level ${local.level} Explorer`, "🏠", "#84cc16", () => {
-          const pet = (local.equippedPets && local.equippedPets.length > 0) ? local.equippedPets[0] : (local.unlockedAnimals && local.unlockedAnimals.length > 0 ? local.unlockedAnimals[0] : null);
-          if (!pet) { alert("This player has no animals!"); return; }
-          const data = ANIMALS.find(a => a.name === pet.animalName);
-          this.startBattleSequence('pet', { ...data, name: pet.petName, hp: 100 + (local.level * 10) });
-        });
+          friendIds.forEach(fid => {
+            const friend = this.users[fid];
+            if (friend) {
+              createOption(friend.name, `Level ${friend.level} Friend`, "🤝", "#0ea5e9", () => {
+                const pet = (friend.equippedPets && friend.equippedPets.length > 0) ? friend.equippedPets[0] : (friend.unlockedAnimals && friend.unlockedAnimals.length > 0 ? friend.unlockedAnimals[0] : null);
+                if (!pet) { alert("This friend has no animals!"); return; }
+                const data = ANIMALS.find(a => a.name === pet.animalName);
+                this.startBattleSequence('pet', { ...data, name: pet.petName, hp: 100 + (friend.level * 10) });
+              });
+            }
+          });
+        }
+
+        // 4. Local People
+        const localOthers = otherUsers.filter(id => !friendIds.includes(id));
+        if (localOthers.length > 0) {
+          const localHeader = document.createElement('div');
+          localHeader.style.margin = '10px 0 5px';
+          localHeader.style.fontSize = '0.7rem';
+          localHeader.style.fontWeight = '800';
+          localHeader.style.color = 'var(--text-light)';
+          localHeader.textContent = 'LOCAL PROFILES';
+          list.appendChild(localHeader);
+
+          localOthers.forEach(id => {
+            const local = this.users[id];
+            createOption(local.name, `Level ${local.level} Explorer`, "🏠", "#84cc16", () => {
+              const pet = (local.equippedPets && local.equippedPets.length > 0) ? local.equippedPets[0] : (local.unlockedAnimals && local.unlockedAnimals.length > 0 ? local.unlockedAnimals[0] : null);
+              if (!pet) { alert("This player has no animals!"); return; }
+              const data = ANIMALS.find(a => a.name === pet.animalName);
+              this.startBattleSequence('pet', { ...data, name: pet.petName, hp: 100 + (local.level * 10) });
+            });
+          });
+        }
+      }).catch(() => {
+        list.innerHTML = '<p style="color:var(--danger);">Failed to load Arena Hub. Check connection!</p>';
       });
-    }
 
     screen.style.display = 'flex';
   }
@@ -1603,17 +1738,22 @@ class Game {
     // 1. Remove from current user array
     this.unlockedAnimals.splice(index, 1);
     
+    const notif = {
+      type: 'gift',
+      title: 'New Gift! 🎁',
+      message: `${this.users[this.currentUser].name} sent you a treasure: ${ua.petName} (${ua.animalName})!`
+    };
+
     // 2. Add to recipient in the main users object
     if (this.users[recipientId]) {
       if (!this.users[recipientId].unlockedAnimals) this.users[recipientId].unlockedAnimals = [];
       this.users[recipientId].unlockedAnimals.push(ua);
       
       // Send notification to recipient
-      this.addNotificationToUser(recipientId, {
-        type: 'gift',
-        title: 'New Gift! 🎁',
-        message: `${this.users[this.currentUser].name} sent you a treasure: ${ua.petName} (${ua.animalName})!`
-      });
+      this.addNotificationToUser(recipientId, notif);
+      if (this.users[recipientId].cloudCode) {
+        this.beamNotification(this.users[recipientId].cloudCode, notif);
+      }
     }
     
     // 3. Save the main users object (which now has the recipient's new animal)
