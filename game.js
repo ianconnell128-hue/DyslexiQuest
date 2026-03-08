@@ -516,22 +516,6 @@ class Game {
     } catch (e) { console.warn("Cloud sync failed", e); }
   }
 
-  async searchAndPlayYouTube() {
-    const query = document.getElementById('yt-search-input').value.trim();
-    if (!query) return;
-    this.playSFX('click');
-    const container = document.getElementById('yt-player-container');
-    if (container) {
-      let embedUrl = "";
-      if (query.includes('v=')) embedUrl = `https://www.youtube.com/embed/${query.split('v=')[1].split('&')[0]}?autoplay=1`;
-      else if (query.includes('be/')) embedUrl = `https://www.youtube.com/embed/${query.split('be/')[1].split('?')[0]}?autoplay=1`;
-      else embedUrl = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(query)}&autoplay=1`;
-      this.setMusic(false);
-      container.innerHTML = `<iframe width="1" height="1" src="${embedUrl}" frameborder="0" allow="autoplay; encrypted-media"></iframe>`;
-      alert(`Tuning in: ${query} 🎵 (Local music paused)`);
-    }
-  }
-
   initBattle3DScene(env) {
     const container = document.getElementById('battle-canvas-container');
     if (!container) return; container.innerHTML = '';
@@ -760,13 +744,10 @@ class Game {
 
   setMusic(enabled) {
     this.musicEnabled = enabled;
-    if (enabled) {
-      this.bgm.play().catch(() => {});
-    } else {
-      this.bgm.pause();
+    if (this.bgm) {
+      if (enabled) this.bgm.play().catch(() => {});
+      else this.bgm.pause();
     }
-    document.getElementById('music-on-btn')?.classList.toggle('active', enabled);
-    document.getElementById('music-off-btn')?.classList.toggle('active', !enabled);
     this.saveProfile();
   }
 
@@ -786,20 +767,9 @@ class Game {
         this.bgm.play().catch(() => {});
       }
     }
-    
-    // Update UI
-    const selector = document.getElementById('song-selector');
-    if (selector) selector.value = num.toString();
-    
-    const onBtn = document.getElementById('music-on-btn');
-    const offBtn = document.getElementById('music-off-btn');
-    if (onBtn) onBtn.classList.toggle('active', this.musicEnabled);
-    if (offBtn) offBtn.classList.toggle('active', !this.musicEnabled);
-
     this.updateQuestProgress('change_song', 1);
     this.saveProfile();
   }
-
   triggerAvatarReaction(type) {
     const avatar = document.getElementById('gameplay-visuals');
     if (!avatar) return;
@@ -3006,18 +2976,26 @@ class Game {
       document.getElementById('create-step-2').style.display = 'none'; 
     });
     document.getElementById('new-player-en')?.addEventListener('click', () => this.setLang('en'));
-    document.getElementById('yt-search-btn')?.addEventListener('click', () => this.searchAndPlayYouTube());
-    document.getElementById('yt-search-input')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') this.searchAndPlayYouTube(); });
     document.getElementById('new-player-fr')?.addEventListener('click', () => this.setLang('fr'));
     document.getElementById('request-mic-btn')?.addEventListener('click', () => this.requestMicAccess());
     document.getElementById('mic-test-btn')?.addEventListener('click', () => this.startListening(true));
     document.getElementById('mode-listen')?.addEventListener('click', () => this.setMode('listen'));
     document.getElementById('mode-talk')?.addEventListener('click', () => this.setMode('talk'));
     document.getElementById('notif-btn')?.addEventListener('click', () => this.showNotificationsScreen());
-    document.getElementById('friend-battle-btn')?.addEventListener('click', () => this.initiateFriendBattle());
-    document.getElementById('sidebar-toggle')?.addEventListener('click', () => { this.playSFX('click'); document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebar-overlay').style.display = 'block'; });
-    document.getElementById('sidebar-close')?.addEventListener('click', () => { this.playSFX('click'); document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').style.display = 'none'; });
-    document.getElementById('sidebar-overlay')?.addEventListener('click', () => { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').style.display = 'none'; });
+    document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
+      this.playSFX('click');
+      document.getElementById('sidebar').classList.add('open');
+      document.getElementById('sidebar-overlay').style.display = 'block';
+    });
+    document.getElementById('sidebar-close')?.addEventListener('click', () => {
+      this.playSFX('click');
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebar-overlay').style.display = 'none';
+    });
+    document.getElementById('sidebar-overlay')?.addEventListener('click', () => {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebar-overlay').style.display = 'none';
+    });
     document.getElementById('new-game')?.addEventListener('click', () => { if(confirm("Reset progress?")) this.reset(); });
     document.getElementById('delete-profile-btn')?.addEventListener('click', () => this.deleteCurrentProfile());
     document.getElementById('store-btn')?.addEventListener('click', () => this.showStoreScreen());
@@ -3025,12 +3003,6 @@ class Game {
     document.getElementById('quests-btn')?.addEventListener('click', () => this.showQuestsScreen());
     document.getElementById('font-standard-btn')?.addEventListener('click', () => this.setFont(false));
     document.getElementById('font-dyslexic-btn')?.addEventListener('click', () => this.setFont(true));
-    document.getElementById('music-on-btn')?.addEventListener('click', () => { this.playSFX('click'); this.setMusic(true); });
-    document.getElementById('music-off-btn')?.addEventListener('click', () => { this.playSFX('click'); this.setMusic(false); });
-    document.getElementById('song-selector')?.addEventListener('change', (e) => {
-      this.playSFX('click');
-      this.setSong(parseInt(e.target.value));
-    });
     document.getElementById('close-quests-btn')?.addEventListener('click', () => { this.playSFX('click'); document.getElementById('quests-screen').style.display = 'none'; });
     document.getElementById('shop-btn')?.addEventListener('click', () => this.showShopScreen());
     document.getElementById('shop-btn-sidebar')?.addEventListener('click', () => this.showShopScreen());
@@ -3052,14 +3024,6 @@ class Game {
     document.getElementById('battle-btn')?.addEventListener('click', () => {
       this.playSFX('click');
       this.startBattleSequence('pet'); 
-    });
-    document.getElementById('mode-pet-battle')?.addEventListener('click', () => {
-      document.getElementById('battle-mode-screen').style.display = 'none';
-      this.startBattleSequence('pet');
-    });
-    document.getElementById('mode-avatar-battle')?.addEventListener('click', () => {
-      document.getElementById('battle-mode-screen').style.display = 'none';
-      this.startBattleSequence('avatar');
     });
     document.getElementById('close-battle-mode-btn')?.addEventListener('click', () => {
       this.playSFX('click');
