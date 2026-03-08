@@ -494,6 +494,7 @@
 
     #catching-content, #battle-content {
       background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
     }
 
     .spinner {
@@ -839,7 +840,8 @@
       border-radius: 50%;
       z-index: 10001;
       pointer-events: none;
-      box-shadow: 0 0 10px white;
+      filter: blur(5px);
+      box-shadow: 0 0 10px white, 0 0 20px #bae6fd;
     }
 
     @keyframes drift {
@@ -854,6 +856,7 @@
       transform: translateX(-50%);
       font-size: 6rem;
       z-index: 10005;
+      filter: drop-shadow(0 0 20px white);
       transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
@@ -865,7 +868,8 @@
       border-radius: 50%;
       z-index: 10004;
       pointer-events: none;
-      box-shadow: 0 0 5px #fff;
+      box-shadow: 0 0 10px #fff, 0 0 15px rgba(125, 211, 252, 0.6);
+      filter: blur(0.5px);
     }
 
     @keyframes soul-rain {
@@ -1120,6 +1124,31 @@
     </div>
 
     <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 15px;">
+      <div style="background: #f8fafc; padding: 12px; border-radius: 20px; border: 2px solid #e2e8f0;">
+        <label style="font-size: 0.7rem; font-weight: 800; color: var(--text-light); margin-bottom: 8px; display: block;">MUSIC SETTINGS</label>
+        
+        <!-- YouTube Search -->
+        <div style="margin-bottom: 12px; display: flex; flex-direction: column; gap: 5px;">
+          <input id="yt-search-input" type="text" placeholder="Search YouTube Music..." style="font-size: 0.75rem; padding: 8px; border-radius: 10px; border: 1px solid #e2e8f0; width: 100%; box-sizing: border-box;">
+          <button id="yt-search-btn" class="primary" style="padding: 8px; font-size: 0.7rem; background: #ff0000; border-color: #cc0000; color: white;">🔍 Search & Play</button>
+        </div>
+
+        <div style="display: flex; gap: 5px; margin-bottom: 8px;">
+          <button id="music-on-btn" class="active" style="padding: 8px; font-size: 0.75rem;">ON</button>
+          <button id="music-off-btn" style="padding: 8px; font-size: 0.75rem;">OFF</button>
+        </div>
+        <select id="song-selector" style="font-size: 0.8rem; width: 100%; padding: 8px; border-radius: 10px; border: 1px solid #e2e8f0; background: white;">
+          <option value="1">🎵 Track 1</option>
+          <option value="2">🎵 Track 2</option>
+          <option value="3">🎵 Track 3</option>
+          <option value="4">🎵 Track 4</option>
+          <option value="5">🎵 Track 5</option>
+        </select>
+      </div>
+
+      <!-- Hidden YouTube Player -->
+      <div id="yt-player-container" style="display:none"></div>
+
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
         <button id="mode-listen" class="active" style="padding: 12px 5px; font-size: 0.75rem;">LISTEN</button>
         <button id="mode-talk" style="padding: 12px 5px; font-size: 0.75rem;">TALK</button>
@@ -1146,13 +1175,6 @@
 
       <div style="background: #f8fafc; padding: 12px; border-radius: 20px; border: 2px solid #e2e8f0;">
         <label style="font-size: 0.7rem; font-weight: 800; color: var(--text-light); margin-bottom: 8px; display: block;">MUSIC SETTINGS</label>
-        
-        <!-- YouTube Search -->
-        <div style="margin-bottom: 12px; display: flex; flex-direction: column; gap: 5px;">
-          <input id="yt-search-input" type="text" placeholder="Search YouTube Music..." style="font-size: 0.75rem; padding: 8px; border-radius: 10px; border: 1px solid #e2e8f0; width: 100%; box-sizing: border-box;">
-          <button id="yt-search-btn" class="primary" style="padding: 8px; font-size: 0.7rem; background: #ff0000; border-color: #cc0000; color: white;">🔍 Search & Play</button>
-        </div>
-
         <div style="display: flex; gap: 5px; margin-bottom: 8px;">
           <button id="music-on-btn" class="active" style="padding: 8px; font-size: 0.75rem;">ON</button>
           <button id="music-off-btn" style="padding: 8px; font-size: 0.75rem;">OFF</button>
@@ -1165,9 +1187,6 @@
           <option value="5">🎵 Track 5</option>
         </select>
       </div>
-
-      <!-- Hidden YouTube Player -->
-      <div id="yt-player-container" style="display:none"></div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
         <button id="english-btn" class="active" style="padding: 10px; font-size: 0.75rem;">ENG</button>
@@ -1328,20 +1347,21 @@
 
     <!-- Cartoon Grass Ground (Keep for baseline) -->
     <div class="dirt-ground" style="background: #4ade80; border-top: 8px solid #22c55e; height: 100px; z-index: 4;"></div>
-
+    
     <!-- Stylized Treasure Base -->
-    <div style="position: absolute; bottom: 80px; left: 10%; width: 140px; height: 40px; background: rgba(255,255,255,0.4); border-radius: 50%; z-index: 50; animation: pulse-blue 2s infinite;"></div>
-
+    <div style="position: absolute; bottom: 80px; left: 10%; width: 140px; height: 40px; background: rgba(255,255,255,0.4); border-radius: 50%; filter: blur(15px); z-index: 50; animation: pulse-blue 2s infinite;"></div>
+    
     <div id="capture-cloud" class="capture-cloud" style="display:none; width: 300px; height: 150px; background: transparent; filter: none;"></div>
-
+    
     <!-- Avatar and Treasure Positioning with Comic Outline -->
     <!-- Treasure Bottom Left - Sit on top of grass -->
     <div id="catch-mystery-overlay" style="display:none; position: absolute; bottom: 220px; left: 15%; width: 250px; text-align: center; font-size: 5rem; z-index: 105; pointer-events: none; text-shadow: 0 0 20px white;">❓</div>
-    <model-viewer id="catch-model" src="" style="position: absolute; width: 350px; height: 350px; bottom: 50px; left: 5%; z-index: 100;" disable-zoom camera-orbit="0deg 75deg 4m" interaction-prompt="none"></model-viewer>
-
+    <model-viewer id="catch-model" src="" style="position: absolute; width: 350px; height: 350px; bottom: 50px; left: 5%; z-index: 100; filter: drop-shadow(0 0 15px white);" disable-zoom camera-orbit="0deg 75deg 4m" interaction-prompt="none"></model-viewer>
+    
     <!-- Player Avatar Bottom Right - Positioned lower to sit on grass -->
-    <model-viewer id="catching-player-avatar" src="" style="position: absolute; width: 300px; height: 400px; bottom: 20px; right: 0%; z-index: 100;" disable-zoom camera-orbit="0deg 75deg 5m" autoplay animation-name="Idle"></model-viewer>
-    <div id="catching-content" class="collection-content" style="max-width: 600px; z-index: 1000; margin-top: 20px; margin-bottom: auto; background: rgba(255, 255, 255, 0.9); border: 4px solid #3b82f6; border-radius: 32px; padding: 20px; box-shadow: 0 20px 0 rgba(59, 130, 246, 0.2); position: relative;">
+    <model-viewer id="catching-player-avatar" src="" style="position: absolute; width: 300px; height: 400px; bottom: 20px; right: 0%; z-index: 100; filter: drop-shadow(0 0 10px white);" disable-zoom camera-orbit="0deg 75deg 5m" autoplay animation-name="Idle"></model-viewer>
+
+    <div id="catching-content" class="collection-content" style="max-width: 600px; z-index: 1000; margin-top: 20px; margin-bottom: auto; background: rgba(255, 255, 255, 0.9); border: 4px solid #3b82f6; border-radius: 32px; padding: 20px; box-shadow: 0 20px 0 rgba(59, 130, 246, 0.2); backdrop-filter: blur(5px); position: relative;">
       <h2 style="font-family:'Outfit'; font-size: 2.2rem; color: #3b82f6; margin-bottom: 5px; text-shadow: 2px 2px 0 white;">✨ A Wild Animal! ✨</h2>
       <p id="catch-instruction" style="color:var(--text); margin-bottom: 20px; font-weight: 600;">Complete the challenge to power up your capture!</p>
 
@@ -1399,7 +1419,7 @@
     <model-viewer id="battle-enemy-pet" src="" style="position: absolute; width: 120px; height: 120px; bottom: 50px; right: 25%; z-index: 12; filter: drop-shadow(0 0 10px white);" disable-zoom camera-orbit="0deg 75deg 2m" disable-zoom interaction-prompt="none"></model-viewer>
 
     <!-- Battle UI Content -->
-    <div id="battle-content" class="collection-content" style="max-width: 350px; z-index: 1000; position: absolute; top: 100px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.8); border: 2px solid #8b5cf6; border-radius: 20px; padding: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+    <div id="battle-content" class="collection-content" style="max-width: 350px; z-index: 1000; position: absolute; top: 100px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.8); border: 2px solid #8b5cf6; border-radius: 20px; padding: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); backdrop-filter: blur(5px);">
       <h2 id="battle-status" style="font-family:'Outfit'; font-size: 1.1rem; color: #7c3aed; margin: 0 0 5px 0;">Battle Started!</h2>
       
       <div id="battle-challenge-area">
