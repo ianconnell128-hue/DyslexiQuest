@@ -1,4 +1,4 @@
-# DyslexiQuest French Sight Words
+# dyslexiquest.com French Sight Words
 From "school words.pdf": Progressive niveaux for dyslexic visual learning (whole-word shapes). [file:33]
 
 ## Niveau 1
