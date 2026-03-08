@@ -3084,10 +3084,19 @@ class Game {
     document.getElementById('speak-btn')?.addEventListener('click', () => this.speak());
     document.getElementById('catch-speak-btn')?.addEventListener('click', () => this.speak());
     document.getElementById('battle-speak-btn')?.addEventListener('click', () => this.speak());
-    document.getElementById('battle-btn')?.addEventListener('click', () => {
-      this.playSFX('click');
-      this.startBattleSequence('pet'); 
-    });
+    
+    // Arena Button - Robust Listener
+    const arenaBtn = document.getElementById('battle-btn');
+    if (arenaBtn) {
+      arenaBtn.onclick = () => {
+        this.playSFX('click');
+        // Close sidebar if open
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebar-overlay').style.display = 'none';
+        this.startBattleSequence('pet'); 
+      };
+    }
+
     document.getElementById('close-battle-mode-btn')?.addEventListener('click', () => {
       this.playSFX('click');
       document.getElementById('battle-mode-screen').style.display = 'none';
