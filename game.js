@@ -1841,106 +1841,117 @@ class Game {
     return false;
   }
   startBattleSequence(mode = 'pet', enemyData = null) {
-    if (this.unlockedAnimals.length === 0 && mode === 'pet') {
-      alert("You need at least one animal for a Pet Battle!");
-      return;
-    }
-
-    this.playSFX('levelUp');
-    const screen = document.getElementById('battle-screen');
-    const challengeArea = document.getElementById('battle-challenge-area');
-    const actionArea = document.getElementById('battle-action-area');
-    const closeBtn = document.getElementById('close-battle-btn');
-    
-    // 1. Determine Player fighter
-    let playerFighterModel = this.avatarModel;
-    let playerFighterData = { name: 'Hero', powers: 'Strike', rarity: 'Common', color: '#3b82f6' };
-    
-    if (mode === 'pet') {
-      const petUa = this.equippedPets.length > 0 ? this.equippedPets[0] : this.unlockedAnimals[0];
-      const petData = ANIMALS.find(a => a.name === petUa.animalName);
-      playerFighterModel = petData.model;
-      playerFighterData = { ...petData, name: petUa.petName };
-    } else {
-      const transformedData = ANIMALS.find(a => a.model === this.avatarModel);
-      if (transformedData) playerFighterData = transformedData;
-    }
-
-    // 2. Determine Enemy fighter
-    let enemyFighterModel, enemyFighterData, difficulty;
-
-    if (enemyData) {
-      enemyFighterModel = enemyData.model;
-      enemyFighterData = enemyData;
-      difficulty = { label: 'Friend', hp: enemyData.hp || 150, damageMult: 1.2, rewardMult: 2, color: '#0ea5e9' };
-    } else {
-      // Generate a random NPC with a "Normal" name
-      const firstNames = ["Explorer", "Ranger", "Hunter", "Trainer", "Master", "Adventurer"];
-      const lastNames = ["Sam", "Luna", "Tom", "Alex", "Jade", "Zane", "Mia", "Leo"];
-      const npcName = `${firstNames[Math.floor(Math.random()*firstNames.length)]} ${lastNames[Math.floor(Math.random()*lastNames.length)]}`;
-      
-      enemyFighterData = { name: npcName, powers: 'Bash', rarity: 'Common', color: '#ef4444' };
-      if (mode === 'pet') {
-        const matchingEnv = ANIMALS.filter(a => a.env === (playerFighterData.env || 'land'));
-        const randomEnemyPet = matchingEnv[Math.floor(Math.random() * matchingEnv.length)];
-        enemyFighterModel = randomEnemyPet.model;
-        enemyFighterData = { ...randomEnemyPet, name: npcName };
-      } else {
-        enemyFighterModel = Object.values(AVATAR_MODELS)[Math.floor(Math.random() * Object.values(AVATAR_MODELS).length)];
+    try {
+      if (this.unlockedAnimals.length === 0 && mode === 'pet') {
+        alert("You need at least one animal for a Pet Battle! Go capture some treasures first.");
+        return;
       }
 
-      const diffRoll = Math.random();
-      difficulty = { label: 'Normal', hp: 100, damageMult: 1, rewardMult: 1, color: '#fff' };
-      if (diffRoll < 0.2) difficulty = { label: 'Very Weak', hp: 50, damageMult: 0.5, rewardMult: 0.5, color: '#94a3b8' };
-      else if (diffRoll < 0.9) difficulty = { label: 'Strong', hp: 150, damageMult: 1.5, rewardMult: 2, color: '#f59e0b' };
-      else difficulty = { label: 'Extremely Strong', hp: 250, damageMult: 2.5, rewardMult: 5, color: '#ef4444' };
+      this.playSFX('levelUp');
+      const screen = document.getElementById('battle-screen');
+      const challengeArea = document.getElementById('battle-challenge-area');
+      const actionArea = document.getElementById('battle-action-area');
+      const closeBtn = document.getElementById('close-battle-btn');
+      
+      // 1. Determine Player fighter
+      let playerFighterModel = this.avatarModel;
+      let playerFighterData = { name: 'Hero', powers: 'Strike', rarity: 'Common', color: '#3b82f6' };
+      
+      if (mode === 'pet') {
+        const petUa = this.equippedPets.length > 0 ? this.equippedPets[0] : this.unlockedAnimals[0];
+        const petData = ANIMALS.find(a => a.name === petUa.animalName);
+        if (petData) {
+          playerFighterModel = petData.model;
+          playerFighterData = { ...petData, name: petUa.petName };
+        } else {
+          // Fallback if data is missing
+          playerFighterModel = ANIMALS[0].model;
+          playerFighterData = { ...ANIMALS[0], name: petUa.petName };
+        }
+      } else {
+        const transformedData = ANIMALS.find(a => a.model === this.avatarModel);
+        if (transformedData) playerFighterData = transformedData;
+      }
+
+      // 2. Determine Enemy fighter
+      let enemyFighterModel, enemyFighterData, difficulty;
+
+      if (enemyData) {
+        enemyFighterModel = enemyData.model;
+        enemyFighterData = enemyData;
+        difficulty = { label: 'Friend', hp: enemyData.hp || 150, damageMult: 1.2, rewardMult: 2, color: '#0ea5e9' };
+      } else {
+        // Generate a random NPC with a "Normal" name
+        const firstNames = ["Explorer", "Ranger", "Hunter", "Trainer", "Master", "Adventurer"];
+        const lastNames = ["Sam", "Luna", "Tom", "Alex", "Jade", "Zane", "Mia", "Leo"];
+        const npcName = `${firstNames[Math.floor(Math.random()*firstNames.length)]} ${lastNames[Math.floor(Math.random()*lastNames.length)]}`;
+        
+        enemyFighterData = { name: npcName, powers: 'Bash', rarity: 'Common', color: '#ef4444' };
+        if (mode === 'pet') {
+          const matchingEnv = ANIMALS.filter(a => a.env === (playerFighterData.env || 'land'));
+          const randomEnemyPet = matchingEnv.length > 0 ? matchingEnv[Math.floor(Math.random() * matchingEnv.length)] : ANIMALS[0];
+          enemyFighterModel = randomEnemyPet.model;
+          enemyFighterData = { ...randomEnemyPet, name: npcName };
+        } else {
+          enemyFighterModel = Object.values(AVATAR_MODELS)[Math.floor(Math.random() * Object.values(AVATAR_MODELS).length)];
+        }
+
+        const diffRoll = Math.random();
+        difficulty = { label: 'Normal', hp: 100, damageMult: 1, rewardMult: 1, color: '#fff' };
+        if (diffRoll < 0.2) difficulty = { label: 'Very Weak', hp: 50, damageMult: 0.5, rewardMult: 0.5, color: '#94a3b8' };
+        else if (diffRoll < 0.9) difficulty = { label: 'Strong', hp: 150, damageMult: 1.5, rewardMult: 2, color: '#f59e0b' };
+        else difficulty = { label: 'Extremely Strong', hp: 250, damageMult: 2.5, rewardMult: 5, color: '#ef4444' };
+      }
+
+      const playerStats = RARITY_STATS[playerFighterData.rarity] || RARITY_STATS.Common;
+      const enemyRarityStats = RARITY_STATS[enemyFighterData.rarity] || RARITY_STATS.Common;
+      const finalEnemyHp = Math.round(difficulty.hp * enemyRarityStats.dmg);
+
+      this.battleState = {
+        playerHp: playerStats.hp,
+        playerMaxHp: playerStats.hp,
+        enemyHp: finalEnemyHp,
+        enemyMaxHp: finalEnemyHp,
+        playerPet: playerFighterData,
+        enemyPet: enemyFighterData,
+        playerAttackCount: 0,
+        superAttackCharge: 0,
+        difficulty: difficulty,
+        mode: mode,
+        lives: 3,
+        usedPetNames: mode === 'pet' ? [playerFighterData.name] : ['Hero']
+      };
+
+      // 3. Initialize 3D Arena (OpenGL)
+      this.initBattle3DScene(playerFighterData.env || 'land');
+      this.updateArenaTheme(playerFighterData.env || 'land');
+      
+      document.getElementById('battle-player-hp').style.width = '100%';
+      document.getElementById('battle-enemy-hp').style.width = '100%';
+      this.updateBattleStatsUI();
+      document.getElementById('battle-status').textContent = enemyData ? "FRIEND BATTLE!" : `${mode.toUpperCase()} BATTLE!`;
+      document.getElementById('battle-status').style.color = "#7c3aed";
+
+      document.getElementById('battle-player-avatar').style.display = 'none';
+      document.getElementById('battle-enemy-avatar').style.display = 'none';
+      
+      const pFighter = document.getElementById('battle-player-pet');
+      const eFighter = document.getElementById('battle-enemy-pet');
+      if (pFighter) pFighter.src = playerFighterModel;
+      if (eFighter) eFighter.src = enemyFighterModel;
+      pFighter?.classList.remove('anim-knocked');
+      eFighter?.classList.remove('anim-knocked');
+
+      if (challengeArea) challengeArea.style.display = 'block';
+      if (actionArea) actionArea.style.display = 'none';
+      if (closeBtn) closeBtn.style.display = 'none';
+      if (screen) screen.style.display = 'flex';
+
+      this.renderBattleChallenge();
+    } catch (err) {
+      console.error("Arena Error:", err);
+      alert("Oops! The Arena had a problem starting. Try again!");
     }
-
-    const playerStats = RARITY_STATS[playerFighterData.rarity] || RARITY_STATS.Common;
-    const enemyRarityStats = RARITY_STATS[enemyFighterData.rarity] || RARITY_STATS.Common;
-    const finalEnemyHp = Math.round(difficulty.hp * enemyRarityStats.dmg);
-
-    this.battleState = {
-      playerHp: playerStats.hp,
-      playerMaxHp: playerStats.hp,
-      enemyHp: finalEnemyHp,
-      enemyMaxHp: finalEnemyHp,
-      playerPet: playerFighterData,
-      enemyPet: enemyFighterData,
-      playerAttackCount: 0,
-      superAttackCharge: 0,
-      difficulty: difficulty,
-      mode: mode,
-      lives: 3,
-      usedPetNames: mode === 'pet' ? [playerFighterData.name] : ['Hero']
-    };
-
-    // 3. Initialize 3D Arena (OpenGL)
-    this.initBattle3DScene(playerFighterData.env || 'land');
-    this.updateArenaTheme(playerFighterData.env || 'land');
-    
-    document.getElementById('battle-player-hp').style.width = '100%';
-    document.getElementById('battle-enemy-hp').style.width = '100%';
-    this.updateBattleStatsUI();
-    document.getElementById('battle-status').textContent = enemyData ? "FRIEND BATTLE!" : `${mode.toUpperCase()} BATTLE!`;
-    document.getElementById('battle-status').style.color = "#7c3aed";
-
-    document.getElementById('battle-player-avatar').style.display = 'none';
-    document.getElementById('battle-enemy-avatar').style.display = 'none';
-    
-    const pFighter = document.getElementById('battle-player-pet');
-    const eFighter = document.getElementById('battle-enemy-pet');
-    pFighter.src = playerFighterModel;
-    eFighter.src = enemyFighterModel;
-    pFighter.classList.remove('anim-knocked');
-    eFighter.classList.remove('anim-knocked');
-
-    if (challengeArea) challengeArea.style.display = 'block';
-    if (actionArea) actionArea.style.display = 'none';
-    if (closeBtn) closeBtn.style.display = 'none';
-    if (screen) screen.style.display = 'flex';
-
-    this.renderBattleChallenge();
   }
 
   updateBattleStatsUI() {
@@ -2114,8 +2125,13 @@ class Game {
     const playerPet = document.getElementById('battle-player-pet');
     const enemyPet = document.getElementById('battle-enemy-pet');
     const battleScreen = document.getElementById('battle-screen');
+    const powerSource = document.getElementById('avatar-power-source');
     const power = this.battleState.playerPet.powers;
 
+    // 1. "POWER GOES OUT" EFFECT (Eyes/Chest Glow)
+    playerPet.classList.add('anim-power');
+    if (powerSource) powerSource.style.opacity = '1';
+    
     // specialized animations
     if (power === 'Shockwave' || power === 'Earthquake' || power === 'Stomp' || (this.battleState.playerPet.animalName && this.battleState.playerPet.animalName.toLowerCase().includes('rex'))) {
       playerPet.classList.add('anim-stomp');
@@ -2125,7 +2141,13 @@ class Game {
         const sw = document.createElement('div'); sw.className = 'shockwave-effect';
         const pr = playerPet.getBoundingClientRect(); sw.style.left = `${pr.left}px`; sw.style.top = `${pr.bottom - 50}px`;
         battleScreen.appendChild(sw);
-        setTimeout(() => { battleScreen.classList.remove('anim-shake-screen'); sw.remove(); this.applyBattleDamage(isSuper); }, 600);
+        setTimeout(() => { 
+          battleScreen.classList.remove('anim-shake-screen'); 
+          sw.remove(); 
+          this.applyBattleDamage(isSuper);
+          playerPet.classList.remove('anim-power');
+          if (powerSource) powerSource.style.opacity = '0';
+        }, 600);
       }, 400);
     } else if (power === 'Speed' || power === 'Dash' || power === 'Strike') {
       // ⚡ DASH ATTACK
@@ -2136,6 +2158,8 @@ class Game {
       setTimeout(() => {
         this.applyBattleDamage(isSuper);
         playerPet.style.transform = 'translate(0,0) scale(1)';
+        playerPet.classList.remove('anim-power');
+        if (powerSource) powerSource.style.opacity = '0';
       }, 250);
     } else {
       const p = document.createElement('div'); p.className = 'glitter-particle'; p.style.background = this.battleState.playerPet.color || '#3b82f6'; p.style.transform = isSuper ? 'scale(6)' : 'scale(3)';
@@ -2143,7 +2167,12 @@ class Game {
       p.style.left = `${pr.left + pr.width / 2}px`; p.style.top = `${pr.top + pr.height / 2}px`;
       battleScreen.appendChild(p);
       p.animate([{ left: p.style.left, top: p.style.top }, { left: `${er.left + er.width / 2}px`, top: `${er.top + er.height / 2}px` }], { duration: 500, easing: 'ease-in-out', fill: 'forwards' });
-      setTimeout(() => { p.remove(); this.applyBattleDamage(isSuper); }, 500);
+      setTimeout(() => { 
+        p.remove(); 
+        this.applyBattleDamage(isSuper); 
+        playerPet.classList.remove('anim-power');
+        if (powerSource) powerSource.style.opacity = '0';
+      }, 500);
     }
   }
 
