@@ -748,6 +748,8 @@ class Game {
       if (enabled) this.bgm.play().catch(() => {});
       else this.bgm.pause();
     }
+    document.getElementById('music-on-btn')?.classList.toggle('active', enabled);
+    document.getElementById('music-off-btn')?.classList.toggle('active', !enabled);
     this.saveProfile();
   }
 
@@ -767,6 +769,15 @@ class Game {
         this.bgm.play().catch(() => {});
       }
     }
+    
+    const selector = document.getElementById('song-selector');
+    if (selector) selector.value = num.toString();
+
+    const onBtn = document.getElementById('music-on-btn');
+    const offBtn = document.getElementById('music-off-btn');
+    if (onBtn) onBtn.classList.toggle('active', this.musicEnabled);
+    if (offBtn) offBtn.classList.toggle('active', !this.musicEnabled);
+
     this.updateQuestProgress('change_song', 1);
     this.saveProfile();
   }
@@ -3003,6 +3014,12 @@ class Game {
     document.getElementById('quests-btn')?.addEventListener('click', () => this.showQuestsScreen());
     document.getElementById('font-standard-btn')?.addEventListener('click', () => this.setFont(false));
     document.getElementById('font-dyslexic-btn')?.addEventListener('click', () => this.setFont(true));
+    document.getElementById('music-on-btn')?.addEventListener('click', () => { this.playSFX('click'); this.setMusic(true); });
+    document.getElementById('music-off-btn')?.addEventListener('click', () => { this.playSFX('click'); this.setMusic(false); });
+    document.getElementById('song-selector')?.addEventListener('change', (e) => {
+      this.playSFX('click');
+      this.setSong(parseInt(e.target.value));
+    });
     document.getElementById('close-quests-btn')?.addEventListener('click', () => { this.playSFX('click'); document.getElementById('quests-screen').style.display = 'none'; });
     document.getElementById('shop-btn')?.addEventListener('click', () => this.showShopScreen());
     document.getElementById('shop-btn-sidebar')?.addEventListener('click', () => this.showShopScreen());
