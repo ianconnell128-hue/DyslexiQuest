@@ -265,27 +265,6 @@
     }
     .anim-power { animation: power-glow 1s infinite alternate; }
 
-    @keyframes energy-burst {
-      0% { transform: translate(-50%, -50%) scale(0.1); opacity: 1; border-width: 20px; }
-      100% { transform: translate(-50%, -50%) scale(8); opacity: 0; border-width: 1px; }
-    }
-    .energy-burst-effect {
-      position: absolute; width: 50px; height: 50px; border: 10px solid #fff; border-radius: 50%; pointer-events: none; z-index: 20;
-      box-shadow: 0 0 30px #818cf8, inset 0 0 20px #818cf8;
-    }
-
-    @keyframes beam-flicker {
-      0%, 100% { opacity: 0.8; width: 4px; }
-      50% { opacity: 1; width: 12px; }
-    }
-    .power-beam {
-      position: absolute; height: 1000px; bottom: 50%; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(to top, #fff, #818cf8, transparent);
-      box-shadow: 0 0 20px #818cf8;
-      pointer-events: none; z-index: 14;
-      animation: beam-flicker 0.1s infinite;
-    }
-
     .custom-ar-button {
       background: white;
       border-radius: 12px;

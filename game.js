@@ -2289,23 +2289,7 @@ class Game {
 
     // 1. "POWER GOES OUT" EFFECT (Eyes/Chest Glow)
     playerPet.classList.add('anim-power');
-    if (powerSource) {
-      powerSource.style.opacity = '1';
-      
-      // Create a vertical energy beam
-      const beam = document.createElement('div');
-      beam.className = 'power-beam';
-      powerSource.appendChild(beam);
-      
-      // Create a ripple burst
-      const burst = document.createElement('div');
-      burst.className = 'energy-burst-effect';
-      const psRect = powerSource.getBoundingClientRect();
-      burst.style.left = `50%`; burst.style.top = `50%`;
-      powerSource.appendChild(burst);
-      
-      setTimeout(() => { beam.remove(); burst.remove(); }, 800);
-    }
+    if (powerSource) powerSource.style.opacity = '1';
     
     // specialized animations
     if (power === 'Shockwave' || power === 'Earthquake' || power === 'Stomp' || (this.battleState.playerPet.animalName && this.battleState.playerPet.animalName.toLowerCase().includes('rex'))) {
@@ -2787,15 +2771,6 @@ class Game {
     const endX = modelRect.left + modelRect.width * 0.5;
     const endY = modelRect.top + modelRect.height * 0.5;
 
-    // Create a vertical energy beam from hands
-    if (powerSource) {
-      const beam = document.createElement('div');
-      beam.className = 'power-beam';
-      beam.style.left = '50%'; beam.style.bottom = '50%';
-      powerSource.appendChild(beam);
-      setTimeout(() => beam.remove(), 800);
-    }
-
     // Create a powder cloud (60 particles)
     const container = document.getElementById('catching-screen');
     const theme = this.captureTheme || { color: '#ffffff' };
@@ -2908,7 +2883,7 @@ class Game {
 
   finalizeCapture(animal, avatarViewer) {
     const mysteryOverlay = document.getElementById('catch-mystery-overlay');
-    const powerSource = document.getElementById('catching-power-source');
+    const catchingPowerSource = document.getElementById('catching-power-source');
     if (mysteryOverlay) mysteryOverlay.style.display = 'none';
     avatarViewer.style.right = '0%';
     
@@ -2918,12 +2893,12 @@ class Game {
       avatarViewer.animationName = 'Idle';
       avatarViewer.classList.remove('anim-power');
     }
-    if (powerSource) powerSource.style.opacity = '0';
+    if (catchingPowerSource) catchingPowerSource.style.opacity = '0';
 
     // Trigger "Power Out" glow during absorption
     avatarViewer.classList.add('anim-power');
-    const powerSource = document.getElementById('avatar-power-source');
-    if (powerSource) powerSource.style.opacity = '1';
+    const avatarPowerSource = document.getElementById('avatar-power-source');
+    if (avatarPowerSource) avatarPowerSource.style.opacity = '1';
 
     setTimeout(() => {
       const screen = document.getElementById('catching-screen');
@@ -2931,7 +2906,7 @@ class Game {
       
       // Clear glow after transition
       avatarViewer.classList.remove('anim-power');
-      if (powerSource) powerSource.style.opacity = '0';
+      if (avatarPowerSource) avatarPowerSource.style.opacity = '0';
 
       // Restore main game elements
       const gameContainer = document.querySelector('.game-container');
