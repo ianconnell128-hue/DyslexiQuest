@@ -1303,12 +1303,8 @@
 
     <!-- Cartoon Grass Ground (Keep for baseline) -->
     <div class="dirt-ground" style="background: #4ade80; border-top: 8px solid #22c55e; height: 100px; z-index: 4;"></div>
-    
-    <!-- Stylized Treasure Base -->
-    <div style="position: absolute; bottom: 80px; left: 10%; width: 140px; height: 40px; background: rgba(255,255,255,0.4); border-radius: 50%; filter: blur(15px); z-index: 50; animation: pulse-blue 2s infinite;"></div>
-    
-    <div id="capture-cloud" class="capture-cloud" style="display:none; width: 300px; height: 150px; background: transparent; filter: none;"></div>
-    
+
+    <div id="capture-cloud" class="capture-cloud" style="display:none; width: 300px; height: 150px; background: transparent; filter: none;"></div>    
     <!-- Avatar and Treasure Positioning with Comic Outline -->
     <!-- Treasure Bottom Left - Sit on top of grass -->
     <div id="catch-mystery-overlay" style="display:none; position: absolute; bottom: 220px; left: 15%; width: 250px; text-align: center; font-size: 5rem; z-index: 105; pointer-events: none; text-shadow: 0 0 20px white;">❓</div>
@@ -1330,7 +1326,7 @@
       </div>
 
       <div id="capture-action-area" style="display: none; margin-bottom: 20px;">
-        <button id="shoot-power-btn" class="charge-button" style="background: linear-gradient(to right, #60a5fa, #3b82f6, #2563eb); border: none; padding: 15px 30px; font-weight: 800; color: white; border-radius: 50px; cursor: pointer; animation: pulse-blue 2s infinite;">🕸️ CAPTURE! 🕸️</button>
+        <button id="shoot-power-btn" class="charge-button" style="background: #3b82f6; border: none; padding: 15px 30px; font-weight: 800; color: white; border-radius: 50px; cursor: pointer;">🕸️ CAPTURE! 🕸️</button>
       </div>    </div>
   </div>
 
@@ -1387,8 +1383,8 @@
       </div>
 
       <div id="battle-action-area" style="display: none; margin-bottom: 2px;">
-        <button id="battle-attack-btn" class="charge-button" style="background: linear-gradient(to right, #ef4444, #f97316); border: none; padding: 10px 25px; font-weight: 800; color: white; border-radius: 50px; cursor: pointer; animation: pulse-blue 2s infinite; font-size: 1rem;">⚔️ ATTACK!</button>
-        <button id="battle-super-btn" class="charge-button" style="display: none; background: linear-gradient(to right, #7c3aed, #db2777); border: none; padding: 10px 25px; font-weight: 800; color: white; border-radius: 50px; cursor: pointer; animation: pulse-blue 1s infinite; font-size: 1rem; border: 3px solid white;">✨ SUPER ATTACK! ✨</button>
+        <button id="battle-attack-btn" class="charge-button" style="background: #ef4444; border: none; padding: 10px 25px; font-weight: 800; color: white; border-radius: 50px; cursor: pointer; font-size: 1rem;">⚔️ ATTACK!</button>
+        <button id="battle-super-btn" class="charge-button" style="display: none; background: #7c3aed; border: none; padding: 10px 25px; font-weight: 800; color: white; border-radius: 50px; cursor: pointer; font-size: 1rem; border: 3px solid white;">✨ SUPER ATTACK! ✨</button>
       </div>
       
       <button id="close-battle-btn" class="primary" style="margin-top: 5px; display: none; background: #64748b; padding: 8px 20px; font-size: 0.8rem; border-radius: 12px;">Leave Arena</button>
@@ -1529,7 +1525,7 @@
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 15px; align-items: center;">
-        <button id="spin-btn" class="primary" style="background: #f59e0b; border: none; padding: 20px 60px; font-size: 1.5rem; border-radius: 50px; cursor: pointer; animation: pulse-blue 2s infinite;">SPIN!</button>
+        <button id="spin-btn" class="primary" style="background: #f59e0b; border: none; padding: 20px 60px; font-size: 1.5rem; border-radius: 50px; cursor: pointer;">SPIN!</button>
         <button id="close-wheel-btn" class="primary" style="display:none; border-radius:20px; padding:15px 40px; width:auto;">Claim Prize!</button>
       </div>
     </div>
