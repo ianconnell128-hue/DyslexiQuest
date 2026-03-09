@@ -2759,6 +2759,13 @@ class Game {
 
     const modelViewer = document.getElementById('catch-model');
     const avatarViewer = document.getElementById('catching-player-avatar');
+    
+    // 1. CHANGE AVATAR POSE (Put out hands / Active stance)
+    if (avatarViewer) {
+      avatarViewer.animationName = 'Walk'; // This pose usually has hands forward/active
+      avatarViewer.classList.add('anim-power'); // Reuse power glow
+    }
+
     const modelRect = modelViewer.getBoundingClientRect();
     const avatarRect = avatarViewer.getBoundingClientRect();
     
@@ -2882,6 +2889,12 @@ class Game {
     if (mysteryOverlay) mysteryOverlay.style.display = 'none';
     avatarViewer.style.right = '0%';
     
+    // Reset Avatar Pose
+    if (avatarViewer) {
+      avatarViewer.animationName = 'Idle';
+      avatarViewer.classList.remove('anim-power');
+    }
+
     // Trigger "Power Out" glow during absorption
     avatarViewer.classList.add('anim-power');
     const powerSource = document.getElementById('avatar-power-source');
