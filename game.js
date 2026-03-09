@@ -2287,9 +2287,8 @@ class Game {
     const powerSource = document.getElementById('avatar-power-source');
     const power = this.battleState.playerPet.powers;
 
-    // 1. "POWER GOES OUT" EFFECT (Eyes/Chest Glow)
+    // 1. "POWER GOES OUT" EFFECT
     playerPet.classList.add('anim-power');
-    if (powerSource) powerSource.style.opacity = '1';
     
     // specialized animations
     if (power === 'Shockwave' || power === 'Earthquake' || power === 'Stomp' || (this.battleState.playerPet.animalName && this.battleState.playerPet.animalName.toLowerCase().includes('rex'))) {
@@ -2305,7 +2304,6 @@ class Game {
           sw.remove(); 
           this.applyBattleDamage(isSuper);
           playerPet.classList.remove('anim-power');
-          if (powerSource) powerSource.style.opacity = '0';
         }, 600);
       }, 400);
     } else if (power === 'Speed' || power === 'Dash' || power === 'Strike') {
@@ -2318,20 +2316,18 @@ class Game {
         this.applyBattleDamage(isSuper);
         playerPet.style.transform = 'translate(0,0) scale(1)';
         playerPet.classList.remove('anim-power');
-        if (powerSource) powerSource.style.opacity = '0';
       }, 250);
     } else {
-      const p = document.createElement('div'); p.className = 'glitter-particle'; p.style.background = this.battleState.playerPet.color || '#3b82f6'; p.style.transform = isSuper ? 'scale(6)' : 'scale(3)';
-      const pr = playerPet.getBoundingClientRect(), er = enemyPet.getBoundingClientRect();
-      p.style.left = `${pr.left + pr.width / 2}px`; p.style.top = `${pr.top + pr.height / 2}px`;
-      battleScreen.appendChild(p);
-      p.animate([{ left: p.style.left, top: p.style.top }, { left: `${er.left + er.width / 2}px`, top: `${er.top + er.height / 2}px` }], { duration: 500, easing: 'ease-in-out', fill: 'forwards' });
-      setTimeout(() => { 
-        p.remove(); 
-        this.applyBattleDamage(isSuper); 
-        playerPet.classList.remove('anim-power');
-        if (powerSource) powerSource.style.opacity = '0';
-      }, 500);
+      // 3. INSTANT HIT EFFECT (Replaces shooting ball)
+      this.playSFX('correct');
+      enemyPet.animate([
+        { filter: 'brightness(1)', transform: 'scale(1)' },
+        { filter: 'brightness(3) contrast(0.5)', transform: 'scale(1.1)', offset: 0.1 },
+        { filter: 'brightness(1)', transform: 'scale(1)' }
+      ], { duration: 400 });
+      
+      this.applyBattleDamage(isSuper);
+      playerPet.classList.remove('anim-power');
     }
   }
 
@@ -2771,46 +2767,18 @@ class Game {
     const endX = modelRect.left + modelRect.width * 0.5;
     const endY = modelRect.top + modelRect.height * 0.5;
 
-    // Create a powder cloud (60 particles)
-    const container = document.getElementById('catching-screen');
-    const theme = this.captureTheme || { color: '#ffffff' };
+    // 2. INSTANT HIT FLASH (Replaces shooting ball)
+    this.playSFX('correct');
+    modelViewer.animate([
+      { filter: 'brightness(1)', transform: 'scale(1)' },
+      { filter: 'brightness(3) contrast(0.5)', transform: 'scale(1.1)', offset: 0.1 },
+      { filter: 'brightness(1)', transform: 'scale(1)' }
+    ], { duration: 600 });
 
-    for (let i = 0; i < 60; i++) {
-      setTimeout(() => {
-        const p = document.createElement('div');
-        p.className = 'powder-particle';
-        p.style.left = `${startX}px`;
-        p.style.top = `${startY}px`;
-        p.style.background = theme.color;
-        p.style.boxShadow = `0 0 15px ${theme.color}`;
-        container.appendChild(p);
-
-        const duration = 1200 + Math.random() * 800;
-        // Randomize the cloud spread
-        const cloudSpread = 40 + Math.random() * 60;
-        const jitterX = (Math.random() - 0.5) * cloudSpread;
-        const jitterY = (Math.random() - 0.5) * cloudSpread;
-
-        p.animate([
-          { left: `${startX}px`, top: `${startY}px`, scale: 0.5, opacity: 1 },
-          { left: `${endX + jitterX}px`, top: `${endY + jitterY}px`, scale: 2, opacity: 0.8 }
-        ], {
-          duration: duration,
-          easing: 'ease-in-out',
-          fill: 'forwards'
-        });
-
-        setTimeout(() => {
-          p.animate([{ opacity: 0.8 }, { opacity: 0 }], { duration: 400, fill: 'forwards' });
-          setTimeout(() => p.remove(), 400);
-        }, duration);
-      }, i * 15);
-    }
-
-    // Wait for the powder cloud to "hit"
+    // Transition immediately to the swirl
     setTimeout(() => {
       this.wrapTreasureInSwirl(animal, modelViewer, avatarViewer);
-    }, 2000);
+    }, 400);
   }
 
   wrapTreasureInSwirl(animal, modelViewer, avatarViewer) {
@@ -2883,7 +2851,6 @@ class Game {
 
   finalizeCapture(animal, avatarViewer) {
     const mysteryOverlay = document.getElementById('catch-mystery-overlay');
-    const catchingPowerSource = document.getElementById('catching-power-source');
     if (mysteryOverlay) mysteryOverlay.style.display = 'none';
     avatarViewer.style.right = '0%';
     
@@ -2893,12 +2860,6 @@ class Game {
       avatarViewer.animationName = 'Idle';
       avatarViewer.classList.remove('anim-power');
     }
-    if (catchingPowerSource) catchingPowerSource.style.opacity = '0';
-
-    // Trigger "Power Out" glow during absorption
-    avatarViewer.classList.add('anim-power');
-    const avatarPowerSource = document.getElementById('avatar-power-source');
-    if (avatarPowerSource) avatarPowerSource.style.opacity = '1';
 
     setTimeout(() => {
       const screen = document.getElementById('catching-screen');
@@ -2906,7 +2867,6 @@ class Game {
       
       // Clear glow after transition
       avatarViewer.classList.remove('anim-power');
-      if (avatarPowerSource) avatarPowerSource.style.opacity = '0';
 
       // Restore main game elements
       const gameContainer = document.querySelector('.game-container');
