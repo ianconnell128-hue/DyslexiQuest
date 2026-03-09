@@ -37,6 +37,10 @@ const ANIMALS = [
   { name: 'Stone Golem', env: 'land', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', color: '#3b82f6', rarity: 'Uncommon', story: 'A creature made of ancient boulders and moss. It was built centuries ago to guard the secret entrance to the mountain.', powers: 'Earthquake', bg: 'linear-gradient(135deg, #f8fafc 0%, #334155 100%)' },
   { name: 'Zippy Alien', env: 'space', model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/alien.glb', color: '#3b82f6', rarity: 'Uncommon', story: 'A friendly visitor from the Andromeda galaxy. It uses localized gravity fields to float above the ground and loves earth snacks.', powers: 'Gravity', bg: 'linear-gradient(135deg, #fae8ff 0%, #a21caf 100%)' },
   { name: 'Tiny T-Rex', env: 'land', model: 'https://raw.githubusercontent.com/adityakeyal/blender-models/main/Trex.glb', color: '#3b82f6', rarity: 'Uncommon', story: 'A mighty dinosaur trapped in a small body. What it lacks in size, it makes up for with an incredibly loud, earth-shaking roar.', powers: 'Roar', bg: 'linear-gradient(135deg, #fef2f2 0%, #b91c1c 100%)' },
+  { name: 'Tri-Horn', env: 'land', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Triceratops/glTF-Binary/Triceratops.glb', color: '#3b82f6', rarity: 'Rare', story: 'A three-horned defender of the prehistoric plains. It is famous for its massive bony frill and its powerful charging speed.', powers: 'Charge', bg: 'linear-gradient(135deg, #fef3c7 0%, #92400e 100%)' },
+  { name: 'Spike Tail', env: 'land', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Stegosaurus/glTF-Binary/Stegosaurus.glb', color: '#3b82f6', rarity: 'Rare', story: 'A heavily armored herbivore with dangerous spikes on its tail. It uses its plated back to absorb sunlight and stay warm.', powers: 'Swipe', bg: 'linear-gradient(135deg, #dcfce7 0%, #166534 100%)' },
+  { name: 'Sky Glider', env: 'space', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Pterodactyl/glTF-Binary/Pterodactyl.glb', color: '#8b5cf6', rarity: 'Epic', story: 'The undisputed ruler of the ancient skies. It can dive from incredible heights to surprise its prey with its sharp beak.', powers: 'Dive', bg: 'linear-gradient(135deg, #e0e7ff 0%, #4338ca 100%)' },
+  { name: 'Swift Raptor', env: 'land', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Velociraptor/glTF-Binary/Velociraptor.glb', color: '#f43f5e', rarity: 'Epic', story: 'One of the fastest and smartest hunters to ever walk the earth. It works in small packs to outmaneuver much larger creatures.', powers: 'Pounce', bg: 'linear-gradient(135deg, #ffe4e6 0%, #9f1239 100%)' },
   { name: 'Big Splash Fish', env: 'water', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BarramundiFish/glTF-Binary/BarramundiFish.glb', color: '#3b82f6', rarity: 'Uncommon', story: 'A river legend capable of creating mega splashes. Its scales are as tough as iron armor, protecting it from fierce currents.', powers: 'Armor', bg: 'linear-gradient(135deg, #eff6ff 0%, #1d4ed8 100%)' },
   { name: 'Dino King', env: 'land', model: 'https://raw.githubusercontent.com/adityakeyal/blender-models/main/Trex.glb', color: '#3b82f6', rarity: 'Uncommon', story: 'The crowned ruler of the prehistoric valley. With a single stomp, it can summon shockwaves that topple ancient trees.', powers: 'Wave', bg: 'linear-gradient(135deg, #fdf2f8 0%, #db2777 100%)' },
   { name: 'Glowy Fish', env: 'water', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BarramundiFish/glTF-Binary/BarramundiFish.glb', color: '#3b82f6', rarity: 'Uncommon', story: 'A deep-sea wanderer equipped with a natural submarine detector. It illuminates the darkest trenches with neon bioluminescence.', powers: 'Glow', bg: 'linear-gradient(135deg, #0f172a 0%, #3b82f6 100%)' },
@@ -398,7 +402,7 @@ class Game {
           btn.innerHTML = `
             <div style="display:flex; align-items:center; gap: 15px;">
               <div style="width: 50px; height: 50px; background: white; border-radius: 12px; border: 2px solid #e2e8f0; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <model-viewer ar ar-modes="webxr scene-viewer quick-look" camera-controls autoplay src="${u.avatarModel || AVATAR_MODELS.male}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width: 100%; height: 100%;" autoplay animation-name="Idle"><button slot="ar-button" class="custom-ar-button">📱 AR</button></model-viewer>
+                <model-viewer src="${u.avatarModel || AVATAR_MODELS.male}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width: 100%; height: 100%;" autoplay animation-name="Idle"></model-viewer>
               </div>
               <div style="display:flex; flex-direction:column; align-items:flex-start;">
                 <div style="display:flex; align-items:center;">
@@ -624,7 +628,7 @@ class Game {
         btn.style.display = 'flex'; btn.style.flexDirection = 'column'; btn.style.alignItems = 'center';
         if (this.avatarModel === modelUrl) btn.style.borderColor = 'var(--primary)';
 
-        btn.innerHTML = `<div style="height:70px; width:100%;"><model-viewer ar ar-modes="webxr scene-viewer quick-look" camera-controls autoplay src="${modelUrl}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white)"><button slot="ar-button" class="custom-ar-button">📱 AR</button></model-viewer></div><div style="margin-top:5px; line-height:1.1; overflow:hidden; text-overflow:ellipsis; width:100%; white-space:nowrap;">${gearInfo.name}</div>`;
+        btn.innerHTML = `<div style="height:70px; width:100%;"><model-viewer src="${modelUrl}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white)"></model-viewer></div><div style="margin-top:5px; line-height:1.1; overflow:hidden; text-overflow:ellipsis; width:100%; white-space:nowrap;">${gearInfo.name}</div>`;
         btn.onclick = () => {
           this.avatarModel = modelUrl;
           this.playSFX('click');
@@ -648,7 +652,7 @@ class Game {
           btn.style.display = 'flex'; btn.style.flexDirection = 'column'; btn.style.alignItems = 'center';
           if (this.avatarModel === animalData.model) btn.style.borderColor = 'var(--primary)';
 
-          btn.innerHTML = `<div style="height:70px; width:100%;"><model-viewer ar ar-modes="webxr scene-viewer quick-look" camera-controls autoplay src="${animalData.model}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white)"><button slot="ar-button" class="custom-ar-button">📱 AR</button></model-viewer></div><div style="margin-top:5px; line-height:1.1; overflow:hidden; text-overflow:ellipsis; width:100%; white-space:nowrap; color:#065f46; font-weight:800;">${ua.petName}</div>`;
+          btn.innerHTML = `<div style="height:70px; width:100%;"><model-viewer src="${animalData.model}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white)"></model-viewer></div><div style="margin-top:5px; line-height:1.1; overflow:hidden; text-overflow:ellipsis; width:100%; white-space:nowrap; color:#065f46; font-weight:800;">${ua.petName}</div>`;
           btn.onclick = () => {
             this.avatarModel = animalData.model;
             this.playSFX('click');
@@ -808,10 +812,6 @@ class Game {
         if (petData) {
           const viewer = document.createElement('model-viewer');
           viewer.src = petData.model;
-          viewer.setAttribute('ar', '');
-          viewer.setAttribute('ar-modes', 'webxr scene-viewer quick-look');
-          viewer.setAttribute('camera-controls', '');
-          viewer.setAttribute('autoplay', '');
           viewer.setAttribute('shadow-intensity', '1');
           viewer.setAttribute('camera-orbit', '0deg 75deg auto');
           viewer.setAttribute('disable-zoom', '');
@@ -1525,7 +1525,7 @@ class Game {
         card.className = 'collection-card';
         card.innerHTML = `
           <div style="font-weight: 800; font-size: 0.9rem;">${item.name}</div>
-          <div style="height: 80px;"><model-viewer ar ar-modes="webxr scene-viewer quick-look" camera-controls autoplay src="${item.model}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white)"><button slot="ar-button" class="custom-ar-button">📱 AR</button></model-viewer></div>
+          <div style="height: 80px;"><model-viewer src="${item.model}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white)"></model-viewer></div>
           <button class="${isOwned ? '' : 'accent'}" style="margin-top: 10px; font-size: 0.8rem; padding: 8px;" ${isOwned ? 'disabled' : ''}>
             ${isOwned ? 'Owned' : `Buy $${item.price}`}
           </button>
@@ -1562,7 +1562,7 @@ class Game {
         card.className = 'collection-card';
         card.innerHTML = `
           <div style="font-weight: 800; font-size: 0.9rem;">${ua.petName}</div>
-          <div style="height: 60px; width: 100%;"><model-viewer ar ar-modes="webxr scene-viewer quick-look" camera-controls autoplay src="${data.model}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white) drop-shadow(0 0 2px white);"><button slot="ar-button" class="custom-ar-button">📱 AR</button></model-viewer></div>
+          <div style="height: 60px; width: 100%;"><model-viewer src="${data.model}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white) drop-shadow(0 0 2px white);"></model-viewer></div>
           <div class="rarity-display rarity-${data.rarity.toLowerCase()}" style="font-size: 0.6rem; padding: 2px 8px; margin: 5px 0;">${data.rarity}</div>
           <div style="display: flex; gap: 5px; margin-top: 5px;">
             <button class="primary" style="flex: 1; font-size: 0.75rem; padding: 8px;">Sell $${price}</button>
@@ -2394,7 +2394,7 @@ class Game {
 
       card.innerHTML = `
         <div style="font-weight:800; font-size:0.8rem;">${ua.petName}</div>
-        <div style="height:70px; width:100%;"><model-viewer ar ar-modes="webxr scene-viewer quick-look" camera-controls autoplay src="${data.model}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white);"><button slot="ar-button" class="custom-ar-button">📱 AR</button></model-viewer></div>
+        <div style="height:70px; width:100%;"><model-viewer src="${data.model}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white);"></model-viewer></div>
         <div class="rarity-display rarity-${data.rarity.toLowerCase()}" style="font-size:0.5rem; padding:2px 5px;">${data.rarity}</div>
       `;
       card.onclick = () => {
@@ -2940,7 +2940,7 @@ class Game {
           <div style="font-weight:800; color:var(--primary); font-size:0.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%; text-align:center;">${ua.petName}</div>
           <div style="height:80px; width:100%; position:relative;">
             ${mysteryOverlay}
-            <model-viewer ar ar-modes="webxr scene-viewer quick-look" camera-controls autoplay src="${data.model}" shadow-intensity="1" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: ${data.name === 'Mystery Box' ? 'sepia(1) hue-rotate(-50deg) saturate(3) brightness(0.6) drop-shadow(0 0 5px white)' : 'drop-shadow(0 0 5px white) drop-shadow(0 0 2px white)'};"><button slot="ar-button" class="custom-ar-button">📱 AR</button></model-viewer>
+            <model-viewer src="${data.model}" shadow-intensity="1" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: ${data.name === 'Mystery Box' ? 'sepia(1) hue-rotate(-50deg) saturate(3) brightness(0.6) drop-shadow(0 0 5px white)' : 'drop-shadow(0 0 5px white) drop-shadow(0 0 2px white)'};"></model-viewer>
           </div>
           <div style="font-weight:700; font-size:0.7rem; text-transform:uppercase; color:var(--text);">${data.name}</div>
           ${extraContent}
