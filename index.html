@@ -1407,7 +1407,11 @@
     <model-viewer id="catch-model" src="" style="position: absolute; width: 350px; height: 350px; bottom: 50px; left: 5%; z-index: 100; filter: drop-shadow(0 0 15px white);" disable-zoom camera-orbit="0deg 75deg 4m" interaction-prompt="none"></model-viewer>
     
     <!-- Player Avatar Bottom Right - Positioned lower to sit on grass -->
-    <model-viewer id="catching-player-avatar" src="" style="position: absolute; width: 300px; height: 400px; bottom: 20px; right: 0%; z-index: 100; filter: drop-shadow(0 0 10px white);" disable-zoom camera-orbit="0deg 75deg 5m" autoplay animation-name="Idle"></model-viewer>
+    <div id="catching-avatar-container" style="position: absolute; width: 300px; height: 400px; bottom: 20px; right: 0%; z-index: 100;">
+      <model-viewer id="catching-player-avatar" src="" style="width: 100%; height: 100%; filter: drop-shadow(0 0 10px white);" disable-zoom camera-orbit="0deg 75deg 5m" autoplay animation-name="Idle"></model-viewer>
+      <!-- Cupped Hand Power Source -->
+      <div id="catching-power-source" style="position: absolute; top: 45%; left: 40%; transform: translate(-50%, -50%); width: 30px; height: 30px; background: white; border-radius: 50%; box-shadow: 0 0 60px 25px #818cf8; opacity: 0; z-index: 110; pointer-events: none; transition: opacity 0.3s, transform 0.3s;"></div>
+    </div>
 
     <div id="catching-content" class="collection-content" style="max-width: 600px; z-index: 1000; margin-top: 20px; margin-bottom: auto; background: rgba(255, 255, 255, 0.9); border: 4px solid #3b82f6; border-radius: 32px; padding: 20px; box-shadow: 0 20px 0 rgba(59, 130, 246, 0.2); backdrop-filter: blur(5px); position: relative;">
       <h2 style="font-family:'Outfit'; font-size: 2.2rem; color: #3b82f6; margin-bottom: 5px; text-shadow: 2px 2px 0 white;">✨ A Wild Animal! ✨</h2>

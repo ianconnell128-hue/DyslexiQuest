@@ -2767,20 +2767,34 @@ class Game {
 
     const modelViewer = document.getElementById('catch-model');
     const avatarViewer = document.getElementById('catching-player-avatar');
+    const powerSource = document.getElementById('catching-power-source');
     
-    // 1. CHANGE AVATAR POSE (Put out hands / Active stance)
+    // 1. "KAMEHAMEHA" STANCE
     if (avatarViewer) {
-      avatarViewer.animationName = 'Walk'; // This pose usually has hands forward/active
-      avatarViewer.classList.add('anim-power'); // Reuse power glow
+      // Rotate model to face the animal sideways (Fighter Stance)
+      avatarViewer.setAttribute('camera-orbit', '-45deg 75deg 5m');
+      avatarViewer.animationName = 'Walk'; // Hands forward/active
+      avatarViewer.classList.add('anim-power');
     }
+    if (powerSource) powerSource.style.opacity = '1';
 
     const modelRect = modelViewer.getBoundingClientRect();
-    const avatarRect = avatarViewer.getBoundingClientRect();
+    const powerRect = powerSource ? powerSource.getBoundingClientRect() : avatarViewer.getBoundingClientRect();
     
-    const startX = avatarRect.left + avatarRect.width * 0.5;
-    const startY = avatarRect.top + avatarRect.height * 0.5;
+    // Fire from the HANDS (Power Source)
+    const startX = powerRect.left + powerRect.width * 0.5;
+    const startY = powerRect.top + powerRect.height * 0.5;
     const endX = modelRect.left + modelRect.width * 0.5;
     const endY = modelRect.top + modelRect.height * 0.5;
+
+    // Create a vertical energy beam from hands
+    if (powerSource) {
+      const beam = document.createElement('div');
+      beam.className = 'power-beam';
+      beam.style.left = '50%'; beam.style.bottom = '50%';
+      powerSource.appendChild(beam);
+      setTimeout(() => beam.remove(), 800);
+    }
 
     // Create a powder cloud (60 particles)
     const container = document.getElementById('catching-screen');
@@ -2894,14 +2908,17 @@ class Game {
 
   finalizeCapture(animal, avatarViewer) {
     const mysteryOverlay = document.getElementById('catch-mystery-overlay');
+    const powerSource = document.getElementById('catching-power-source');
     if (mysteryOverlay) mysteryOverlay.style.display = 'none';
     avatarViewer.style.right = '0%';
     
-    // Reset Avatar Pose
+    // Reset Avatar Pose & Rotation
     if (avatarViewer) {
+      avatarViewer.setAttribute('camera-orbit', '0deg 75deg 5m');
       avatarViewer.animationName = 'Idle';
       avatarViewer.classList.remove('anim-power');
     }
+    if (powerSource) powerSource.style.opacity = '0';
 
     // Trigger "Power Out" glow during absorption
     avatarViewer.classList.add('anim-power');
