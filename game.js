@@ -969,9 +969,11 @@ class Game {
     
     const targetLetter = this.targetWord.word.charAt(0).toLowerCase();
     
-    // 1. Get ALL words from the entire bank that start with the same letter
+    // 1. Get ALL words from the current language bank that start with the same letter
     const globalSameLetterPool = [];
-    Object.values(this.wordBank).forEach(levelWords => {
+    const currentBank = this.wordBank[this.isFrench ? 'fr' : 'en'];
+    
+    Object.values(currentBank).forEach(levelWords => {
       levelWords.forEach(w => {
         if (w.word.toLowerCase() !== this.targetWord.word.toLowerCase() && 
             w.word.charAt(0).toLowerCase() === targetLetter) {
