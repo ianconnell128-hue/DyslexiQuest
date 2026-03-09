@@ -33,7 +33,11 @@ const ANIMALS = [
   { name: 'Forest Deer', env: 'land', model: 'https://modelviewer.dev/shared-assets/models/Horse.glb', color: '#94a3b8', rarity: 'Common', story: 'A gentle creature with antlers made of living wood. It is said that wherever it walks, flowers bloom instantly.', powers: 'Nature Heal', bg: 'linear-gradient(135deg, #ecfdf5 0%, #10b981 100%)' },
   { name: 'Mystery Box', env: 'land', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF-Binary/Box.glb', color: '#94a3b8', rarity: 'Common', story: 'An enigmatic block of unknown origin. It constantly shifts its weight and occasionally hums a low, resonant tone.', powers: 'Blast', bg: 'linear-gradient(135deg, #f1f5f9 0%, #64748b 100%)' },
   { name: 'Spotted Leopard', env: 'land', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb', color: '#94a3b8', rarity: 'Common', story: 'A master of camouflage in the dappled sunlight. It can move as silently as a ghost through the thickest jungle.', powers: 'Stealth', bg: 'linear-gradient(135deg, #fffbeb 0%, #fbbf24 100%)' },
+  { name: 'Pink Flamingo', env: 'water', model: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Flamingo.glb', color: '#94a3b8', rarity: 'Common', story: 'A graceful bird that loves to stand on one leg. Its pink feathers glow with a soft light at sunset.', powers: 'Splash', bg: 'linear-gradient(135deg, #fce7f3 0%, #db2777 100%)' },
+  { name: 'Brave Rabbit', env: 'land', model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/rabbit.glb', color: '#94a3b8', rarity: 'Common', story: 'Small but incredibly fast. It can hop over entire mountains if it gets enough of a head start.', powers: 'Super-Jump', bg: 'linear-gradient(135deg, #f1f5f9 0%, #475569 100%)' },
   { name: 'Chompy Shark', env: 'water', model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/shark.glb', color: '#3b82f6', rarity: 'Uncommon', story: 'The undisputed king of the coral reefs. It guards sunken treasure ships and only eats magical, deep-sea kelp.', powers: 'Bite', bg: 'linear-gradient(135deg, #bae6fd 0%, #0284c7 100%)' },
+  { name: 'Colorful Parrot', env: 'space', model: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Parrot.glb', color: '#3b82f6', rarity: 'Uncommon', story: 'A talkative friend from the jungle. It can mimic any sound it hears, even the sound of a spaceship engine!', powers: 'Echo', bg: 'linear-gradient(135deg, #dcfce7 0%, #16a34a 100%)' },
+  { name: 'Sky Seagull', env: 'water', model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/seagull.glb', color: '#3b82f6', rarity: 'Uncommon', story: 'A coastal explorer that loves to dive for glowing fish. Its cry can be heard from miles away.', powers: 'Dive', bg: 'linear-gradient(135deg, #e0f2fe 0%, #38bdf8 100%)' },
   { name: 'Stone Golem', env: 'land', model: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', color: '#3b82f6', rarity: 'Uncommon', story: 'A creature made of ancient boulders and moss. It was built centuries ago to guard the secret entrance to the mountain.', powers: 'Earthquake', bg: 'linear-gradient(135deg, #f8fafc 0%, #334155 100%)' },
   { name: 'Zippy Alien', env: 'space', model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/alien.glb', color: '#3b82f6', rarity: 'Uncommon', story: 'A friendly visitor from the Andromeda galaxy. It uses localized gravity fields to float above the ground and loves earth snacks.', powers: 'Gravity', bg: 'linear-gradient(135deg, #fae8ff 0%, #a21caf 100%)' },
   { name: 'Tiny T-Rex', env: 'land', model: 'https://raw.githubusercontent.com/adityakeyal/blender-models/main/Trex.glb', color: '#3b82f6', rarity: 'Uncommon', story: 'A mighty dinosaur trapped in a small body. What it lacks in size, it makes up for with an incredibly loud, earth-shaking roar.', powers: 'Roar', bg: 'linear-gradient(135deg, #fef2f2 0%, #b91c1c 100%)' },
@@ -41,7 +45,13 @@ const ANIMALS = [
   { name: 'Spike Tail', env: 'land', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Stegosaurus/glTF-Binary/Stegosaurus.glb', color: '#3b82f6', rarity: 'Rare', story: 'A heavily armored herbivore with dangerous spikes on its tail. It uses its plated back to absorb sunlight and stay warm.', powers: 'Swipe', bg: 'linear-gradient(135deg, #dcfce7 0%, #166534 100%)' },
   { name: 'Sky Glider', env: 'space', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Pterodactyl/glTF-Binary/Pterodactyl.glb', color: '#8b5cf6', rarity: 'Epic', story: 'The undisputed ruler of the ancient skies. It can dive from incredible heights to surprise its prey with its sharp beak.', powers: 'Dive', bg: 'linear-gradient(135deg, #e0e7ff 0%, #4338ca 100%)' },
   { name: 'Swift Raptor', env: 'land', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Velociraptor/glTF-Binary/Velociraptor.glb', color: '#f43f5e', rarity: 'Epic', story: 'One of the fastest and smartest hunters to ever walk the earth. It works in small packs to outmaneuver much larger creatures.', powers: 'Pounce', bg: 'linear-gradient(135deg, #ffe4e6 0%, #9f1239 100%)' },
-  { name: 'Big Splash Fish', env: 'water', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BarramundiFish/glTF-Binary/BarramundiFish.glb', color: '#3b82f6', rarity: 'Uncommon', story: 'A river legend capable of creating mega splashes. Its scales are as tough as iron armor, protecting it from fierce currents.', powers: 'Armor', bg: 'linear-gradient(135deg, #eff6ff 0%, #1d4ed8 100%)' },
+  { name: 'Apatosaurus', env: 'land', model: 'https://raw.githubusercontent.com/pmndrs/drei-assets/master/apatosaurus.glb', color: '#eab308', rarity: 'Legendary', story: 'A giant so large the earth trembles when it walks. It spent its days peacefully grazing on the tallest treetops.', powers: 'Earth-Stomp', bg: 'linear-gradient(135deg, #fef3c7 0%, #d97706 100%)' },
+  { name: 'Frost Wolf', env: 'land', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb', color: '#a855f7', rarity: 'Rare', story: 'A guardian of the frozen north. Its fur is made of shimmering ice that never melts, even in the hottest sun.', powers: 'Blizzard', bg: 'linear-gradient(135deg, #e0e7ff 0%, #7c3aed 100%)' },
+  { name: 'Pink Flamingo', env: 'water', model: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Flamingo.glb', color: '#94a3b8', rarity: 'Common', story: 'A graceful bird that loves to stand on one leg. Its pink feathers glow with a soft light at sunset.', powers: 'Splash', bg: 'linear-gradient(135deg, #fce7f3 0%, #db2777 100%)' },
+  { name: 'Colorful Parrot', env: 'space', model: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Parrot.glb', color: '#3b82f6', rarity: 'Uncommon', story: 'A talkative friend from the jungle. It can mimic any sound it hears, even the sound of a spaceship engine!', powers: 'Echo', bg: 'linear-gradient(135deg, #dcfce7 0%, #16a34a 100%)' },
+  { name: 'Brave Rabbit', env: 'land', model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/rabbit.glb', color: '#94a3b8', rarity: 'Common', story: 'Small but incredibly fast. It can hop over entire mountains if it gets enough of a head start.', powers: 'Super-Jump', bg: 'linear-gradient(135deg, #f1f5f9 0%, #475569 100%)' },
+  { name: 'Golden Dragon', env: 'space', model: 'https://assets.babylonjs.com/meshes/Georgia-Tech-Dragon/dragonUV.glb', color: '#ef4444', rarity: 'Mythic', story: 'A legendary beast made of pure celestial gold. Its breath creates new stars in the night sky.', powers: 'Nova-Breath', bg: 'linear-gradient(135deg, #451a03 0%, #fbbf24 100%)' },
+  { name: 'Big Splash Fish', env: 'water', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/ BarramundiFish/glTF-Binary/BarramundiFish.glb', color: '#3b82f6', rarity: 'Uncommon', story: 'A river legend capable of creating mega splashes. Its scales are as tough as iron armor, protecting it from fierce currents.', powers: 'Armor', bg: 'linear-gradient(135deg, #eff6ff 0%, #1d4ed8 100%)' },
   { name: 'Dino King', env: 'land', model: 'https://raw.githubusercontent.com/adityakeyal/blender-models/main/Trex.glb', color: '#3b82f6', rarity: 'Uncommon', story: 'The crowned ruler of the prehistoric valley. With a single stomp, it can summon shockwaves that topple ancient trees.', powers: 'Wave', bg: 'linear-gradient(135deg, #fdf2f8 0%, #db2777 100%)' },
   { name: 'Glowy Fish', env: 'water', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BarramundiFish/glTF-Binary/BarramundiFish.glb', color: '#3b82f6', rarity: 'Uncommon', story: 'A deep-sea wanderer equipped with a natural submarine detector. It illuminates the darkest trenches with neon bioluminescence.', powers: 'Glow', bg: 'linear-gradient(135deg, #0f172a 0%, #3b82f6 100%)' },
   { name: 'Star Phoenix', env: 'space', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb', color: '#a855f7', rarity: 'Rare', story: 'A mythical bird born from the heart of a dying star. Its wings are made of pure solar flares that never go out.', powers: 'Sun Burn', bg: 'linear-gradient(135deg, #1e1b4b 0%, #7c3aed 100%)' },
@@ -54,6 +64,14 @@ const ANIMALS = [
   { name: 'Shiny Gold Fox', env: 'land', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb', color: '#eab308', rarity: 'Legendary', story: 'A creature of pure luck and fortune. Legend says that anyone who touches its shimmering coat is blessed with endless prosperity.', powers: 'Touch', bg: 'linear-gradient(135deg, #78350f 0%, #fbbf24 100%)' },
   { name: 'Nebula Dragon', env: 'space', model: 'https://assets.babylonjs.com/meshes/Georgia-Tech-Dragon/dragonUV.glb', color: '#ef4444', rarity: 'Mythic', story: 'A legendary dragon that lives inside colorful space nebulae. Its scales reflect the light of a thousand distant stars.', powers: 'Stardust', bg: 'linear-gradient(135deg, #000000 0%, #ef4444 100%)' },
   { name: 'Space Shark', env: 'space', model: 'https://raw.githubusercontent.com/BabylonJS/MeshesLibrary/master/shark.glb', color: '#ef4444', rarity: 'Mythic', story: 'A terrifying and majestic star swimmer. It cruises through asteroid belts, capable of gulping down entire comets in a single bite.', powers: 'Gulp', bg: 'linear-gradient(135deg, #020617 0%, #3b82f6 100%)' },
+  { name: 'Tri-Horn', env: 'land', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Triceratops/glTF-Binary/Triceratops.glb', color: '#3b82f6', rarity: 'Rare', story: 'A three-horned defender of the prehistoric plains. It is famous for its massive bony frill and its powerful charging speed.', powers: 'Charge', bg: 'linear-gradient(135deg, #fef3c7 0%, #92400e 100%)' },
+  { name: 'Spike Tail', env: 'land', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Stegosaurus/glTF-Binary/Stegosaurus.glb', color: '#3b82f6', rarity: 'Rare', story: 'A heavily armored herbivore with dangerous spikes on its tail. It uses its plated back to absorb sunlight and stay warm.', powers: 'Swipe', bg: 'linear-gradient(135deg, #dcfce7 0%, #166534 100%)' },
+  { name: 'Sky Glider', env: 'space', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Pterodactyl/glTF-Binary/Pterodactyl.glb', color: '#8b5cf6', rarity: 'Epic', story: 'The undisputed ruler of the ancient skies. It can dive from incredible heights to surprise its prey with its sharp beak.', powers: 'Dive', bg: 'linear-gradient(135deg, #e0e7ff 0%, #4338ca 100%)' },
+  { name: 'Swift Raptor', env: 'land', model: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Velociraptor/glTF-Binary/Velociraptor.glb', color: '#f43f5e', rarity: 'Epic', story: 'One of the fastest and smartest hunters to ever walk the earth. It works in small packs to outmaneuver much larger creatures.', powers: 'Pounce', bg: 'linear-gradient(135deg, #ffe4e6 0%, #9f1239 100%)' },
+  { name: 'Ankylosaurus', env: 'land', model: 'https://raw.githubusercontent.com/pmndrs/drei-assets/master/ankylosaurus.glb', color: '#3b82f6', rarity: 'Rare', story: 'A walking fortress with a heavy tail-club. It is nearly impossible for predators to break through its thick armor plates.', powers: 'Tail-Club', bg: 'linear-gradient(135deg, #eff6ff 0%, #1d4ed8 100%)' },
+  { name: 'Parasaurolophus', env: 'land', model: 'https://raw.githubusercontent.com/pmndrs/drei-assets/master/parasaurolophus.glb', color: '#10b981', rarity: 'Uncommon', story: 'Known for the musical crest on its head. It can communicate with its herd over long distances using trumpet-like sounds.', powers: 'Sonic-Crest', bg: 'linear-gradient(135deg, #ecfdf5 0%, #059669 100%)' },
+  { name: 'Pachy', env: 'land', model: 'https://raw.githubusercontent.com/pmndrs/drei-assets/master/pachycephalosaurus.glb', color: '#f59e0b', rarity: 'Rare', story: 'The head-butt champion of the dinosaur world. Its skull is 10 inches thick, making it a formidable opponent in any scuffle.', powers: 'Head-Butt', bg: 'linear-gradient(135deg, #fef3c7 0%, #d97706 100%)' },
+  { name: 'Apatosaurus', env: 'land', model: 'https://raw.githubusercontent.com/pmndrs/drei-assets/master/apatosaurus.glb', color: '#eab308', rarity: 'Legendary', story: 'A giant so large the earth trembles when it walks. It spent its days peacefully grazing on the tallest treetops.', powers: 'Earth-Stomp', bg: 'linear-gradient(135deg, #fef3c7 0%, #d97706 100%)' },
   { name: 'Cyber Dino', env: 'land', model: 'https://raw.githubusercontent.com/adityakeyal/blender-models/main/Trex.glb', color: '#ef4444', rarity: 'Mythic', story: 'An unstoppable beast from the distant future. Combining raw prehistoric power with advanced cybernetics, it is the ultimate apex predator.', powers: 'Cyber', bg: 'linear-gradient(135deg, #111827 0%, #10b981 100%)' }
 ];
 
@@ -525,26 +543,82 @@ class Game {
   initBattle3DScene(env) {
     const container = document.getElementById('battle-canvas-container');
     if (!container) return; container.innerHTML = '';
+    
     const scene = new THREE.Scene();
-    let bgColor = 0x1e1b4b; if (env === 'water') bgColor = 0x0ea5e9; else if (env === 'land') bgColor = 0xbae6fd;
+    const isSpace = env === 'space';
+    const isWater = env === 'water';
+    
+    let bgColor = 0x1e1b4b; // Space
+    if (isWater) bgColor = 0x0ea5e9;
+    else if (env === 'land') bgColor = 0xbae6fd;
     scene.background = new THREE.Color(bgColor);
+    if (isSpace) scene.fog = new THREE.FogExp2(0x1e1b4b, 0.01);
+
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 10, 30); camera.lookAt(0, 5, 0);
+    camera.position.set(0, 15, 40);
+    camera.lookAt(0, 5, 0);
+
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight); container.appendChild(renderer.domElement);
-    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-    const light = new THREE.DirectionalLight(0xffffff, 0.8); light.position.set(10, 20, 10); scene.add(light);
-    const groundGeo = new THREE.CylinderGeometry(15, 16, 2, 32);
-    let groundColor = 0x312e81; if (env === 'water') groundColor = 0x075985; else if (env === 'land') groundColor = 0x16a34a;
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+
+    // Lights
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const sun = new THREE.DirectionalLight(0xffffff, 1);
+    sun.position.set(10, 20, 10);
+    scene.add(sun);
+
+    // Main Arena Platform
+    const groundGeo = new THREE.CylinderGeometry(18, 20, 3, 32);
+    let groundColor = 0x312e81; // Space
+    if (isWater) groundColor = 0x075985;
+    else if (env === 'land') groundColor = 0x16a34a;
+    
     const ground = new THREE.Mesh(groundGeo, new THREE.MeshLambertMaterial({ color: groundColor }));
-    ground.position.y = -1; scene.add(ground);
+    ground.position.y = -1.5;
+    scene.add(ground);
+
+    // Floating Islands / Rocks
+    for (let i = 0; i < 15; i++) {
+      const rockGeo = new THREE.IcosahedronGeometry(2 + Math.random() * 3, 0);
+      const rockMat = new THREE.MeshLambertMaterial({ color: isSpace ? 0x4338ca : 0x15803d });
+      const rock = new THREE.Mesh(rockGeo, rockMat);
+      
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 30 + Math.random() * 40;
+      rock.position.set(Math.cos(angle) * dist, Math.random() * 20 - 5, Math.sin(angle) * dist);
+      rock.rotation.set(Math.random(), Math.random(), Math.random());
+      scene.add(rock);
+    }
+
+    // Animated "Stadium" Pillars
+    const pillars = new THREE.Group();
     for (let i = 0; i < 8; i++) {
       const angle = (i / 8) * Math.PI * 2;
-      const pillar = new THREE.Mesh(new THREE.BoxGeometry(1, 8, 1), new THREE.MeshLambertMaterial({ color: 0x4338ca }));
-      pillar.position.set(Math.cos(angle) * 14, 3, Math.sin(angle) * 14); scene.add(pillar);
+      const p = new THREE.Mesh(new THREE.BoxGeometry(2, 12, 2), new THREE.MeshLambertMaterial({ color: isSpace ? 0x818cf8 : 0xfacc15 }));
+      p.position.set(Math.cos(angle) * 25, 4, Math.sin(angle) * 25);
+      pillars.add(p);
     }
-    const animate = () => { if (document.getElementById('battle-screen').style.display === 'none') return; requestAnimationFrame(animate); scene.rotation.y += 0.002; renderer.render(scene, camera); };
+    scene.add(pillars);
+
+    const animate = () => {
+      if (document.getElementById('battle-screen').style.display === 'none') return;
+      requestAnimationFrame(animate);
+      
+      // Cinematic rotation
+      scene.rotation.y += 0.001;
+      pillars.rotation.y -= 0.003;
+      
+      renderer.render(scene, camera);
+    };
     animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
   }
 
   async checkForCloudBeams() {
