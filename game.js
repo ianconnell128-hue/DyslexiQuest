@@ -1992,6 +1992,27 @@ class Game {
     document.getElementById('battle-enemy-name').innerHTML = `${enemy.name} <br><span style="color:${diff.color}; font-size:0.7em;">[${diff.label}] HP: ${this.battleState.enemyHp} | ${enemy.rarity}</span>`;
   }
 
+  updateArenaTheme(env) {
+    const screen = document.getElementById('battle-screen');
+    const floor = document.getElementById('battle-bg');
+    if (!screen || !floor) return;
+
+    if (env === 'water') {
+      screen.style.background = 'linear-gradient(180deg, #e0f2fe 0%, #38bdf8 50%, #0369a1 100%)';
+      floor.style.background = '#075985';
+      floor.style.borderTopColor = '#0ea5e9';
+    } else if (env === 'space') {
+      screen.style.background = 'linear-gradient(180deg, #1e1b4b 0%, #4c1d95 100%)';
+      floor.style.background = '#312e81';
+      floor.style.borderTopColor = '#4338ca';
+    } else {
+      // Land / Forest
+      screen.style.background = 'linear-gradient(180deg, #bae6fd 0%, #7dd3fc 50%, #10b981 100%)';
+      floor.style.background = '#16a34a';
+      floor.style.borderTopColor = '#15803d';
+    }
+  }
+
   initiateFriendBattle() {
     this.playSFX('click');
     const otherUsers = Object.keys(this.users).filter(id => id !== this.currentUser);
@@ -2077,8 +2098,31 @@ class Game {
     
     const target = pool[Math.floor(Math.random() * pool.length)];
     this.targetWord = target; 
+    const targetLetter = target.word.charAt(0).toLowerCase();
     
-    const distractors = pool.filter(w => w.word !== target.word).slice(0, 3);
+    // Get same-letter distractors globally
+    const globalSameLetterPool = [];
+    const currentBank = this.wordBank[this.isFrench ? 'fr' : 'en'];
+    Object.values(currentBank).forEach(levelWords => {
+      levelWords.forEach(w => {
+        if (w.word.toLowerCase() !== target.word.toLowerCase() && 
+            w.word.charAt(0).toLowerCase() === targetLetter) {
+          globalSameLetterPool.push(w);
+        }
+      });
+    });
+
+    let distractors = [];
+    if (globalSameLetterPool.length >= 3) {
+      distractors = globalSameLetterPool.sort(() => Math.random() - 0.5).slice(0, 3);
+    } else {
+      const otherWords = pool.filter(w => 
+        w.word.toLowerCase() !== target.word.toLowerCase() && 
+        w.word.charAt(0).toLowerCase() !== targetLetter
+      ).sort(() => Math.random() - 0.5);
+      distractors = [...globalSameLetterPool, ...otherWords].slice(0, 3);
+    }
+
     let cards = [target, ...distractors];
     for (let i = cards.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [cards[i], cards[j]] = [cards[j], cards[i]]; }
 
