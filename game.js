@@ -398,7 +398,7 @@ class Game {
           btn.innerHTML = `
             <div style="display:flex; align-items:center; gap: 15px;">
               <div style="width: 50px; height: 50px; background: white; border-radius: 12px; border: 2px solid #e2e8f0; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <model-viewer src="${u.avatarModel || AVATAR_MODELS.male}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width: 100%; height: 100%;" autoplay animation-name="Idle"></model-viewer>
+                <model-viewer ar ar-modes="webxr scene-viewer quick-look" camera-controls autoplay src="${u.avatarModel || AVATAR_MODELS.male}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width: 100%; height: 100%;" autoplay animation-name="Idle"><button slot="ar-button" class="custom-ar-button">📱 AR</button></model-viewer>
               </div>
               <div style="display:flex; flex-direction:column; align-items:flex-start;">
                 <div style="display:flex; align-items:center;">
@@ -624,7 +624,7 @@ class Game {
         btn.style.display = 'flex'; btn.style.flexDirection = 'column'; btn.style.alignItems = 'center';
         if (this.avatarModel === modelUrl) btn.style.borderColor = 'var(--primary)';
 
-        btn.innerHTML = `<div style="height:70px; width:100%;"><model-viewer src="${modelUrl}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white)"></model-viewer></div><div style="margin-top:5px; line-height:1.1; overflow:hidden; text-overflow:ellipsis; width:100%; white-space:nowrap;">${gearInfo.name}</div>`;
+        btn.innerHTML = `<div style="height:70px; width:100%;"><model-viewer ar ar-modes="webxr scene-viewer quick-look" camera-controls autoplay src="${modelUrl}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white)"><button slot="ar-button" class="custom-ar-button">📱 AR</button></model-viewer></div><div style="margin-top:5px; line-height:1.1; overflow:hidden; text-overflow:ellipsis; width:100%; white-space:nowrap;">${gearInfo.name}</div>`;
         btn.onclick = () => {
           this.avatarModel = modelUrl;
           this.playSFX('click');
@@ -648,7 +648,7 @@ class Game {
           btn.style.display = 'flex'; btn.style.flexDirection = 'column'; btn.style.alignItems = 'center';
           if (this.avatarModel === animalData.model) btn.style.borderColor = 'var(--primary)';
 
-          btn.innerHTML = `<div style="height:70px; width:100%;"><model-viewer src="${animalData.model}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white)"></model-viewer></div><div style="margin-top:5px; line-height:1.1; overflow:hidden; text-overflow:ellipsis; width:100%; white-space:nowrap; color:#065f46; font-weight:800;">${ua.petName}</div>`;
+          btn.innerHTML = `<div style="height:70px; width:100%;"><model-viewer ar ar-modes="webxr scene-viewer quick-look" camera-controls autoplay src="${animalData.model}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white)"><button slot="ar-button" class="custom-ar-button">📱 AR</button></model-viewer></div><div style="margin-top:5px; line-height:1.1; overflow:hidden; text-overflow:ellipsis; width:100%; white-space:nowrap; color:#065f46; font-weight:800;">${ua.petName}</div>`;
           btn.onclick = () => {
             this.avatarModel = animalData.model;
             this.playSFX('click');
@@ -808,13 +808,16 @@ class Game {
         if (petData) {
           const viewer = document.createElement('model-viewer');
           viewer.src = petData.model;
+          viewer.setAttribute('ar', '');
+          viewer.setAttribute('ar-modes', 'webxr scene-viewer quick-look');
+          viewer.setAttribute('camera-controls', '');
+          viewer.setAttribute('autoplay', '');
           viewer.setAttribute('shadow-intensity', '1');
           viewer.setAttribute('camera-orbit', '0deg 75deg auto');
           viewer.setAttribute('disable-zoom', '');
           viewer.setAttribute('interaction-prompt', 'none');
           viewer.style.width = '100px';
           viewer.style.height = '100px';
-          viewer.style.filter = 'drop-shadow(0 0 5px white)';
           petsContainer.appendChild(viewer);
         }
       });
@@ -1522,7 +1525,7 @@ class Game {
         card.className = 'collection-card';
         card.innerHTML = `
           <div style="font-weight: 800; font-size: 0.9rem;">${item.name}</div>
-          <div style="height: 80px;"><model-viewer src="${item.model}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white)"></model-viewer></div>
+          <div style="height: 80px;"><model-viewer ar ar-modes="webxr scene-viewer quick-look" camera-controls autoplay src="${item.model}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white)"><button slot="ar-button" class="custom-ar-button">📱 AR</button></model-viewer></div>
           <button class="${isOwned ? '' : 'accent'}" style="margin-top: 10px; font-size: 0.8rem; padding: 8px;" ${isOwned ? 'disabled' : ''}>
             ${isOwned ? 'Owned' : `Buy $${item.price}`}
           </button>
@@ -1559,7 +1562,7 @@ class Game {
         card.className = 'collection-card';
         card.innerHTML = `
           <div style="font-weight: 800; font-size: 0.9rem;">${ua.petName}</div>
-          <div style="height: 60px; width: 100%;"><model-viewer src="${data.model}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white) drop-shadow(0 0 2px white);"></model-viewer></div>
+          <div style="height: 60px; width: 100%;"><model-viewer ar ar-modes="webxr scene-viewer quick-look" camera-controls autoplay src="${data.model}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white) drop-shadow(0 0 2px white);"><button slot="ar-button" class="custom-ar-button">📱 AR</button></model-viewer></div>
           <div class="rarity-display rarity-${data.rarity.toLowerCase()}" style="font-size: 0.6rem; padding: 2px 8px; margin: 5px 0;">${data.rarity}</div>
           <div style="display: flex; gap: 5px; margin-top: 5px;">
             <button class="primary" style="flex: 1; font-size: 0.75rem; padding: 8px;">Sell $${price}</button>
@@ -2391,7 +2394,7 @@ class Game {
 
       card.innerHTML = `
         <div style="font-weight:800; font-size:0.8rem;">${ua.petName}</div>
-        <div style="height:70px; width:100%;"><model-viewer src="${data.model}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white);"></model-viewer></div>
+        <div style="height:70px; width:100%;"><model-viewer ar ar-modes="webxr scene-viewer quick-look" camera-controls autoplay src="${data.model}" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: drop-shadow(0 0 5px white);"><button slot="ar-button" class="custom-ar-button">📱 AR</button></model-viewer></div>
         <div class="rarity-display rarity-${data.rarity.toLowerCase()}" style="font-size:0.5rem; padding:2px 5px;">${data.rarity}</div>
       `;
       card.onclick = () => {
@@ -2937,7 +2940,7 @@ class Game {
           <div style="font-weight:800; color:var(--primary); font-size:0.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%; text-align:center;">${ua.petName}</div>
           <div style="height:80px; width:100%; position:relative;">
             ${mysteryOverlay}
-            <model-viewer src="${data.model}" shadow-intensity="1" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: ${data.name === 'Mystery Box' ? 'sepia(1) hue-rotate(-50deg) saturate(3) brightness(0.6) drop-shadow(0 0 5px white)' : 'drop-shadow(0 0 5px white) drop-shadow(0 0 2px white)'};"></model-viewer>
+            <model-viewer ar ar-modes="webxr scene-viewer quick-look" camera-controls autoplay src="${data.model}" shadow-intensity="1" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width:100%; height:100%; filter: ${data.name === 'Mystery Box' ? 'sepia(1) hue-rotate(-50deg) saturate(3) brightness(0.6) drop-shadow(0 0 5px white)' : 'drop-shadow(0 0 5px white) drop-shadow(0 0 2px white)'};"><button slot="ar-button" class="custom-ar-button">📱 AR</button></model-viewer>
           </div>
           <div style="font-weight:700; font-size:0.7rem; text-transform:uppercase; color:var(--text);">${data.name}</div>
           ${extraContent}
