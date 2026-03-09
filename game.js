@@ -2284,7 +2284,6 @@ class Game {
     const playerPet = document.getElementById('battle-player-pet');
     const enemyPet = document.getElementById('battle-enemy-pet');
     const battleScreen = document.getElementById('battle-screen');
-    const powerSource = document.getElementById('avatar-power-source');
     const power = this.battleState.playerPet.powers;
 
     // 1. "POWER GOES OUT" EFFECT
@@ -2735,7 +2734,6 @@ class Game {
 
     const modelViewer = document.getElementById('catch-model');
     const avatarViewer = document.getElementById('catching-player-avatar');
-    const powerSource = document.getElementById('catching-power-source');
     
     // 1. "KAMEHAMEHA" STANCE
     if (avatarViewer) {
@@ -2744,18 +2742,16 @@ class Game {
       avatarViewer.animationName = 'Walk'; // Hands forward/active
       avatarViewer.classList.add('anim-power');
     }
-    if (powerSource) powerSource.style.opacity = '1';
 
     const modelRect = modelViewer.getBoundingClientRect();
-    const powerRect = powerSource ? powerSource.getBoundingClientRect() : avatarViewer.getBoundingClientRect();
+    const avatarRect = avatarViewer.getBoundingClientRect();
     
-    // Fire from the HANDS (Power Source)
-    const startX = powerRect.left + powerRect.width * 0.5;
-    const startY = powerRect.top + powerRect.height * 0.5;
+    // 2. INSTANT HIT FLASH (Replaces shooting ball)
+    const startX = avatarRect.left + avatarRect.width * 0.5;
+    const startY = avatarRect.top + avatarRect.height * 0.5;
     const endX = modelRect.left + modelRect.width * 0.5;
     const endY = modelRect.top + modelRect.height * 0.5;
 
-    // 2. INSTANT HIT FLASH (Replaces shooting ball)
     this.playSFX('correct');
     modelViewer.animate([
       { filter: 'brightness(1)', transform: 'scale(1)' },

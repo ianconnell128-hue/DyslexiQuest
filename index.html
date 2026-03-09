@@ -868,30 +868,6 @@
       animation: treasure-power-up 1s infinite ease-in-out !important;
     }
 
-    .glitter-particle {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      background: white;
-      border-radius: 50%;
-      z-index: 10002;
-      pointer-events: none;
-      box-shadow: 0 0 10px white, 0 0 20px var(--accent);
-      animation: twinkle 0.5s infinite alternate;
-    }
-
-    .powder-particle {
-      position: absolute;
-      width: 15px;
-      height: 15px;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 50%;
-      z-index: 10001;
-      pointer-events: none;
-      filter: blur(5px);
-      box-shadow: 0 0 10px white, 0 0 20px #bae6fd;
-    }
-
     @keyframes drift {
       0% { transform: translate(0, 0) scale(1); opacity: 1; }
       100% { transform: translate(var(--dx), var(--dy)) scale(2); opacity: 0; }
