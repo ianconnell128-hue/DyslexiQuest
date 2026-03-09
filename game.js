@@ -20,7 +20,8 @@ const SONGS = {
   3: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
   4: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
   5: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
-  6: 'https://raw.githubusercontent.com/effacestudios/Royalty-Free-Music-Pack/master/technologist.mp3'
+  6: 'https://raw.githubusercontent.com/effacestudios/Royalty-Free-Music-Pack/master/technologist.mp3',
+  7: 'https://raw.githubusercontent.com/Solanacean/GrimoireDigiMusicDLL/master/Music/!UPBEAT.mp3'
 };
 
 // ── 3-D collectible characters ──────────────────────────────────────────────
@@ -2740,72 +2741,83 @@ class Game {
     const theme = this.captureTheme || { grad: 'linear-gradient(to bottom, #ffffff, #7dd3fc)', glow: 'rgba(125, 211, 252, 0.6)' };
 
     // 1. FREEZE AND DISAPPEAR QUICKLY
-    modelViewer.style.filter = 'brightness(3) contrast(0.5) drop-shadow(0 0 20px #bae6fd)';
+    modelViewer.style.filter = 'brightness(3) contrast(0.5)';
     setTimeout(() => { modelViewer.style.opacity = '0'; }, 50);
 
-    // 2. CREATE SHAPE PIXELS (300 particles for a clear, magical flow)
+    // 2. CREATE SHAPE PIXELS (120 particles - optimized for mobile performance)
     const particles = [];
-    for (let i = 0; i < 300; i++) {
+    const particleCount = 120;
+    for (let i = 0; i < particleCount; i++) {
       const p = document.createElement('div');
       p.className = 'snow-soul';
       p.style.background = theme.grad;
-      p.style.boxShadow = `0 0 10px #fff, 0 0 15px ${theme.glow}`;
+      p.style.boxShadow = `0 0 8px #fff`; // Simpler shadow for performance
 
-      const rx = (Math.random() - 0.5) * rect.width * 0.9;
-      const ry = (Math.random() - 0.5) * rect.height * 0.9;
+      const rx = (Math.random() - 0.5) * rect.width * 0.8;
+      const ry = (Math.random() - 0.5) * rect.height * 0.8;
       p.style.left = `${centerX + rx}px`;
       p.style.top = `${centerY + ry}px`;
-      const size = 4 + Math.random() * 6;
+      const size = 3 + Math.random() * 5;
       p.style.width = `${size}px`;
       p.style.height = `${size}px`;
       container.appendChild(p);
       particles.push(p);
     }
 
-    // 3. MAGICAL SLOW STREAM (Two at a time)
-    const pocketX = aRect.left + aRect.width * 0.35;
-    const pocketY = aRect.top + aRect.height * 0.6;
+    // 3. RAPID MAGICAL STREAM (Hits the avatar's side pocket area)
+    // Adjust target to be visually "inside" the avatar container
+    const pocketX = aRect.left + aRect.width * 0.5;
+    const pocketY = aRect.top + aRect.height * 0.5;
 
     setTimeout(() => {
       particles.forEach((p, i) => {
-        // Send them in pairs by using Math.floor(i/2) for the delay
         setTimeout(() => {
           const currentX = parseFloat(p.style.left);
           const currentY = parseFloat(p.style.top);
           
-          // Graceful high arc
-          const midX = centerX + (pocketX - centerX) * 0.5 + (Math.sin(i * 0.2) * 150);
-          const midY = centerY - 450 - (Math.random() * 150); 
+          // Fast trajectory
+          const midX = centerX + (pocketX - centerX) * 0.5 + (Math.sin(i * 0.5) * 80);
+          const midY = centerY - 200 - (Math.random() * 100); 
 
           p.animate([
-            { left: `${currentX}px`, top: `${currentY}px`, transform: 'scale(1) rotate(0deg)', opacity: 1 },
-            { left: `${midX}px`, top: `${midY}px`, transform: 'scale(2) rotate(180deg)', opacity: 1, offset: 0.4 }, // Pulse bigger mid-flight
-            { left: `${pocketX}px`, top: `${pocketY}px`, transform: 'scale(0.1) rotate(1080deg)', opacity: 0 }
+            { left: `${currentX}px`, top: `${currentY}px`, transform: 'scale(1)', opacity: 1 },
+            { left: `${midX}px`, top: `${midY}px`, transform: 'scale(1.5)', opacity: 1, offset: 0.3 },
+            { left: `${pocketX}px`, top: `${pocketY}px`, transform: 'scale(0.1)', opacity: 0 }
           ], {
-            duration: 2500 + Math.random() * 1500, // Very slow and graceful
-            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            duration: 800 + Math.random() * 400, // Fast and energetic
+            easing: 'ease-in',
             fill: 'forwards'
           });
           
-          setTimeout(() => p.remove(), 4000);
-        }, Math.floor(i / 2) * 25); // Clear "two at a time" staggered entry
+          setTimeout(() => p.remove(), 1300);
+        }, Math.floor(i / 3) * 15); // Much faster stagger
       });
-    }, 100);
+    }, 50);
 
-    // 4. FINALIZE (Extended for the long cinematic flow)
+    // 4. FINALIZE (Now much faster - only 2 seconds total)
     setTimeout(() => {
       this.finalizeCapture(animal, avatarViewer);
-    }, 8500);
+    }, 2000);
   }
 
   finalizeCapture(animal, avatarViewer) {
     const mysteryOverlay = document.getElementById('catch-mystery-overlay');
     if (mysteryOverlay) mysteryOverlay.style.display = 'none';
     avatarViewer.style.right = '0%';
+    
+    // Trigger "Power Out" glow during absorption
+    avatarViewer.classList.add('anim-power');
+    const powerSource = document.getElementById('avatar-power-source');
+    if (powerSource) powerSource.style.opacity = '1';
+
     setTimeout(() => {
       const screen = document.getElementById('catching-screen');
       if (screen) screen.style.display = 'none';
       
+      // Clear glow after transition
+      avatarViewer.classList.remove('anim-power');
+      if (powerSource) powerSource.style.opacity = '0';
+
       // Restore main game elements
       const gameContainer = document.querySelector('.game-container');
       const topBar = document.querySelector('.top-bar');
