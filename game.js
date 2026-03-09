@@ -2364,27 +2364,15 @@ class Game {
     const playerPet = document.getElementById('battle-player-pet');
     const enemyPet = document.getElementById('battle-enemy-pet');
     
-    const p = document.createElement('div');
-    p.className = 'glitter-particle';
-    p.style.background = this.battleState.enemyPet.color || '#ef4444';
-    p.style.transform = 'scale(3)';
-    
-    const pRect = playerPet.getBoundingClientRect();
-    const eRect = enemyPet.getBoundingClientRect();
-    p.style.left = `${eRect.left + eRect.width / 2}px`;
-    p.style.top = `${eRect.top + eRect.height / 2}px`;
-    document.getElementById('battle-screen').appendChild(p);
-
-    p.animate([
-      { left: p.style.left, top: p.style.top },
-      { left: `${pRect.left + pRect.width / 2}px`, top: `${pRect.top + pRect.height / 2}px` }
-    ], { duration: 500, easing: 'ease-in-out', fill: 'forwards' });
+    // 1. INSTANT HIT EFFECT (Replaces shooting ball)
+    this.playSFX('wrong');
+    playerPet.animate([
+      { filter: 'brightness(1)', transform: 'scale(1)' },
+      { filter: 'brightness(0.5) sepia(1) hue-rotate(-50deg)', transform: 'scale(0.95)', offset: 0.1 },
+      { filter: 'brightness(1)', transform: 'scale(1)' }
+    ], { duration: 400 });
 
     setTimeout(() => {
-      p.remove();
-      this.playSFX('wrong'); // Hit sound
-      playerPet.animate([{ transform: 'translateX(-20px)' }, { transform: 'translateX(0)' }], { duration: 300 });
-      
       const enemyRarityStats = RARITY_STATS[this.battleState.enemyPet.rarity] || RARITY_STATS.Common;
       const damage = Math.round((15 + Math.floor(Math.random() * 15)) * this.battleState.difficulty.damageMult * enemyRarityStats.dmg);
       this.battleState.playerHp = Math.max(0, this.battleState.playerHp - damage);
@@ -2404,7 +2392,7 @@ class Game {
         document.getElementById('battle-challenge-area').style.display = 'block';
         this.renderBattleChallenge();
       }
-    }, 500);
+    }, 200);
   }
 
   handlePlayerDefeat() {
