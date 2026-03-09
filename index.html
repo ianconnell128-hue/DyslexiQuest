@@ -800,23 +800,6 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
 
-    @keyframes sparkle-orbit {
-      0% { transform: translate(-50%, -50%) rotate(0deg) translateX(var(--radius)) scale(0); opacity: 0; }
-      20% { opacity: 1; scale: 1.2; }
-      100% { transform: translate(-50%, -50%) rotate(1080deg) translateX(0) scale(0); opacity: 0; }
-    }
-
-    .swirl-sparkle {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      background: white;
-      border-radius: 50%;
-      z-index: 20000;
-      pointer-events: none;
-      box-shadow: 0 0 15px white, 0 0 30px var(--accent);
-    }
-
     .dirt-ground {
       position: absolute;
       bottom: 0;
