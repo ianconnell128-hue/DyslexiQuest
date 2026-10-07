@@ -91,7 +91,34 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Simple web viewer for recent logs
+  // Direct APK download endpoints
+  const APK_PATH = path.resolve(__dirname, '..', 'android', 'app', 'build', 'outputs', 'apk', 'debug', 'app-debug.apk');
+  const DIST_DIR = path.resolve(__dirname, '..', 'dist');
+
+  if (req.method === 'GET' && (url.pathname === '/apk' || url.pathname === '/dyslexiquest.apk' || url.pathname === '/latest.apk')) {
+    let filePath = APK_PATH;
+    if (!fs.existsSync(filePath) && fs.existsSync(DIST_DIR)) {
+      const files = fs.readdirSync(DIST_DIR).filter(f => f.endsWith('.apk')).sort();
+      if (files.length > 0) filePath = path.join(DIST_DIR, files[files.length - 1]);
+    }
+    if (fs.existsSync(filePath)) {
+      const stat = fs.statSync(filePath);
+      res.writeHead(200, {
+        'Content-Type': 'application/vnd.android.package-archive',
+        'Content-Length': stat.size,
+        'Content-Disposition': 'attachment; filename="dyslexiquest.apk"',
+        'Cache-Control': 'no-cache'
+      });
+      fs.createReadStream(filePath).pipe(res);
+      return;
+    } else {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('APK not found on host machine.');
+      return;
+    }
+  }
+
+  // Simple web viewer for recent logs and APK download
   if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/logs')) {
     const today = new Date().toISOString().slice(0, 10);
     const combinedFile = path.join(LOG_DIR, `${today}_combined.log`);
@@ -105,18 +132,27 @@ const server = http.createServer((req, res) => {
     res.end(`<!DOCTYPE html>
 <html>
 <head>
-  <title>DyslexiQuest DevLogs (${today})</title>
+  <title>DyslexiQuest DevHub & Logs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: monospace; background: #0f172a; color: #f8fafc; padding: 20px; margin: 0; }
-    h1 { color: #38bdf8; font-size: 1.2rem; }
-    pre { background: #1e293b; padding: 15px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap; font-size: 12px; line-height: 1.5; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace; background: #0f172a; color: #f8fafc; padding: 20px; margin: 0; }
+    h1 { color: #38bdf8; font-size: 1.3rem; margin: 0; }
+    .card { background: #1e293b; padding: 18px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; }
+    .btn { display: inline-block; background: #10b981; color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 1.05rem; }
+    .btn:hover { background: #059669; }
+    pre { background: #0b1120; padding: 15px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap; font-size: 12px; line-height: 1.5; max-height: 500px; }
     .refresh { background: #38bdf8; color: #0f172a; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
   </style>
 </head>
 <body>
-  <div style="display:flex; justify-content:space-between; align-items:center;">
-    <h1>📱 DyslexiQuest Live DevLogs (${today})</h1>
+  <div class="card" style="text-align: center;">
+    <h2 style="margin-top:0; color:#38bdf8;">📲 DyslexiQuest Android Install</h2>
+    <p style="color:#94a3b8; font-size: 0.95rem;">Tap below on your phone to download the new build directly over WireGuard:</p>
+    <a class="btn" href="/apk">⬇️ Download dyslexiquest.apk (v0.102)</a>
+  </div>
+
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+    <h1>📱 Live DevLogs (${today})</h1>
     <button class="refresh" onclick="location.reload()">Refresh</button>
   </div>
   <pre>${content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>

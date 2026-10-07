@@ -1197,10 +1197,38 @@ class Game {
       'jai': ['j', 'ai', 'jay'],
       'nest': ['n', 'est'],
       'senva': ['sen va', 's en va'],
-      'aujourdhui': ['aujourd hui']
+      'aujourdhui': ['aujourd hui'],
+      // English letters & homophones
+      'are': ['r', 'our', 'ar', 'ah'],
+      'you': ['u', 'ya', 'yu', 'yew'],
+      'see': ['c', 'sea'],
+      'be': ['b', 'bee'],
+      'why': ['y'],
+      'to': ['too', 'two', '2'],
+      'two': ['to', 'too', '2'],
+      'too': ['to', 'two', '2'],
+      'for': ['four', 'fore', '4'],
+      'four': ['for', 'fore', '4'],
+      'one': ['1', 'won'],
+      'won': ['one', '1'],
+      'ate': ['8', 'eight'],
+      'eight': ['8', 'ate'],
+      'no': ['know'],
+      'know': ['no'],
+      'here': ['hear'],
+      'hear': ['here'],
+      'our': ['hour', 'are'],
+      'hour': ['our'],
+      'blue': ['blew'],
+      'blew': ['blue'],
+      'red': ['read'],
+      'read': ['red'],
+      'by': ['buy', 'bye'],
+      'buy': ['by', 'bye'],
+      'so': ['sew', 'sow']
     };
 
-    const stripArticle = s => s.replace(/^(le|la|les|un|une|des|du|de|d|l)\s+/i, '').trim();
+    const stripArticle = s => s.replace(/^(le|la|les|un|une|des|du|de|d|l|the|a|an)\s+/i, '').trim();
 
     let isMatch = false;
     let matchedCandidate = '';
@@ -1223,14 +1251,12 @@ class Game {
         break;
       }
 
-      // French homophone / alternative match
-      if (this.isFrench) {
-        const equivalents = HOMOPHONES[cleanTarget] || [];
-        if (equivalents.includes(cleanCand) || equivalents.includes(strippedCand) || equivalents.includes(candAsWord)) {
-          isMatch = true;
-          matchedCandidate = cand;
-          break;
-        }
+      // Homophone / letter match (French and English)
+      const equivalents = HOMOPHONES[cleanTarget] || [];
+      if (equivalents.includes(cleanCand) || equivalents.includes(strippedCand) || equivalents.includes(candAsWord)) {
+        isMatch = true;
+        matchedCandidate = cand;
+        break;
       }
     }
 

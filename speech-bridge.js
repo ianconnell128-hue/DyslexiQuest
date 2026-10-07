@@ -10,6 +10,9 @@
   // Called from Android MainActivity via evaluateJavascript
   window.__onAndroidSpeechEvent = function(eventType, detail) {
     console.log("[SpeechBridge] Received event:", eventType, detail);
+    if (window.DevLog) {
+      window.DevLog.log('SPEECH_EVENT', { type: eventType, detail: detail || '' });
+    }
     if (!activeRecognition) return;
 
     if (eventType === 'start') {

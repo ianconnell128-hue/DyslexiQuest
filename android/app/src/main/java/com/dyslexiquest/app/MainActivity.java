@@ -461,6 +461,11 @@ public class MainActivity extends BridgeActivity {
                 intent.putStringArrayListExtra("android.speech.extra.BIASING_STRINGS", currentHints);
             }
 
+            // Silence tolerance: give user ample time to speak short single-syllable words
+            intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 3000L);
+            intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1800L);
+            intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 1800L);
+
             Log.i(TAG, "Starting speech recognition with lang=" + currentTargetLang + ", retry=" + isRetry + ", hints=" + currentHints.size());
             speechRecognizer.startListening(intent);
         } catch (Exception e) {
