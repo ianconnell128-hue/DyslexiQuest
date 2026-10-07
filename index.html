@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dyslexiquest.com</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>DyslexiQuest</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Lexend:wght@400;500;700;800&family=Open+Sans:wght@400;600;700;800&display=swap');
 
@@ -18,6 +18,12 @@
       --danger: #ef4444;
     }
 
+    *, *::before, *::after {
+      box-sizing: border-box;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
       background: linear-gradient(135deg, #f5f7ff 0%, #e0e7ff 100%);
@@ -25,8 +31,14 @@
       color: var(--text);
       margin: 0;
       padding: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
       overflow-x: hidden;
       user-select: none;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
     }
 
     /* ── Gameplay Avatar & Pet ── */
@@ -71,12 +83,17 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 20px;
-      background: rgba(253, 253, 253, 0.9);
+      padding: 8px 14px;
+      padding-top: max(8px, env(safe-area-inset-top));
+      padding-left: max(12px, env(safe-area-inset-left));
+      padding-right: max(12px, env(safe-area-inset-right));
+      background: rgba(253, 253, 253, 0.95);
       backdrop-filter: blur(10px);
       z-index: 3000; /* Ensure HUD is always on top */
       border-bottom: 1px solid #f1f1f1;
-      gap: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      gap: 8px;
     }
 
     .brand {
@@ -180,14 +197,18 @@
     .menu-toggle {
       background: none;
       border: none;
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       cursor: pointer;
       color: var(--text);
-      padding: 5px;
+      padding: 4px;
       box-shadow: none;
-      min-width: auto;
+      width: auto !important;
+      min-width: auto !important;
       text-transform: none;
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* ── Sidebar ── */
@@ -288,7 +309,7 @@
     .custom-ar-button:hover { background: #f8fafc; transform: scale(1.05); }
     .custom-ar-button:active { transform: scale(0.95); }
 
-    /* ── Main Gameplay ── */
+    .modal-backdrop {
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.3);
@@ -360,18 +381,36 @@
       align-items: center;
       justify-content: center;
       padding: 10px;
-      transition: all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+      transition: transform 0.06s cubic-bezier(0, 0, 0.2, 1), box-shadow 0.06s ease-out;
       box-shadow: 0 8px 20px rgba(0,0,0,0.04);
       border: 4px solid #1a1a1a;
       position: relative;
       overflow: hidden;
-      touch-action: manipulation; /* Instant click on mobile */
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .card:hover { 
-      transform: translateY(-8px) scale(1.02); 
+      transform: translateY(-4px) scale(1.01); 
       box-shadow: 0 15px 30px rgba(0,0,0,0.08);
       border-color: var(--primary);
+    }
+
+    .card:active, .card.touched {
+      transform: scale(0.96) translateY(2px) !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+      transition: transform 0.02s ease-out, box-shadow 0.02s ease-out !important;
+    }
+
+    @keyframes card-shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .card.wrong-shake {
+      animation: card-shake 0.35s ease-in-out !important;
+      border-color: var(--danger) !important;
     }
 
     .card.correct-zoom {
@@ -427,14 +466,14 @@
     }
 
     /* ── Buttons & Controls ── */
-    button {
+    button, .profile-card, .filter-btn {
       font-family: inherit;
       padding: 14px 24px;
       border-radius: 24px;
       border: none;
       font-weight: 800;
       cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: transform 0.06s cubic-bezier(0, 0, 0.2, 1), box-shadow 0.06s ease-out;
       background: #f8fafc;
       color: var(--text);
       display: flex;
@@ -444,8 +483,10 @@
       width: 100%;
       border: 2px solid #e2e8f0;
       box-shadow: 0 4px 0 #e2e8f0;
-      touch-action: manipulation; /* Instant click on mobile */
+      touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     button:hover { 
@@ -454,9 +495,12 @@
       box-shadow: 0 6px 0 #e2e8f0;
     }
 
-    button:active {
-      transform: translateY(2px);
-      box-shadow: 0 0 0 #e2e8f0;
+    button:active, button.touched,
+    .profile-card:active, .profile-card.touched,
+    .filter-btn:active, .filter-btn.touched {
+      transform: translateY(2px) scale(0.97) !important;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.1) !important;
+      transition: transform 0.02s ease-out, box-shadow 0.02s ease-out !important;
     }
 
     button.primary { 
@@ -506,8 +550,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      padding: 40px 20px;
+      justify-content: center;
+      padding: 20px 12px;
       text-align: center;
       overflow-y: auto;
       overflow-x: hidden;
@@ -515,16 +559,51 @@
       box-sizing: border-box;
     }
 
+    #start-overlay {
+      background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 50%, #dbeafe 100%);
+      z-index: 9999;
+      justify-content: center;
+      padding: 16px 12px;
+    }
+
+    .start-card {
+      background: white;
+      border-radius: 28px;
+      border: 3px solid #1a1a1a;
+      box-shadow: 0 16px 32px rgba(79, 70, 229, 0.12), 0 8px 0 #1a1a1a;
+      padding: 24px 20px;
+      width: 100%;
+      max-width: 380px;
+      box-sizing: border-box;
+      margin: auto;
+      text-align: center;
+    }
+
+    .start-card h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 0 0 16px 0;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    @media (max-width: 480px) {
+      .start-card {
+        padding: 18px 14px;
+        border-radius: 22px;
+      }
+      .start-card h1 {
+        font-size: 1.35rem;
+        margin-bottom: 12px;
+      }
+    }
+
     /* Full-screen 3D backgrounds should not be constricted */
     #catching-screen, #battle-screen {
       padding: 0 !important;
       justify-content: center !important;
-    }
-
-    /* Keep content centered if it fits */
-    #loading-overlay > *:not(div[id*="canvas"]), #start-overlay > *, .modal > *, .unlock-screen > *, .collection-screen > *:not(div[id*="canvas"]) {
-      margin-top: auto;
-      margin-bottom: auto;
     }
 
     .modal-content, .unlock-content, .collection-content {
@@ -556,27 +635,52 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     @media (max-width: 600px) {
-      .top-bar { padding: 10px 15px; }
-      .brand { font-size: 1.1rem; }
+      .top-bar { padding: 8px 10px; gap: 6px; }
+      .brand { font-size: 1.05rem; }
       .hud-stats { display: none; }
+      #hud-profile-btn { padding: 3px 8px 3px 3px !important; gap: 6px !important; }
+      #hud-user-name { max-width: 55px !important; }
+      #quests-btn-top { padding: 5px 8px !important; font-size: 0.7rem !important; }
+      #chest-container { font-size: 1.5rem !important; }
 
-      .game-container { padding: 10px 2px; }
-      #word-prompt { margin: 15px 0 10px; font-size: 1.8rem; }
+      .game-container { padding: 10px 4px; }
+      #word-prompt { margin: 15px 0 10px; font-size: 1.7rem; }
 
-      /* Scaled down cards for small screens - Fix horizontal overflow */
+      /* Scaled down cards for small screens - Fix horizontal overflow & word wrapping */
       .game-area { gap: 4px; padding: 2px; flex-wrap: nowrap; overflow-x: visible; }
       .card { 
         min-width: 0; 
-        flex: 1;
-        min-height: 120px; 
+        flex: 1; 
+        min-height: 110px; 
         height: auto; 
         aspect-ratio: 2/3;
-        padding: 5px; 
+        padding: 4px 2px; 
         border-radius: 15px; 
         border-width: 2px;
         margin: 1px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
-      .card-word { font-size: 1.1rem; word-break: break-word; }
+      .game-area .card-word { 
+        font-size: clamp(0.75rem, 3.2vw, 1.05rem) !important; 
+        word-break: normal !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: 100% !important;
+      }
+      #speech-target-card .card-word {
+        font-size: clamp(2.5rem, 10vw, 3.8rem) !important;
+        white-space: nowrap !important;
+      }
+      .card-word.ruled {
+        padding: 2px 4px !important;
+        white-space: nowrap !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
 
       /* Modals & Screens: More compact */
       #loading-overlay, #start-overlay, .modal, .unlock-screen, .collection-screen {
@@ -604,18 +708,47 @@
       }
       
       #catching-content {
-        margin-top: 20px !important;
-        width: 92% !important;
+        margin-top: 10px !important;
+        width: 94% !important;
+        max-width: 480px !important;
+        padding: 10px 14px !important;
+        border-radius: 24px !important;
+        z-index: 200 !important;
+        transition: opacity 0.3s ease;
       }
-      #catching-content h2 { font-size: 1.5rem !important; }
-      #catch-instruction { font-size: 0.8rem !important; margin-bottom: 10px !important; }
-      #catch-challenge-area { padding: 10px !important; margin-bottom: 10px !important; }
-      #catch-word-prompt { font-size: 1.2rem !important; margin-bottom: 8px !important; }
+      #catching-content h2 { font-size: 1.35rem !important; margin-bottom: 2px !important; }
+      #catch-instruction { font-size: 0.75rem !important; margin-bottom: 6px !important; }
+      #catch-challenge-area { padding: 8px 10px !important; margin-bottom: 6px !important; }
+      #catch-word-prompt { font-size: 1.05rem !important; margin-bottom: 4px !important; }
+      #catch-speak-btn { padding: 5px 14px !important; font-size: 0.8rem !important; margin-bottom: 6px !important; }
+      #catch-game-area { gap: 6px !important; }
+      #catch-game-area .card { height: 85px !important; min-width: 65px !important; padding: 6px !important; border-radius: 14px !important; }
+      #catch-game-area .card-word { font-size: 0.85rem !important; }
 
-      /* Fix Catching screen models on mobile */
-      #catch-model, #catching-player-avatar {
-        width: 180px !important;
-        height: 250px !important;
+      /* Vertical Staging: Animal in upper half, Player at bottom */
+      #catch-model {
+        position: absolute !important;
+        width: 220px !important;
+        height: 220px !important;
+        top: 39% !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        z-index: 50 !important;
+      }
+      #catch-mystery-overlay {
+        top: 43% !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+      }
+      #catching-avatar-container {
+        position: absolute !important;
+        width: 200px !important;
+        height: 260px !important;
+        bottom: 0px !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+        z-index: 60 !important;
       }
     }
 
@@ -742,41 +875,55 @@
     .color-picker-group {
       display: flex;
       flex-direction: column;
-      gap: 15px;
-      margin-bottom: 25px;
+      gap: 10px;
+      margin-bottom: 16px;
+      background: #f8fafc;
+      padding: 12px 10px;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-sizing: border-box;
+      width: 100%;
     }
 
     .color-option {
       display: flex;
       align-items: center;
-      gap: 15px;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
     }
 
     .color-option label {
-      width: 80px;
+      width: 48px;
       font-weight: 800;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--text-light);
+      text-align: left;
+      flex-shrink: 0;
+      letter-spacing: 0.5px;
     }
 
     .color-swatches {
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: nowrap;
     }
 
     .color-swatch {
-      width: 25px;
-      height: 25px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       border: 2px solid white;
-      box-shadow: 0 0 0 1px #e2e8f0;
+      box-shadow: 0 0 0 1px #cbd5e1;
       cursor: pointer;
+      flex-shrink: 0;
       transition: transform 0.2s;
     }
 
-    .color-swatch:hover { transform: scale(1.2); }
-    .color-swatch.active { box-shadow: 0 0 0 2px var(--primary); transform: scale(1.1); }
+    .color-swatch:hover { transform: scale(1.15); }
+    .color-swatch.active { box-shadow: 0 0 0 3px var(--primary); transform: scale(1.12); }
 
     .cat-tabs {
       background: #f1f5f9;
@@ -975,9 +1122,42 @@
     }
 
     @media (max-width: 800px) {
-      .shop-layout { flex-direction: column; }
-      .shop-sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 10px; }
-      .shop-sidebar-btn { white-space: nowrap; }
+      .shop-layout { flex-direction: column !important; gap: 10px !important; }
+      .shop-sidebar {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        padding: 6px 2px !important;
+        gap: 6px !important;
+        background: transparent !important;
+        border: none !important;
+        -webkit-overflow-scrolling: touch;
+      }
+      .shop-sidebar > div {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 6px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+      }
+      .shop-sidebar label {
+        display: none !important;
+      }
+      .shop-sidebar-btn {
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+        padding: 8px 14px !important;
+        font-size: 0.8rem !important;
+        border-radius: 12px !important;
+        width: auto !important;
+      }
+      .shop-main {
+        min-height: 250px !important;
+        padding: 10px !important;
+      }
     }
   </style>
 </head>
@@ -1069,7 +1249,7 @@
           <button id="gear-tab-sets" style="width: auto; font-size: 0.7rem; padding: 5px 15px;">Sets</button>
           <button id="gear-tab-treasures" style="width: auto; font-size: 0.7rem; padding: 5px 15px; background: var(--accent); border-color: #059669; color: white;">Become Treasure</button>
         </div>
-        <div id="my-gear-list" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding-bottom: 10px;"></div>
+        <div id="my-gear-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 10px; padding-bottom: 10px;"></div>
       </div>      
       <button id="save-avatar-btn" class="primary" style="border-radius:20px; padding:15px 40px; width:auto; margin:0 auto;">Save Avatar</button>
     </div>
@@ -1104,8 +1284,8 @@
 
     <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 15px;">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-        <button id="mode-listen" class="active" style="padding: 12px 5px; font-size: 0.75rem;">LISTEN</button>
-        <button id="mode-talk" style="padding: 12px 5px; font-size: 0.75rem;">TALK</button>
+        <button id="mode-listen" style="padding: 12px 5px; font-size: 0.75rem;">LISTEN</button>
+        <button id="mode-talk" class="active" style="padding: 12px 5px; font-size: 0.75rem;">TALK</button>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
@@ -1145,8 +1325,8 @@
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-        <button id="english-btn" class="active" style="padding: 10px; font-size: 0.75rem;">ENG</button>
-        <button id="french-btn" style="padding: 10px; font-size: 0.75rem;">FRA</button>
+        <button id="english-btn" style="padding: 10px; font-size: 0.75rem;">ENG</button>
+        <button id="french-btn" class="active" style="padding: 10px; font-size: 0.75rem;">FRA</button>
       </div>
 
       <div style="border-top: 2px solid #e2e8f0; padding-top: 15px; display: flex; flex-direction: column; gap: 8px;">
@@ -1161,72 +1341,74 @@
     <h2 style="margin-top: 20px; font-family: 'Outfit';">dyslexiquest.com</h2>
   </div>
 
-  <div id="start-overlay" style="display:none; background: rgba(253, 253, 253, 0.98); z-index: 9999;">
-    <h1 style="font-family: 'Outfit'; margin-bottom: 20px; color: var(--primary);">Welcome to dyslexiquest.com!</h1>
-    
-    <div id="profile-select-view" style="width: 100%; max-width: 400px; display: none; text-align: left; margin: auto;">
-      <h3 style="margin-bottom: 15px; color: var(--text);">Who is playing?</h3>
-      <div id="profile-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; max-height: 300px; overflow-y: auto;"></div>
-      <button id="show-new-profile-btn" style="background: transparent; color: var(--primary); border: 2px dashed var(--primary);">+ New Player</button>
-    </div>
-
-    <div id="profile-create-view" style="width: 100%; max-width: 400px; text-align: left; margin: auto;">
-      <!-- Step 1: Name -->
-      <div id="create-step-1">
-        <h3 style="margin-bottom: 15px; color: var(--text);">What is your name, adventurer?</h3>
-        <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
-          <div style="width: 80px; height: 80px; background: #f8fafc; border-radius: 20px; border: 2px solid #e2e8f0; overflow: hidden; flex-shrink: 0;">
-            <model-viewer id="name-step-avatar-preview" src="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width: 100%; height: 100%;" autoplay animation-name="Idle"></model-viewer>
-          </div>
-          <input type="text" id="new-player-name" placeholder="Type name..." style="flex-grow: 1; padding: 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-family: inherit; font-size: 1.1rem; box-sizing: border-box;" autocomplete="off" />
-        </div>
-        <button id="next-to-avatar-btn" class="primary" style="padding: 18px; border-radius: 15px;">NEXT →</button>
+  <div id="start-overlay" style="display:none;">
+    <div class="start-card">
+      <h1>Welcome to DyslexiQuest!</h1>
+      
+      <div id="profile-select-view" style="width: 100%; display: none; text-align: left;">
+        <h3 style="margin-bottom: 12px; color: var(--text); font-size: 1.1rem;">Who is playing?</h3>
+        <div id="profile-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; max-height: 250px; overflow-y: auto;"></div>
+        <button id="show-new-profile-btn" style="background: transparent; color: var(--primary); border: 2px dashed var(--primary); padding: 12px;">+ New Player</button>
       </div>
 
-      <!-- Step 1.5: Avatar Customization -->
-      <div id="create-step-avatar" style="display: none;">
-        <h3 style="margin-bottom: 10px; color: var(--text);">Customize Your Hero!</h3>
-        
-        <div class="lang-toggle" style="margin-bottom: 15px;">
-          <button id="avatar-gender-male" class="active">BOY</button>
-          <button id="avatar-gender-female">GIRL</button>
+      <div id="profile-create-view" style="width: 100%; text-align: left;">
+        <!-- Step 1: Name -->
+        <div id="create-step-1">
+          <h3 style="margin-bottom: 12px; color: var(--text); font-size: 1.05rem;">What is your name, adventurer?</h3>
+          <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 16px;">
+            <div style="width: 64px; height: 64px; background: #f8fafc; border-radius: 16px; border: 2px solid #e2e8f0; overflow: hidden; flex-shrink: 0;">
+              <model-viewer id="name-step-avatar-preview" src="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" style="width: 100%; height: 100%;" autoplay animation-name="Idle"></model-viewer>
+            </div>
+            <input type="text" id="new-player-name" placeholder="Type name..." style="flex: 1; padding: 12px 14px; border-radius: 14px; border: 2px solid #cbd5e1; font-family: inherit; font-size: 1rem; box-sizing: border-box; min-width: 0;" autocomplete="off" />
+          </div>
+          <button id="next-to-avatar-btn" class="primary" style="padding: 14px; border-radius: 16px; font-size: 1rem;">NEXT →</button>
         </div>
 
-        <div style="height: 180px; margin-bottom: 15px; background: #f8fafc; border-radius: 20px;">
-          <model-viewer id="create-avatar-preview" shadow-intensity="1" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" autoplay animation-name="Idle" style="width:100%; height:100%;"></model-viewer>
+        <!-- Step 1.5: Avatar Customization -->
+        <div id="create-step-avatar" style="display: none;">
+          <h3 style="margin-bottom: 10px; color: var(--text); font-size: 1.05rem;">Customize Your Hero!</h3>
+          
+          <div class="lang-toggle" style="margin-bottom: 12px;">
+            <button id="avatar-gender-male" class="active" style="padding: 10px; font-size: 0.95rem;">BOY</button>
+            <button id="avatar-gender-female" style="padding: 10px; font-size: 0.95rem;">GIRL</button>
+          </div>
+
+          <div style="height: 140px; margin-bottom: 12px; background: #f8fafc; border-radius: 16px; border: 2px solid #e2e8f0; overflow: hidden;">
+            <model-viewer id="create-avatar-preview" shadow-intensity="1" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" autoplay animation-name="Idle" style="width:100%; height:100%;"></model-viewer>
+          </div>
+
+          <div class="color-picker-group">
+            <div class="color-option">
+              <label>SKIN</label>
+              <div id="skin-colors" class="color-swatches"></div>
+            </div>
+            <div class="color-option">
+              <label>HAIR</label>
+              <div id="hair-colors" class="color-swatches"></div>
+            </div>
+            <div class="color-option">
+              <label>EYES</label>
+              <div id="eye-colors" class="color-swatches"></div>
+            </div>
+          </div>
+
+          <button id="next-to-lang-btn" class="primary" style="padding: 14px; border-radius: 16px; font-size: 1rem;">NEXT →</button>
+          <button id="back-to-name-btn" style="background: transparent; color: var(--text-light); margin-top: 8px; border: none; font-size: 0.85rem; width: 100%; padding: 6px;">← Back</button>
         </div>
 
-        <div class="color-picker-group">
-          <div class="color-option">
-            <label>SKIN</label>
-            <div id="skin-colors" class="color-swatches"></div>
+        <!-- Step 2: Language -->
+        <div id="create-step-2" style="display: none;">
+          <h3 style="margin-bottom: 12px; color: var(--text); font-size: 1.05rem;">Pick a language!</h3>
+          <div class="lang-toggle" style="margin-bottom: 16px;">
+            <button id="new-player-en" style="padding: 14px; font-size: 0.95rem;">🇺🇸 ENGLISH</button>
+            <button id="new-player-fr" class="active" style="padding: 14px; font-size: 0.95rem;">🇫🇷 FRENCH</button>
           </div>
-          <div class="color-option">
-            <label>HAIR</label>
-            <div id="hair-colors" class="color-swatches"></div>
-          </div>
-          <div class="color-option">
-            <label>EYES</label>
-            <div id="eye-colors" class="color-swatches"></div>
-          </div>
+          <button id="create-player-btn" class="primary" style="padding: 16px; font-size: 1.1rem; border-radius: 18px;">START ADVENTURE!</button>
+          <button id="back-to-avatar-btn" style="background: transparent; color: var(--text-light); margin-top: 8px; border: none; font-size: 0.85rem; width: 100%; padding: 6px;">← Go Back</button>
         </div>
 
-        <button id="next-to-lang-btn" class="primary" style="padding: 18px; border-radius: 15px;">NEXT →</button>
-        <button id="back-to-name-btn" style="background: transparent; color: var(--text-light); margin-top: 10px; border: none; font-size: 0.9rem; width: 100%;">← Back</button>
+        <button id="cancel-new-profile-btn" style="background: transparent; color: var(--text-light); margin-top: 12px; border: none; font-size: 0.9rem; width: 100%; display: none;">Cancel</button>
       </div>
-
-      <!-- Step 2: Language -->
-      <div id="create-step-2" style="display: none;">
-        <h3 style="margin-bottom: 15px; color: var(--text);">Pick a language!</h3>
-        <div class="lang-toggle" style="margin-bottom: 25px;">
-          <button id="new-player-en" class="active" style="padding: 20px;">ENGLISH</button>
-          <button id="new-player-fr" style="padding: 20px;">FRENCH</button>
-        </div>
-        <button id="create-player-btn" class="primary" style="padding: 20px; font-size: 1.2rem; border-radius: 20px;">START ADVENTURE!</button>
-        <button id="back-to-avatar-btn" style="background: transparent; color: var(--text-light); margin-top: 15px; border: none; font-size: 0.9rem; width: 100%;">← Go Back</button>
-      </div>
-
-      <button id="cancel-new-profile-btn" style="background: transparent; color: var(--text-light); margin-top: 20px; border: none; font-size: 1rem; width: 100%; display: none;">Cancel</button>
     </div>
   </div>
 
@@ -1297,37 +1479,41 @@
   </div>
 
   <!-- Catching Screen -->
-  <div id="catching-screen" class="collection-screen" style="display:none; padding: 0; background: #bae6fd; overflow: hidden;">
+  <div id="catching-screen" class="collection-screen" style="display:none; padding: 0; background: #bae6fd; overflow: hidden; position: fixed; inset: 0;">
     <!-- Three.js Canvas Container -->
     <div id="catching-canvas-container" style="position: absolute; inset: 0; z-index: 1;"></div>
 
-    <!-- Cartoon Grass Ground (Keep for baseline) -->
-    <div class="dirt-ground" style="background: #4ade80; border-top: 8px solid #22c55e; height: 100px; z-index: 4;"></div>
+    <!-- Cartoon Grass Ground -->
+    <div class="dirt-ground" style="background: #4ade80; border-top: 8px solid #22c55e; height: 120px; z-index: 4; position: absolute; bottom: 0; left: 0; right: 0;"></div>
 
     <div id="capture-cloud" class="capture-cloud" style="display:none; width: 300px; height: 150px; background: transparent; filter: none;"></div>    
-    <!-- Avatar and Treasure Positioning with Comic Outline -->
-    <!-- Treasure Bottom Left - Sit on top of grass -->
-    <div id="catch-mystery-overlay" style="display:none; position: absolute; bottom: 220px; left: 15%; width: 250px; text-align: center; font-size: 5rem; z-index: 105; pointer-events: none; text-shadow: 0 0 20px white;">❓</div>
-    <model-viewer id="catch-model" src="" style="position: absolute; width: 350px; height: 350px; bottom: 50px; left: 5%; z-index: 100; filter: drop-shadow(0 0 15px white);" disable-zoom camera-orbit="0deg 75deg 4m" interaction-prompt="none"></model-viewer>
     
-    <!-- Player Avatar Bottom Right - Positioned lower to sit on grass -->
-    <div id="catching-avatar-container" style="position: absolute; width: 300px; height: 400px; bottom: 20px; right: 0%; z-index: 100;">
+    <!-- Mystery Overlay -->
+    <div id="catch-mystery-overlay" style="display:none; position: absolute; top: 26%; left: 50%; transform: translateX(-50%); width: 250px; text-align: center; font-size: 4rem; z-index: 105; pointer-events: none; text-shadow: 0 0 20px white;">❓</div>
+    
+    <!-- Wild Animal: Centered in Upper-Center -->
+    <model-viewer id="catch-model" src="" style="position: absolute; width: 240px; height: 240px; top: 22%; left: 50%; transform: translateX(-50%); z-index: 50; filter: drop-shadow(0 0 15px white);" disable-zoom camera-orbit="0deg 75deg 3.5m" interaction-prompt="none"></model-viewer>
+    
+    <!-- Player Avatar: Bottom-Center facing forward/up -->
+    <div id="catching-avatar-container" style="position: absolute; width: 220px; height: 280px; bottom: 0; left: 50%; transform: translateX(-50%); z-index: 60;">
       <model-viewer id="catching-player-avatar" src="" style="width: 100%; height: 100%; filter: drop-shadow(0 0 10px white);" disable-zoom camera-orbit="0deg 75deg 5m" autoplay animation-name="Idle"></model-viewer>
     </div>
 
-    <div id="catching-content" class="collection-content" style="max-width: 600px; z-index: 1000; margin-top: 20px; margin-bottom: auto; background: rgba(255, 255, 255, 0.9); border: 4px solid #3b82f6; border-radius: 32px; padding: 20px; box-shadow: 0 20px 0 rgba(59, 130, 246, 0.2); backdrop-filter: blur(5px); position: relative;">
-      <h2 style="font-family:'Outfit'; font-size: 2.2rem; color: #3b82f6; margin-bottom: 5px; text-shadow: 2px 2px 0 white;">✨ A Wild Animal! ✨</h2>
-      <p id="catch-instruction" style="color:var(--text); margin-bottom: 20px; font-weight: 600;">Complete the challenge to power up your capture!</p>
+    <!-- Challenge / Action Box -->
+    <div id="catching-content" class="collection-content" style="max-width: 500px; width: 92%; z-index: 200; margin-top: 15px; margin-bottom: auto; background: rgba(255, 255, 255, 0.92); border: 3px solid #3b82f6; border-radius: 28px; padding: 14px 18px; box-shadow: 0 15px 0 rgba(59, 130, 246, 0.2); backdrop-filter: blur(8px); position: relative; transition: opacity 0.3s ease;">
+      <h2 style="font-family:'Outfit'; font-size: 1.8rem; color: #3b82f6; margin-bottom: 2px; text-shadow: 1px 1px 0 white; text-align: center;">✨ A Wild Animal! ✨</h2>
+      <p id="catch-instruction" style="color:var(--text); margin-bottom: 12px; font-weight: 600; font-size: 0.85rem; text-align: center;">Complete the challenge to power up your capture!</p>
 
-      <div id="catch-challenge-area" style="background: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 24px; margin-bottom: 20px;">
-        <div id="catch-word-prompt" style="font-family:'Outfit'; font-size: 1.8rem; font-weight: 800; margin-bottom: 15px; color: var(--text);">Powering up...</div>
-        <button id="catch-speak-btn" class="accent" style="width: auto; margin: 0 auto 15px; padding: 8px 20px; border-radius: 50px; font-size: 0.9rem; display: block;">🔊 Listen Again</button>
-        <div id="catch-game-area" class="game-area" style="margin-top: 0; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;"></div>
+      <div id="catch-challenge-area" style="background: rgba(255, 255, 255, 0.85); padding: 12px; border-radius: 20px; margin-bottom: 10px;">
+        <div id="catch-word-prompt" style="font-family:'Outfit'; font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; color: var(--text); text-align: center;">Listen and Find!</div>
+        <button id="catch-speak-btn" class="accent" style="width: auto; margin: 0 auto 10px; padding: 6px 18px; border-radius: 50px; font-size: 0.85rem; display: block;">🔊 Listen Again</button>
+        <div id="catch-game-area" class="game-area" style="margin-top: 0; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;"></div>
       </div>
 
-      <div id="capture-action-area" style="display: none; margin-bottom: 20px;">
-        <button id="shoot-power-btn" class="charge-button" style="background: #3b82f6; border: none; padding: 15px 30px; font-weight: 800; color: white; border-radius: 50px; cursor: pointer;">🕸️ CAPTURE! 🕸️</button>
-      </div>    </div>
+      <div id="capture-action-area" style="display: none; margin: 10px 0; text-align: center;">
+        <button id="shoot-power-btn" class="charge-button" style="background: #3b82f6; border: none; padding: 14px 30px; font-weight: 800; color: white; border-radius: 50px; cursor: pointer; font-size: 1.1rem; width: auto; margin: 0 auto; box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);">🕸️ CAPTURE! 🕸️</button>
+      </div>
+    </div>
   </div>
 
   <!-- Battle Mode Selection Screen -->
@@ -1461,13 +1647,14 @@
   <!-- DyslexiShop Screen -->
   <div id="shop-screen" class="collection-screen" style="display:none">
     <div id="shop-content" class="collection-content" style="max-width: 1000px; position: relative;">
-      <!-- Shop Money Display -->
-      <div style="position: absolute; top: 20px; right: 30px; background: white; padding: 10px 20px; border-radius: 20px; border: 3px solid #f59e0b; font-weight: 800; font-size: 1.2rem; color: #f59e0b; box-shadow: 4px 4px 0 rgba(0,0,0,0.1); z-index: 100;">
-        🪙 <span id="shop-coins-display">0</span>
+      <!-- Shop Header & Coins Display -->
+      <div class="shop-header-row" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 8px;">
+        <h2 style="font-size: 2.4rem; margin: 0; font-family:'Outfit'; color: #f59e0b;">DyslexiShop</h2>
+        <div style="background: white; padding: 6px 16px; border-radius: 20px; border: 3px solid #f59e0b; font-weight: 800; font-size: 1.1rem; color: #f59e0b; box-shadow: 2px 2px 0 rgba(0,0,0,0.1); display: inline-flex; align-items: center; gap: 6px;">
+          🪙 <span id="shop-coins-display">0</span>
+        </div>
       </div>
-
-      <h2 style="font-size:3em;margin-bottom:10px; font-family:'Outfit'; color: #f59e0b;">DyslexiShop</h2>
-      <p style="color:var(--text-light); margin-bottom:20px;">Sell treasures for 🪙 or buy hero gear!</p>
+      <p style="color:var(--text-light); margin: 0 0 15px 0;">Sell treasures for 🪙 or buy hero gear!</p>
 
       <div class="shop-layout">
         <aside class="shop-sidebar">
@@ -1532,14 +1719,16 @@
   </div>
 
   <!-- model-viewer (3-D animals) -->
-  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <script type="module" src="lib/model-viewer.min.js"></script>
 
   <!-- Three.js for 3D Battle Arena -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="lib/three.min.js"></script>
+  <script src="lib/GLTFLoader.js"></script>
+
+  <!-- Android Speech Recognition Bridge -->
+  <script src="speech-bridge.js"></script>
 
   <!-- Game logic -->
   <script src="game.js"></script>
-
 </body>
 </html>

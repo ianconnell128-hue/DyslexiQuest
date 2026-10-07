@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Generated web bundle for Capacitor (built from the project root by scripts/build-web.sh)
+www/
+
+# Android build outputs & local config (android/.gitignore covers most of this too)
+*.apk
+*.aab
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+
+# Signing keys & secrets - NEVER commit these
+*.keystore
+*.jks
+keystore.properties
+.env
+devlog-server/.key
+
+# Remote debug logs
+devlogs/
+
+# Release staging
+dist/
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/

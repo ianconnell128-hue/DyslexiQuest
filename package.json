@@ -1,0 +1,15 @@
+{
+  "name": "dyslexiquest",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DyslexiQuest - Interactive Reading & Speech Game",
+  "scripts": {
+    "sync": "cap sync",
+    "copy": "cap copy"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^7.6.9",
+    "@capacitor/core": "^8.5.2"
+  }
+}

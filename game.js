@@ -267,7 +267,7 @@ function parseLevels(text) {
 class Game {
   constructor() {
     this.level = 1; this.score = 0; this.streak = 0; this.xp = 0; this.maxXP = 5;
-    this.isFrench = false; this.isTalkMode = false; this.micGranted = false; this.micTested = false; this.isTestMode = false;
+    this.isFrench = true; this.isTalkMode = true; this.micGranted = false; this.micTested = false; this.isTestMode = false;
     this.targetWord = null; this.unlockedAnimals = []; this.currentPool = []; this.selectedVoiceURI = null;
     this.gender = 'male';
     this.avatarModel = AVATAR_MODELS.male; this.nextUnlockLevel = 1;
@@ -334,9 +334,11 @@ class Game {
         const feedbackId = this.isTestMode ? 'mic-test-feedback' : 'speech-feedback';
         const feedback = document.getElementById(feedbackId);
         if (feedback) {
-          if (event.error === 'no-speech') feedback.textContent = "No speech detected. Try again!";
-          else if (event.error === 'not-allowed') feedback.textContent = "Mic access blocked!";
-          else feedback.textContent = `Error: ${event.error}`;
+          if (event.error === 'no-speech') feedback.textContent = "No speech heard. Tap mic to speak!";
+          else if (event.error === 'not-allowed') feedback.textContent = "Mic access blocked! Please enable in settings.";
+          else if (event.error === 'busy') feedback.textContent = "Mic busy. Tap to try again!";
+          else if (event.error === 'network') feedback.innerHTML = '<span style="color:var(--secondary)">Tap mic to speak! 🎤</span>';
+          else feedback.textContent = "Tap mic to speak!";
         }
         const targetId = this.isTestMode ? 'mic-test-btn' : 'mic-btn';
         const micBtn = document.getElementById(targetId);
@@ -363,7 +365,69 @@ class Game {
     }
   }
 
-  playSFX(name) { if (this.sounds[name]) { this.sounds[name].currentTime = 0; this.sounds[name].play().catch(() => {}); } }
+  playSFX(name) {
+    let played = false;
+    if (this.sounds[name]) {
+      try {
+        this.sounds[name].currentTime = 0;
+        const p = this.sounds[name].play();
+        if (p) {
+          p.then(() => { played = true; }).catch(() => { this.synthSFX(name); });
+        } else {
+          played = true;
+        }
+      } catch(e) {
+        this.synthSFX(name);
+      }
+    } else {
+      this.synthSFX(name);
+    }
+  }
+
+  synthSFX(name) {
+    try {
+      const ctx = this.audioCtx || (this.audioCtx = new (window.AudioContext || window.webkitAudioContext)());
+      if (ctx.state === 'suspended') ctx.resume();
+      const now = ctx.currentTime;
+      if (name === 'click') {
+        const osc = ctx.createOscillator(), g = ctx.createGain();
+        osc.frequency.setValueAtTime(800, now);
+        g.gain.setValueAtTime(0.15, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+        osc.connect(g); g.connect(ctx.destination);
+        osc.start(now); osc.stop(now + 0.05);
+      } else if (name === 'correct') {
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+          const osc = ctx.createOscillator(), g = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + i * 0.08);
+          g.gain.setValueAtTime(0.2, now + i * 0.08);
+          g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.2);
+          osc.connect(g); g.connect(ctx.destination);
+          osc.start(now + i * 0.08); osc.stop(now + i * 0.08 + 0.2);
+        });
+      } else if (name === 'wrong') {
+        const osc = ctx.createOscillator(), g = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(140, now + 0.25);
+        g.gain.setValueAtTime(0.18, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.connect(g); g.connect(ctx.destination);
+        osc.start(now); osc.stop(now + 0.25);
+      } else if (name === 'levelUp') {
+        [440, 554.37, 659.25, 880, 1108.73].forEach((freq, i) => {
+          const osc = ctx.createOscillator(), g = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + i * 0.1);
+          g.gain.setValueAtTime(0.25, now + i * 0.1);
+          g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.35);
+          osc.connect(g); g.connect(ctx.destination);
+          osc.start(now + i * 0.1); osc.stop(now + i * 0.1 + 0.35);
+        });
+      }
+    } catch(e) {}
+  }
   hideLoading() { const el = document.getElementById('loading-overlay'); if (el) el.style.display = 'none'; }
 
   async loadWordFiles() {
@@ -465,9 +529,12 @@ class Game {
     }
     this.currentUser = id;
     this.level = u.level || 1; this.score = u.score || 0; this.streak = u.streak || 0; this.xp = u.xp || 0;
-    this.maxXP = 5 + (this.level - 1) * 5; this.isFrench = u.isFrench || false;
+    this.maxXP = 5 + (this.level - 1) * 5;
+    this.isFrench = (u.isFrench !== undefined) ? u.isFrench : true;
+    this.isTalkMode = (u.isTalkMode !== undefined) ? u.isTalkMode : true;
     this.unlockedAnimals = u.unlockedAnimals || []; this.selectedVoiceURI = u.selectedVoiceURI || null;
-    this.micTested = u.micTested || false;
+    this.micGranted = (u.micGranted !== undefined) ? u.micGranted : Boolean(window.AndroidSpeechBridge);
+    this.micTested = (u.micTested !== undefined) ? u.micTested : Boolean(window.AndroidSpeechBridge);
     this.gender = u.gender || 'male';
     this.avatarModel = u.avatarModel || AVATAR_MODELS.male;
     this.coins = u.coins || 0;
@@ -493,14 +560,18 @@ class Game {
   }
 
   createProfile() {
-    const name = document.getElementById('new-player-name').value.trim(); if (!name) return;
+    const name = document.getElementById('new-player-name').value.trim() || 'Adventurer';
     const id = Date.now().toString();
+    const isFr = document.getElementById('new-player-fr') ? document.getElementById('new-player-fr').classList.contains('active') : true;
     
-    // START WITH FRESH DEFAULTS for new profiles
+    // START WITH FRESH DEFAULTS for new profiles (Default to French and Talk mode)
     this.users[id] = {
       name: name, level: 1, score: 0, streak: 0, xp: 0,
-      isFrench: document.getElementById('new-player-en').classList.contains('active'),
-      unlockedAnimals: [], selectedVoiceURI: null, micTested: false,
+      isFrench: isFr,
+      isTalkMode: true,
+      unlockedAnimals: [], selectedVoiceURI: null,
+      micGranted: Boolean(window.AndroidSpeechBridge),
+      micTested: Boolean(window.AndroidSpeechBridge),
       gender: this.gender, avatarModel: this.avatarModel,
       coins: 0, unlockedAvatars: ['set_0m', 'set_0f'], 
       avatarColors: { skin: COLORS.skin[0], hair: COLORS.hair[0], eye: COLORS.eye[0] },
@@ -515,7 +586,9 @@ class Game {
     const profile = {
       level: this.level, score: this.score, streak: this.streak, xp: this.xp,
       cloudCode: this.users[this.currentUser].cloudCode,
-      isFrench: this.isFrench, unlockedAnimals: this.unlockedAnimals,
+      isFrench: this.isFrench,
+      isTalkMode: this.isTalkMode,
+      unlockedAnimals: this.unlockedAnimals,
       selectedVoiceURI: this.selectedVoiceURI, micTested: this.micTested,
       gender: this.gender, avatarModel: this.avatarModel,
       coins: this.coins, unlockedAvatars: this.unlockedAvatars, avatarColors: this.avatarColors,
@@ -808,6 +881,12 @@ class Game {
     this.updateStats(); this.updateCollectionButton(); this.populateVoiceList(); 
     this.checkDailyRefresh(); this.updateGameplayVisuals(); this.setFont(this.dyslexicFont);
     this.setMusic(this.musicEnabled);
+    document.getElementById('new-player-en')?.classList.toggle('active', !this.isFrench);
+    document.getElementById('new-player-fr')?.classList.toggle('active', this.isFrench);
+    document.getElementById('english-btn')?.classList.toggle('active', !this.isFrench);
+    document.getElementById('french-btn')?.classList.toggle('active', this.isFrench);
+    document.getElementById('mode-listen')?.classList.toggle('active', !this.isTalkMode);
+    document.getElementById('mode-talk')?.classList.toggle('active', this.isTalkMode);
     
     try {
       const res = await fetch('https://api.ipify.org?format=json');
@@ -920,6 +999,13 @@ class Game {
     const text = testWord || (this.targetWord ? this.targetWord.word : null); if (!text) return;
     const speakBtn = document.getElementById('speak-btn'); if (speakBtn) { speakBtn.classList.add('listen-pulse'); setTimeout(() => speakBtn.classList.remove('listen-pulse'), 2000); }
     if (this.currentAudio) { this.currentAudio.pause(); this.currentAudio = null; }
+
+    // Direct Native Android TextToSpeech
+    if (window.AndroidSpeechBridge && typeof window.AndroidSpeechBridge.speakText === 'function') {
+      window.AndroidSpeechBridge.speakText(text, this.isFrench ? 'fr' : 'en', 0.8, 1.05);
+      return;
+    }
+
     const sysSpeak = () => {
       if (!window.speechSynthesis) return; window.speechSynthesis.cancel();
       const msg = new SpeechSynthesisUtterance(text); msg.lang = this.isFrench ? 'fr-FR' : 'en-US';
@@ -1000,9 +1086,18 @@ class Game {
   }
 
   handleSpeechResult(t) {
-    const target = this.targetWord.word.toLowerCase(), fb = document.getElementById('speech-feedback');
+    const rawTarget = this.targetWord ? this.targetWord.word : '';
+    const clean = s => (s || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "").trim();
+    const cleanT = clean(t);
+    const cleanTarget = clean(rawTarget);
+    const fb = document.getElementById('speech-feedback');
     if (fb) fb.innerHTML = `I heard: <b style="color:var(--primary)">"${t}"</b>`;
-    if (t === target || t.includes(target)) {
+
+    const isMatch = cleanT === cleanTarget || 
+                    cleanT.includes(cleanTarget) || 
+                    (cleanT.length >= 3 && cleanTarget.includes(cleanT));
+
+    if (isMatch) {
       this.playSFX('correct'); this.streak++; this.score += 150; this.xp += 5;
       this.updateQuestProgress('correct_words', 1);
       this.updateQuestProgress('use_talk', 1);
@@ -1113,12 +1208,16 @@ class Game {
       this.updateQuestProgress('correct_words', 1);
       this.updateQuestProgress('streak', this.streak);
       this.triggerAvatarReaction('correct');
-      this.score += 100; this.updateStats(); this.saveProfile(); setTimeout(() => this.levelUpOrNext(), 1500);
+      this.score += 100; this.updateStats(); this.saveProfile(); setTimeout(() => this.levelUpOrNext(), 750);
     } else {
-      this.streak = 0; this.canClick = false; this.playSFX('wrong'); card.style.opacity = '0.3';
+      this.streak = 0; this.playSFX('wrong');
+      card.style.opacity = '0.35';
+      card.style.pointerEvents = 'none';
+      card.classList.add('wrong-shake');
       this.triggerAvatarReaction('wrong');
-      document.getElementById('game-area').style.opacity = '0.6';
-      setTimeout(() => { this.canClick = true; document.getElementById('game-area').style.opacity = '1'; this.speak(); }, 1500);
+      // Rapid tap debounce without locking the rest of the board for 1.5s
+      this.canClick = false;
+      setTimeout(() => { this.canClick = true; }, 250);
     }
   }
 
@@ -2502,6 +2601,8 @@ class Game {
       model.src = animal.model;
       model.style.opacity = '1';
       model.classList.remove('powered-up');
+      model.style.transform = 'translateX(-50%)';
+      model.style.transition = 'none';
       const mysteryOverlay = document.getElementById('catch-mystery-overlay');
       if (animal.name === 'Mystery Box') {
         model.style.filter = 'sepia(1) hue-rotate(-50deg) saturate(3) brightness(0.6) drop-shadow(0 0 10px white)';
@@ -2513,7 +2614,15 @@ class Game {
     }
     if (avatar) {
       avatar.src = this.avatarModel || AVATAR_MODELS.male;
-      avatar.style.right = '0%'; // Reset position
+      avatar.setAttribute('camera-orbit', '0deg 75deg 5m');
+      avatar.animationName = 'Idle';
+      avatar.classList.remove('anim-power');
+    }
+
+    const content = document.getElementById('catching-content');
+    if (content) {
+      content.style.opacity = '1';
+      content.style.pointerEvents = 'auto';
     }
     
     if (challengeArea) challengeArea.style.display = 'block';
@@ -2699,7 +2808,7 @@ class Game {
           const model = document.getElementById('catch-model');
           if (model) {
             model.style.transition = 'all 1s ease-in';
-            model.style.transform = 'translateX(-500px) scale(0.5)';
+            model.style.transform = 'translateX(calc(-50% - 400px)) scale(0.5)';
             model.style.opacity = '0';
           }
           
@@ -2716,7 +2825,7 @@ class Game {
             if (model) {
               // Reset model styles for next time
               model.style.transition = 'none';
-              model.style.transform = 'none';
+              model.style.transform = 'translateX(-50%)';
               model.style.opacity = '1';
             }
             this.newTarget();
@@ -2732,34 +2841,32 @@ class Game {
     const btn = document.getElementById('shoot-power-btn');
     if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
 
+    const content = document.getElementById('catching-content');
+    if (content) {
+      content.style.opacity = '0';
+      content.style.pointerEvents = 'none';
+    }
+
     const modelViewer = document.getElementById('catch-model');
     const avatarViewer = document.getElementById('catching-player-avatar');
     
-    // 1. "KAMEHAMEHA" STANCE
+    // 1. Channeling stance (facing forward/up towards the wild animal)
     if (avatarViewer) {
-      // Rotate model to face the animal sideways (Fighter Stance)
-      avatarViewer.setAttribute('camera-orbit', '-45deg 75deg 5m');
+      avatarViewer.setAttribute('camera-orbit', '0deg 75deg 5m');
       avatarViewer.animationName = 'Walk'; // Hands forward/active
       avatarViewer.classList.add('anim-power');
     }
 
-    const modelRect = modelViewer.getBoundingClientRect();
-    const avatarRect = avatarViewer.getBoundingClientRect();
-    
-    // 2. INSTANT HIT FLASH (Replaces shooting ball)
-    const startX = avatarRect.left + avatarRect.width * 0.5;
-    const startY = avatarRect.top + avatarRect.height * 0.5;
-    const endX = modelRect.left + modelRect.width * 0.5;
-    const endY = modelRect.top + modelRect.height * 0.5;
-
     this.playSFX('correct');
-    modelViewer.animate([
-      { filter: 'brightness(1)', transform: 'scale(1)' },
-      { filter: 'brightness(3) contrast(0.5)', transform: 'scale(1.1)', offset: 0.1 },
-      { filter: 'brightness(1)', transform: 'scale(1)' }
-    ], { duration: 600 });
+    if (modelViewer) {
+      modelViewer.animate([
+        { filter: 'brightness(1)', transform: 'translateX(-50%) scale(1)' },
+        { filter: 'brightness(3.5) contrast(0.6)', transform: 'translateX(-50%) scale(1.15)', offset: 0.15 },
+        { filter: 'brightness(1)', transform: 'translateX(-50%) scale(1)' }
+      ], { duration: 600 });
+    }
 
-    // Transition immediately to the swirl
+    // Transition immediately to the vortex swirl
     setTimeout(() => {
       this.wrapTreasureInSwirl(animal, modelViewer, avatarViewer);
     }, 400);
@@ -2777,30 +2884,29 @@ class Game {
     modelViewer.style.filter = 'brightness(3) contrast(0.5)';
     setTimeout(() => { modelViewer.style.opacity = '0'; }, 50);
 
-    // 2. CREATE SHAPE PIXELS (120 particles - optimized for mobile performance)
+    // 2. CREATE SHAPE PIXELS (100 particles - smooth 60fps on mobile)
     const particles = [];
-    const particleCount = 120;
+    const particleCount = 100;
     for (let i = 0; i < particleCount; i++) {
       const p = document.createElement('div');
       p.className = 'snow-soul';
       p.style.background = theme.grad;
-      p.style.boxShadow = `0 0 8px #fff`; // Simpler shadow for performance
+      p.style.boxShadow = `0 0 10px #fff, 0 0 18px ${theme.glow || '#7dd3fc'}`;
 
-      const rx = (Math.random() - 0.5) * rect.width * 0.8;
-      const ry = (Math.random() - 0.5) * rect.height * 0.8;
+      const rx = (Math.random() - 0.5) * rect.width * 0.7;
+      const ry = (Math.random() - 0.5) * rect.height * 0.7;
       p.style.left = `${centerX + rx}px`;
       p.style.top = `${centerY + ry}px`;
-      const size = 3 + Math.random() * 5;
+      const size = 4 + Math.random() * 6;
       p.style.width = `${size}px`;
       p.style.height = `${size}px`;
       container.appendChild(p);
       particles.push(p);
     }
 
-    // 3. RAPID MAGICAL STREAM (Hits the avatar's side pocket area)
-    // Adjust target to be visually "inside" the avatar container
+    // 3. VERTICAL VORTEX FUNNEL (Downward from animal at top to avatar at bottom)
     const pocketX = aRect.left + aRect.width * 0.5;
-    const pocketY = aRect.top + aRect.height * 0.5;
+    const pocketY = aRect.top + aRect.height * 0.45;
 
     setTimeout(() => {
       particles.forEach((p, i) => {
@@ -2808,22 +2914,29 @@ class Game {
           const currentX = parseFloat(p.style.left);
           const currentY = parseFloat(p.style.top);
           
-          // Fast trajectory
-          const midX = centerX + (pocketX - centerX) * 0.5 + (Math.sin(i * 0.5) * 80);
-          const midY = centerY - 200 - (Math.random() * 100); 
+          // Funnel spiral geometry:
+          const angle = (i / particleCount) * Math.PI * 6 + (Math.random() * 0.5);
+          const swirlRadius = 45 + Math.random() * 40;
+          const burstX = centerX + Math.cos(angle) * swirlRadius;
+          const burstY = centerY + Math.sin(angle) * (swirlRadius * 0.5) - 15;
+
+          const midRadius = 30 + Math.random() * 25;
+          const midX = (centerX + pocketX) * 0.5 + Math.sin(angle * 1.5) * midRadius;
+          const midY = centerY + (pocketY - centerY) * 0.52;
 
           p.animate([
             { left: `${currentX}px`, top: `${currentY}px`, transform: 'scale(1)', opacity: 1 },
-            { left: `${midX}px`, top: `${midY}px`, transform: 'scale(1.5)', opacity: 1, offset: 0.3 },
+            { left: `${burstX}px`, top: `${burstY}px`, transform: 'scale(1.5)', opacity: 1, offset: 0.2 },
+            { left: `${midX}px`, top: `${midY}px`, transform: 'scale(1.2)', opacity: 0.95, offset: 0.6 },
             { left: `${pocketX}px`, top: `${pocketY}px`, transform: 'scale(0.1)', opacity: 0 }
           ], {
-            duration: 800 + Math.random() * 400, // Fast and energetic
-            easing: 'ease-in',
+            duration: 850 + Math.random() * 350,
+            easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
             fill: 'forwards'
           });
           
           setTimeout(() => p.remove(), 1300);
-        }, Math.floor(i / 3) * 15); // Much faster stagger
+        }, Math.floor(i / 3) * 16);
       });
     }, 50);
 
@@ -2836,7 +2949,6 @@ class Game {
   finalizeCapture(animal, avatarViewer) {
     const mysteryOverlay = document.getElementById('catch-mystery-overlay');
     if (mysteryOverlay) mysteryOverlay.style.display = 'none';
-    avatarViewer.style.right = '0%';
     
     // Reset Avatar Pose & Rotation
     if (avatarViewer) {
@@ -2845,12 +2957,18 @@ class Game {
       avatarViewer.classList.remove('anim-power');
     }
 
+    const content = document.getElementById('catching-content');
+    if (content) {
+      content.style.opacity = '1';
+      content.style.pointerEvents = 'auto';
+    }
+
     setTimeout(() => {
       const screen = document.getElementById('catching-screen');
       if (screen) screen.style.display = 'none';
       
       // Clear glow after transition
-      avatarViewer.classList.remove('anim-power');
+      if (avatarViewer) avatarViewer.classList.remove('anim-power');
 
       // Restore main game elements
       const gameContainer = document.querySelector('.game-container');
@@ -2859,7 +2977,10 @@ class Game {
       if (topBar) topBar.style.visibility = 'visible';
 
       const model = document.getElementById('catch-model');
-      if (model) model.style.opacity = '1';
+      if (model) {
+        model.style.opacity = '1';
+        model.style.transform = 'translateX(-50%)';
+      }
       
       const usedNames = this.unlockedAnimals.map(u => u.petName), availableNames = PET_NAMES.filter(n => !usedNames.includes(n));
       const petName = availableNames[Math.floor(Math.random() * availableNames.length)] || `${animal.name} #${this.unlockedAnimals.length + 1}`;
@@ -3112,8 +3233,23 @@ class Game {
     modal.style.display = 'flex';
   }
 
-  setLang(l) { this.isFrench = (l === 'fr'); this.saveProfile(); this.populateVoiceList(); document.getElementById('new-player-en').classList.toggle('active', !this.isFrench); document.getElementById('new-player-fr').classList.toggle('active', this.isFrench); this.newTarget(); }
-  setMode(m) { this.isTalkMode = (m === 'talk'); document.getElementById('mode-listen').classList.toggle('active', !this.isTalkMode); document.getElementById('mode-talk').classList.toggle('active', this.isTalkMode); this.newTarget(); }
+  setLang(l) {
+    this.isFrench = (l === 'fr');
+    this.saveProfile();
+    this.populateVoiceList();
+    document.getElementById('new-player-en')?.classList.toggle('active', !this.isFrench);
+    document.getElementById('new-player-fr')?.classList.toggle('active', this.isFrench);
+    document.getElementById('english-btn')?.classList.toggle('active', !this.isFrench);
+    document.getElementById('french-btn')?.classList.toggle('active', this.isFrench);
+    this.newTarget();
+  }
+  setMode(m) {
+    this.isTalkMode = (m === 'talk');
+    this.saveProfile();
+    document.getElementById('mode-listen')?.classList.toggle('active', !this.isTalkMode);
+    document.getElementById('mode-talk')?.classList.toggle('active', this.isTalkMode);
+    this.newTarget();
+  }
   reset() { this.level = 1; this.score = 0; this.streak = 0; this.xp = 0; this.maxXP = 5; this.unlockedAnimals = []; this.saveProfile(); this.updateStats(); this.updateCollectionButton(); this.newTarget(); }
 
   bindEvents() {
@@ -3199,9 +3335,9 @@ class Game {
       this.playSFX('click');
       this.speak("Testing, one two three.");
     });
-    document.getElementById('speak-btn')?.addEventListener('click', () => this.speak());
-    document.getElementById('catch-speak-btn')?.addEventListener('click', () => this.speak());
-    document.getElementById('battle-speak-btn')?.addEventListener('click', () => this.speak());
+    document.getElementById('speak-btn')?.addEventListener('click', () => { this.playSFX('click'); this.speak(); });
+    document.getElementById('catch-speak-btn')?.addEventListener('click', () => { this.playSFX('click'); this.speak(); });
+    document.getElementById('battle-speak-btn')?.addEventListener('click', () => { this.playSFX('click'); this.speak(); });
     
     // Arena Button - Robust Listener
     const arenaBtn = document.getElementById('battle-btn');
@@ -3228,9 +3364,9 @@ class Game {
       this.newTarget(); 
     });
     document.getElementById('mic-btn')?.addEventListener('click', () => this.startListening(false));
-    document.getElementById('chest-container')?.addEventListener('click', () => this.showCollectionScreen());
-    document.getElementById('collection-btn')?.addEventListener('click', () => this.showCollectionScreen());
-    document.getElementById('continue-btn')?.addEventListener('click', () => { document.getElementById('level-up-modal').style.display = 'none'; this.checkAnimalUnlock(); });
+    document.getElementById('chest-container')?.addEventListener('click', () => { this.playSFX('click'); this.showCollectionScreen(); });
+    document.getElementById('collection-btn')?.addEventListener('click', () => { this.playSFX('click'); this.showCollectionScreen(); });
+    document.getElementById('continue-btn')?.addEventListener('click', () => { this.playSFX('click'); document.getElementById('level-up-modal').style.display = 'none'; this.checkAnimalUnlock(); });
   }
 }
 

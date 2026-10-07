@@ -1,0 +1,9 @@
+{
+  "appId": "com.dyslexiquest.app",
+  "appName": "DyslexiQuest",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "http",
+    "cleartext": true
+  }
+}
