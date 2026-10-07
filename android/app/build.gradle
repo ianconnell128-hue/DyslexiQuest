@@ -1,15 +1,56 @@
 apply plugin: 'com.android.application'
 
+// ---------------------------------------------------------------------------
+// Versioning: versionCode = number of git commits, so every committed build is
+// strictly newer than the last. Override with -PdqVersionCode=N if needed.
+// ---------------------------------------------------------------------------
+def gitCommitCount = { ->
+    try {
+        def p = ['git', 'rev-list', '--count', 'HEAD'].execute(null, rootProject.projectDir.parentFile)
+        p.waitFor()
+        return p.text.trim().toInteger()
+    } catch (ignored) {
+        return 1
+    }
+}
+def dqVersionCode = project.hasProperty('dqVersionCode') ? project.property('dqVersionCode').toInteger() : gitCommitCount()
+def dqVersionName = project.hasProperty('dqVersionName') ? project.property('dqVersionName') : "0.${dqVersionCode}"
+
+// ---------------------------------------------------------------------------
+// Signing: the DEV key that all existing installs were signed with.
+// Backed up in ~/Documents/DyslexiQuest-signing (see README.txt there).
+// Optional android/keystore.properties (git-ignored) can point elsewhere.
+// ---------------------------------------------------------------------------
+def keystoreProps = new Properties()
+def keystorePropsFile = rootProject.file('keystore.properties')
+if (keystorePropsFile.exists()) { keystorePropsFile.withInputStream { keystoreProps.load(it) } }
+def devKeystore = file(keystoreProps.getProperty('storeFile',
+        "${System.getProperty('user.home')}/Documents/DyslexiQuest-signing/dyslexiquest-dev.keystore"))
+
 android {
     namespace "com.dyslexiquest.app"
     compileSdk rootProject.ext.compileSdkVersion
+    buildFeatures {
+        buildConfig true
+    }
+    signingConfigs {
+        dev {
+            storeFile devKeystore
+            storePassword keystoreProps.getProperty('storePassword', 'android')
+            keyAlias keystoreProps.getProperty('keyAlias', 'androiddebugkey')
+            keyPassword keystoreProps.getProperty('keyPassword', 'android')
+        }
+    }
     defaultConfig {
         applicationId "com.dyslexiquest.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode dqVersionCode
+        versionName dqVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // Where the in-app updater looks for the latest release manifest.
+        buildConfigField "String", "UPDATE_MANIFEST_URL",
+                "\"https://github.com/thundergeek/dyslexiquest-releases/releases/latest/download/latest.json\""
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
@@ -17,9 +58,13 @@ android {
         }
     }
     buildTypes {
+        debug {
+            signingConfig devKeystore.exists() ? signingConfigs.dev : signingConfigs.debug
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig devKeystore.exists() ? signingConfigs.dev : signingConfigs.debug
         }
     }
 }

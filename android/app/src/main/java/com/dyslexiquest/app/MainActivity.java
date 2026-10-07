@@ -39,6 +39,8 @@ public class MainActivity extends BridgeActivity {
     private float pendingRate = 0.85f;
     private float pendingPitch = 1.0f;
 
+    private AppUpdater appUpdater;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +65,13 @@ public class MainActivity extends BridgeActivity {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Continue an update install after the user granted "install unknown apps".
+        if (appUpdater != null) appUpdater.resumeIfPermitted();
+    }
+
     private void checkAndRequestAudioPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSION_RECORD_AUDIO);
@@ -71,6 +80,10 @@ public class MainActivity extends BridgeActivity {
 
     private void setupBridge(WebView webView) {
         webView.addJavascriptInterface(new SpeechInterface(), "AndroidSpeechBridge");
+
+        // In-app updater (sideloaded builds): window.AndroidUpdater
+        if (appUpdater == null) appUpdater = new AppUpdater(this, webView);
+        webView.addJavascriptInterface(appUpdater, "AndroidUpdater");
 
         // Custom WebChromeClient to grant WebRTC / getUserMedia audio capture
         webView.setWebChromeClient(new BridgeWebChromeClient(bridge) {
