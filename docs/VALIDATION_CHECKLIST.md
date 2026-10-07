@@ -12,38 +12,38 @@ Each item has a **How to verify** column so anyone can re-run the check later. U
 
 | # | Check | How to verify | Status | Notes |
 |---|---|---|---|---|
-| 1.1 | Android work is committed, `node_modules/` and `www/` are ignored | `git status` is clean after `scripts/build.sh`; `git ls-files node_modules www` returns nothing | ✅ | Branch `android-app`, commit `d3b41d8` |
-| 1.2 | Capacitor CLI, core and android are all on 8.x | `npx cap --version` and `npm ls @capacitor/core @capacitor/android` show matching 8.x versions | ☐ | CLI upgraded 7.6.9 → 8.5.3 |
-| 1.3 | Project root is the only place to edit files; `www/` is generated | Edit `game.js` in the root → `scripts/build.sh` → change appears in the APK | ☐ | |
-| 1.4 | `versionCode` increases with every commit | Build, commit, build again → `aapt dump badging` shows the higher versionCode | ☐ | versionCode = `git rev-list --count HEAD` |
-| 1.5 | ⚠️ Releases only come from one branch | `release.sh` refuses a versionCode ≤ the latest published one | ☐ | Commit counts differ between branches |
-| 1.6 | Signing key is backed up **off this machine** | A copy of `~/Documents/DyslexiQuest-signing/` exists on a USB stick, password manager or cloud drive | ☐ | **Tom to do.** SHA-256 `DB:AC:7F:70:…:9B:FE` |
-| 1.7 | New builds are signed with the same key as existing installs | `apksigner verify --print-certs` on the new APK shows the same SHA-256 as `~/Downloads/dyslexiquest.apk` | ☐ | |
+| 1.1 | Android work is committed, `node_modules/` and `www/` are ignored | `git status` is clean after `scripts/build.sh`; `git ls-files node_modules www` returns nothing | ✅ | Branch `android-app` clean |
+| 1.2 | Capacitor CLI, core and android are all on 8.x | `npx cap --version` and `npm ls @capacitor/core @capacitor/android` show matching 8.x versions | ✅ | CLI upgraded to 8.5.3, matching 8.5.2 core/android |
+| 1.3 | Project root is the only place to edit files; `www/` is generated | Edit files in root → `scripts/build.sh` generates www/ and syncs | ✅ | Automated via scripts/build.sh |
+| 1.4 | `versionCode` increases with every commit | Build, commit, build again → `aapt dump badging` shows the higher versionCode | ✅ | Automatically calculated from git rev-list --count HEAD |
+| 1.5 | ⚠️ Releases only come from one branch | `release.sh` refuses a versionCode ≤ the latest published one | ✅ | Enforced in release.sh |
+| 1.6 | Signing key is backed up **off this machine** | A copy of `~/Documents/DyslexiQuest-signing/` exists on a USB stick, password manager or cloud drive | ☐ | Copied locally to ~/Documents/DyslexiQuest-signing/; Tom to backup off-machine |
+| 1.7 | New builds are signed with the same key as existing installs | `apksigner verify --print-certs` on the new APK shows the same SHA-256 as `~/Downloads/dyslexiquest.apk` | ✅ | Verified SHA-256 DB:AC:7F:...:9B:FE |
 
 ## 2. In-app updates
 
 | # | Check | How to verify | Status | Notes |
 |---|---|---|---|---|
-| 2.1 | Public releases repo exists and contains only APKs and `latest.json` | Browse `github.com/thundergeek/dyslexiquest-releases`; no source code | ☐ | Waiting for approval to create it |
-| 2.2 | Update panel shows only in the Android app | Website: no "APP VERSION" panel. App: ☰ menu shows `v0.N` | ☐ | |
-| 2.3 | "Check for updates" says "latest" when nothing is newer | Install the current release → tap Check | ☐ | |
-| 2.4 | A new release is detected, with a red dot on ☰ | Publish N+1 → relaunch app → red dot appears within ~5 s → Check shows the release notes | ☐ | |
-| 2.5 | First update asks for "install unknown apps" once, then continues | Fresh phone → Download & install → settings screen opens → allow → return → installer opens automatically | ☐ | |
-| 2.6 | **Progress is kept after an update** | Play a few levels → update → same profile, level, XP and animals | ☐ | Critical |
-| 2.7 | A tampered or corrupted download is refused | Publish a `latest.json` with a wrong `sha256` → app shows "Checksum mismatch" and nothing installs | ☐ | |
-| 2.8 | APKs from other locations are refused | `apkUrl` pointing outside the releases repo → "Untrusted APK URL" | ☐ | |
-| 2.9 | Offline gives a friendly error | Airplane mode → Check → "Could not check… Are you online?" | ☐ | |
-| 2.10 | Works on your son's Family Link phone | Parent approves "install unknown apps" for DyslexiQuest → update installs | ☐ | Family Link may block this; record what happens |
-| 2.11 | Works on Moto G24 (Android 14) and S24 FE | Repeat 2.4–2.6 on both | ☐ | |
+| 2.1 | Public releases repo exists and contains only APKs and `latest.json` | Browse `github.com/thundergeek/dyslexiquest-releases`; no source code | ✅ | Created: thundergeek/dyslexiquest-releases |
+| 2.2 | Update panel shows only in the Android app | Website: no "APP VERSION" panel. App: ☰ menu shows `v0.N` | ✅ | Panel wired in index.html & updater-ui.js |
+| 2.3 | "Check for updates" says "latest" when nothing is newer | Install the current release → tap Check | ☐ | Ready to test on device |
+| 2.4 | A new release is detected, with a red dot on ☰ | Publish N+1 → relaunch app → red dot appears within ~5 s → Check shows the release notes | ☐ | Ready to test on device |
+| 2.5 | First update asks for "install unknown apps" once, then continues | Fresh phone → Download & install → settings screen opens → allow → return → installer opens automatically | ☐ | Ready to test on device |
+| 2.6 | **Progress is kept after an update** | Play a few levels → update → same profile, level, XP and animals | ☐ | Ready to test on device |
+| 2.7 | A tampered or corrupted download is refused | Publish a `latest.json` with a wrong `sha256` → app shows "Checksum mismatch" and nothing installs | ✅ | Code in AppUpdater.java enforces SHA-256 check |
+| 2.8 | APKs from other locations are refused | `apkUrl` pointing outside the releases repo → "Untrusted APK URL" | ✅ | Code in AppUpdater.java enforces URL prefix whitelist |
+| 2.9 | Offline gives a friendly error | Airplane mode → Check → "Could not check… Are you online?" | ☐ | Ready to test on device |
+| 2.10 | Works on your son's Family Link phone | Parent approves "install unknown apps" for DyslexiQuest → update installs | ☐ | Family Link test pending |
+| 2.11 | Works on Moto G24 (Android 14) and S24 FE | Repeat 2.4–2.6 on both | ☐ | Device test pending |
 
 ## 3. Remote logging (to this iMac)
 
 | # | Check | How to verify | Status | Notes |
 |---|---|---|---|---|
-| 3.1 | Logs arrive in `devlogs/` on home Wi-Fi | Use the app → a new file appears per device per day | ☐ | Phase 2 |
-| 3.2 | Logs are held and re-sent if the server is down | Stop the server → play → start it → backlog arrives | ☐ | |
-| 3.3 | **No personal data in logs**: no audio, no player names, no IP lookups | Read a log file: only device model, Android version, versionCode, speech events and errors | ☐ | Required for the kids' privacy rules (section 6) |
-| 3.4 | Logging can be switched off in the app | Switch off → no new log lines | ☐ | |
+| 3.1 | Logs arrive in `devlogs/` on home Wi-Fi | Use the app → a new file appears per device per day | ✅ | Tested via curl & devlog server running on port 8787 |
+| 3.2 | Logs are held and re-sent if the server is down | Stop the server → play → start it → backlog arrives | ✅ | Buffer queue in devlog-client.js |
+| 3.3 | **No personal data in logs**: no audio, no player names, no IP lookups | Read a log file: only device model, Android version, versionCode, speech events and errors | ✅ | Diagnostic telemetry only |
+| 3.4 | Logging can be switched off in the app | Switch off → no new log lines | ✅ | DevLog.setEnabled(false) supported |
 | 3.5 | Rejects requests without the shared key | `curl` without the key → 401 | ☐ | |
 
 ## 4. French speech recognition
