@@ -49,6 +49,6 @@ PY
 
 echo "==> Publishing $TAG to $RELEASES_REPO"
 gh release create "$TAG" "dist/$APK_NAME" dist/latest.json \
-  --repo "$RELEASES_REPO" --title "DyslexiQuest $VERSION_NAME" --notes "$NOTES" --latest
+  --repo "$RELEASES_REPO" --title "DyslexiQuest $VERSION_NAME" --notes "$NOTES"
 
 echo "✓ Released $VERSION_NAME. Phones will see it under ☰ → APP VERSION → Check for updates."
