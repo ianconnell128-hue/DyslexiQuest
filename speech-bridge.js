@@ -31,23 +31,43 @@
   };
 
   // Called from Android MainActivity when speech is recognized
-  window.__onAndroidSpeechResult = function(transcript, isFinal) {
-    console.log("[SpeechBridge] Received result:", transcript, "isFinal:", isFinal);
+  window.__onAndroidSpeechResult = function(rawTranscript, isFinal) {
+    console.log("[SpeechBridge] Received result:", rawTranscript, "isFinal:", isFinal);
     if (!activeRecognition) return;
 
+    let candidates = [];
+    if (typeof rawTranscript === 'string' && rawTranscript.startsWith('[')) {
+      try {
+        const parsed = JSON.parse(rawTranscript);
+        if (Array.isArray(parsed)) candidates = parsed;
+      } catch (e) {
+        candidates = [rawTranscript];
+      }
+    } else if (Array.isArray(rawTranscript)) {
+      candidates = rawTranscript;
+    } else {
+      candidates = [rawTranscript];
+    }
+
+    if (window.DevLog) {
+      window.DevLog.log('SPEECH_RESULT', {
+        isFinal: Boolean(isFinal),
+        candidates: candidates
+      });
+    }
+
     if (typeof activeRecognition.onresult === 'function') {
-      // Build W3C SpeechRecognitionEvent compatible structure
-      const item = {
-        transcript: transcript,
+      // Build W3C SpeechRecognitionEvent compatible structure with all alternatives
+      const alternatives = candidates.map(t => ({
+        transcript: t,
         confidence: 0.95
-      };
-      const result = [item];
-      result.isFinal = Boolean(isFinal);
-      result.length = 1;
+      }));
+      alternatives.isFinal = Boolean(isFinal);
+      alternatives.length = candidates.length;
 
       const event = {
         resultIndex: 0,
-        results: [result]
+        results: [alternatives]
       };
 
       activeRecognition.onresult(event);
@@ -58,8 +78,9 @@
     constructor() {
       this.continuous = false;
       this.interimResults = true;
-      this.maxAlternatives = 1;
+      this.maxAlternatives = 5;
       this.lang = 'en-US';
+      this.hints = [];
       this.onstart = null;
       this.onresult = null;
       this.onerror = null;
@@ -67,16 +88,28 @@
     }
 
     start() {
-      console.log("[SpeechBridge] SpeechRecognition.start() called, lang:", this.lang);
+      console.log("[SpeechBridge] SpeechRecognition.start() called, lang:", this.lang, "hints:", this.hints);
+      if (window.DevLog) {
+        window.DevLog.log('SPEECH_START', { lang: this.lang, hints: this.hints });
+      }
       activeRecognition = this;
-      if (window.AndroidSpeechBridge && typeof window.AndroidSpeechBridge.startListening === 'function') {
-        window.AndroidSpeechBridge.startListening(this.lang || 'en-US');
-      } else {
+      const callNative = () => {
+        if (!window.AndroidSpeechBridge) return false;
+        const hintsJson = (this.hints && this.hints.length) ? JSON.stringify(this.hints) : null;
+        if (typeof window.AndroidSpeechBridge.startListeningWithHints === 'function') {
+          window.AndroidSpeechBridge.startListeningWithHints(this.lang || 'en-US', hintsJson);
+          return true;
+        } else if (typeof window.AndroidSpeechBridge.startListening === 'function') {
+          window.AndroidSpeechBridge.startListening(this.lang || 'en-US');
+          return true;
+        }
+        return false;
+      };
+
+      if (!callNative()) {
         console.warn("[SpeechBridge] AndroidSpeechBridge not attached yet, waiting...");
         setTimeout(() => {
-          if (window.AndroidSpeechBridge && typeof window.AndroidSpeechBridge.startListening === 'function') {
-            window.AndroidSpeechBridge.startListening(this.lang || 'en-US');
-          } else {
+          if (!callNative()) {
             console.error("[SpeechBridge] Native SpeechRecognizer unavailable");
             if (typeof this.onerror === 'function') {
               const err = new Event('error');

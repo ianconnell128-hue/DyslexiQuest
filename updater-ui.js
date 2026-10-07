@@ -127,6 +127,21 @@
       b.downloadAndInstall();
     });
 
+    const pingBtn = $('devlog-test-btn');
+    if (pingBtn) {
+      pingBtn.addEventListener('click', () => {
+        pingBtn.textContent = '⏳ Sending…';
+        if (window.DevLog) {
+          window.DevLog.log('PING_TEST', { manual: true, time: Date.now() });
+          window.DevLog.flush();
+        }
+        setTimeout(() => {
+          pingBtn.textContent = '✅ Sent!';
+          setTimeout(() => { pingBtn.textContent = '📡 Send Test Ping'; }, 2000);
+        }, 500);
+      });
+    }
+
     // When returning from Android's permission screen, continue the install.
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible' && waitingForPermission && b.canInstall()) {

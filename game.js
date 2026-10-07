@@ -251,12 +251,15 @@ function parseLevels(text) {
   const result = {};
   const chunks = text.split(/(?:Niveau|Level)\s+(\d+)/i);
   for (let i = 1; i < chunks.length; i += 2) {
-    const levelNum = parseInt(chunks[i], 10), body = chunks[i + 1] || '', tokens = body.match(/[a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ'\-]{1,}/g) || [], seen = new Set(), words = [];
-    for (const t of tokens) {
-      const w = t.trim().toLowerCase();
-      if (w.length >= 2 && !seen.has(w) && !/^(niveau|level|titre|title|terminaisons)$/i.test(w)) { 
-        seen.add(w); 
-        words.push({ word: w, shape: generateShape(w) }); 
+    const levelNum = parseInt(chunks[i], 10), body = chunks[i + 1] || '';
+    const lines = body.split('\n').filter(l => !l.trim().startsWith('#') && !l.trim().toLowerCase().startsWith('terminaisons'));
+    const items = lines.join(',').split(',');
+    const seen = new Set(), words = [];
+    for (const item of items) {
+      const w = item.trim().toLowerCase().replace(/[!.]/g, '');
+      if (w.length >= 1 && !seen.has(w) && !/^(niveau|level|titre|title|terminaisons)$/i.test(w)) {
+        seen.add(w);
+        words.push({ word: w, shape: generateShape(w) });
       }
     }
     if (words.length > 0) result[levelNum] = words;
@@ -307,24 +310,33 @@ class Game {
       this.recognition.onresult = (event) => {
         let interimTranscript = '';
         let finalTranscript = '';
+        const allCandidates = [];
 
         for (let i = event.resultIndex; i < event.results.length; ++i) {
-          const transcript = event.results[i][0].transcript.toLowerCase().trim();
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript;
+          const res = event.results[i];
+          for (let j = 0; j < res.length; j++) {
+            const transcript = (res[j].transcript || '').toLowerCase().trim();
+            if (transcript && !allCandidates.includes(transcript)) {
+              allCandidates.push(transcript);
+            }
+          }
+          if (res.isFinal) {
+            finalTranscript += (res[0].transcript || '').toLowerCase().trim();
           } else {
-            interimTranscript += transcript;
+            interimTranscript += (res[0].transcript || '').toLowerCase().trim();
           }
         }
 
         const feedbackId = this.isTestMode ? 'mic-test-feedback' : 'speech-feedback';
         const feedback = document.getElementById(feedbackId);
 
-        if (finalTranscript) {
-          if (this.isTestMode) this.handleTestResult(finalTranscript);
-          else this.handleSpeechResult(finalTranscript);
+        if (finalTranscript || (allCandidates.length > 0 && event.results[event.results.length - 1].isFinal)) {
+          const mainResult = finalTranscript || allCandidates[0];
+          if (this.isTestMode) this.handleTestResult(mainResult, allCandidates);
+          else this.handleSpeechResult(mainResult, allCandidates);
         } else if (feedback && interimTranscript) {
-          feedback.innerHTML = `Hearing: <b style="color:var(--primary)">"${interimTranscript}..."</b>`;
+          const safeInterim = interimTranscript.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          feedback.innerHTML = `Hearing: <b style="color:var(--primary)">"${safeInterim}..."</b>`;
         }
       };
 
@@ -1062,7 +1074,19 @@ class Game {
     }
 
     this.isTestMode = isTest;
-    this.recognition.lang = this.isFrench ? 'fr-FR' : 'en-US';
+    this.recognition.lang = this.isFrench ? 'fr-CA' : 'en-US';
+
+    // Provide target word hints to Android speech recognizer
+    if (this.isTestMode) {
+      this.recognition.hints = this.isFrench ? ['bonjour', 'salut', 'allo'] : ['hello', 'hi'];
+    } else if (this.targetWord && this.targetWord.word) {
+      const currentBank = this.wordBank[this.isFrench ? 'fr' : 'en'];
+      const lvlWords = (currentBank && currentBank[this.level]) ? currentBank[this.level].map(w => w.word) : [];
+      this.recognition.hints = [this.targetWord.word, ...lvlWords.slice(0, 10)];
+    } else {
+      this.recognition.hints = [];
+    }
+
     this.playSFX('click');
 
     try {
@@ -1075,27 +1099,155 @@ class Game {
       setTimeout(() => { try { this.recognition.start(); } catch(err) {} }, 100);
     }
   }
-  handleTestResult(t) {
-    const fb = document.getElementById('mic-test-feedback'), target = this.isFrench ? "bonjour" : "hello";
-    if (fb) fb.innerHTML = `I heard: <b style="color:var(--primary)">"${t}"</b>`;
-    if (t.includes(target) || t.includes("hell") || t.includes("halo")) {
+
+  handleTestResult(t, allCandidates = []) {
+    const candidates = [t, ...allCandidates].filter(Boolean).map(s => s.toLowerCase().trim());
+    const target = this.isFrench ? "bonjour" : "hello";
+    const fb = document.getElementById('mic-test-feedback');
+    const display = (candidates[0] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    if (fb) fb.innerHTML = `I heard: <b style="color:var(--primary)">"${display}"</b>`;
+
+    const isMatch = candidates.some(c => 
+      c.includes(target) || 
+      (this.isFrench && (c.includes("bon") || c.includes("salut") || c.includes("allo") || c.includes("jour"))) ||
+      (!this.isFrench && (c.includes("hell") || c.includes("halo") || c.includes("hi")))
+    );
+
+    if (isMatch) {
       this.playSFX('correct'); this.micTested = true; this.saveProfile();
       if (fb) fb.innerHTML = '<span style="color:var(--accent)">It works! ✨</span>';
       setTimeout(() => { document.getElementById('mic-test-view').style.display = 'none'; document.getElementById('talk-active-view').style.display = 'flex'; this.newTarget(); }, 1500);
-    } else { this.playSFX('wrong'); if (fb) fb.innerHTML = `<span style="color:var(--secondary)">Try saying "${target}".</span>`; }
+    } else {
+      this.playSFX('wrong');
+      if (fb) fb.innerHTML = `<span style="color:var(--secondary)">Try saying "${target}".</span>`;
+    }
   }
 
-  handleSpeechResult(t) {
+  handleSpeechResult(t, allCandidates = []) {
     const rawTarget = this.targetWord ? this.targetWord.word : '';
-    const clean = s => (s || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "").trim();
-    const cleanT = clean(t);
-    const cleanTarget = clean(rawTarget);
-    const fb = document.getElementById('speech-feedback');
-    if (fb) fb.innerHTML = `I heard: <b style="color:var(--primary)">"${t}"</b>`;
+    const clean = s => (s || '').toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // strip accents
+      .replace(/['’\-]/g, "") // strip apostrophes & hyphens
+      .replace(/[^a-z0-9]/g, "")
+      .trim();
 
-    const isMatch = cleanT === cleanTarget || 
-                    cleanT.includes(cleanTarget) || 
-                    (cleanT.length >= 3 && cleanTarget.includes(cleanT));
+    const cleanTarget = clean(rawTarget);
+    const candidates = [t, ...allCandidates].filter(Boolean);
+
+    // Number word mapping
+    const NUM_MAP = {
+      '1': 'un', '2': 'deux', '3': 'trois', '4': 'quatre', '5': 'cinq',
+      '6': 'six', '7': 'sept', '8': 'huit', '9': 'neuf', '10': 'dix'
+    };
+
+    // French common homophones
+    const HOMOPHONES = {
+      'vert': ['verre', 'vers', 'ver'],
+      'verre': ['vert', 'vers', 'ver'],
+      'vers': ['vert', 'verre', 'ver'],
+      'mer': ['mere', 'maire'],
+      'mere': ['mer', 'maire'],
+      'sans': ['sang', 'cent'],
+      'sang': ['sans', 'cent'],
+      'cent': ['sans', 'sang'],
+      'doigt': ['doit'],
+      'doit': ['doigt'],
+      'lit': ['lis'],
+      'lis': ['lit'],
+      'faim': ['fin'],
+      'fin': ['faim'],
+      'pain': ['pin'],
+      'pin': ['pain'],
+      'eau': ['au', 'aux', 'haut'],
+      'au': ['eau', 'aux', 'haut'],
+      'aux': ['eau', 'au', 'haut'],
+      'haut': ['eau', 'au', 'aux'],
+      'porc': ['port'],
+      'port': ['porc'],
+      'lait': ['laid'],
+      'laid': ['lait'],
+      'poids': ['pois'],
+      'pois': ['poids'],
+      'voix': ['voit', 'voie'],
+      'voit': ['voix', 'voie'],
+      'a': ['ah'],
+      'ah': ['a'],
+      'son': ['sont'],
+      'sont': ['son'],
+      'et': ['est', 'ai'],
+      'est': ['et', 'es'],
+      'on': ['ont'],
+      'ont': ['on'],
+      'mes': ['mais', 'met', 'mai'],
+      'mais': ['mes', 'met', 'mai'],
+      'ces': ['ses', 'cest', 'sest'],
+      'ses': ['ces', 'cest', 'sest'],
+      'cest': ['ces', 'ses', 'sest'],
+      'un': ['1', 'une', 'in'],
+      'deux': ['2'],
+      'trois': ['3'],
+      'quatre': ['4'],
+      'cinq': ['5'],
+      'six': ['6'],
+      'sept': ['7'],
+      'huit': ['8'],
+      'neuf': ['9'],
+      'dix': ['10'],
+      'jai': ['j', 'ai', 'jay'],
+      'nest': ['n', 'est'],
+      'senva': ['sen va', 's en va'],
+      'aujourdhui': ['aujourd hui']
+    };
+
+    const stripArticle = s => s.replace(/^(le|la|les|un|une|des|du|de|d|l)\s+/i, '').trim();
+
+    let isMatch = false;
+    let matchedCandidate = '';
+
+    for (const cand of candidates) {
+      const cleanCand = clean(cand);
+      const strippedCand = clean(stripArticle(cand));
+      const candAsWord = NUM_MAP[cleanCand] || cleanCand;
+
+      if (cleanCand === cleanTarget || strippedCand === cleanTarget || candAsWord === cleanTarget) {
+        isMatch = true;
+        matchedCandidate = cand;
+        break;
+      }
+
+      // Substring match
+      if (cleanCand.includes(cleanTarget) || (cleanCand.length >= 3 && cleanTarget.includes(cleanCand))) {
+        isMatch = true;
+        matchedCandidate = cand;
+        break;
+      }
+
+      // French homophone / alternative match
+      if (this.isFrench) {
+        const equivalents = HOMOPHONES[cleanTarget] || [];
+        if (equivalents.includes(cleanCand) || equivalents.includes(strippedCand) || equivalents.includes(candAsWord)) {
+          isMatch = true;
+          matchedCandidate = cand;
+          break;
+        }
+      }
+    }
+
+    if (window.DevLog) {
+      window.DevLog.log('EVAL_RESULT', {
+        target: rawTarget,
+        cleanTarget: cleanTarget,
+        isFrench: this.isFrench,
+        candidates: candidates,
+        isMatch: isMatch,
+        matchedOn: matchedCandidate
+      });
+    }
+
+    const fb = document.getElementById('speech-feedback');
+    const heardDisplay = (candidates[0] || t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    if (fb) fb.innerHTML = `I heard: <b style="color:var(--primary)">"${heardDisplay}"</b>`;
 
     if (isMatch) {
       this.playSFX('correct'); this.streak++; this.score += 150; this.xp += 5;
@@ -1108,7 +1260,7 @@ class Game {
     } else {
       this.playSFX('wrong'); this.streak = 0; 
       this.triggerAvatarReaction('wrong');
-      if (fb) fb.innerHTML = `<span style="color:var(--secondary)">NO, I heard "${t}".</span>`;
+      if (fb) fb.innerHTML = `<span style="color:var(--secondary)">NO, I heard "${heardDisplay}".</span>`;
       setTimeout(() => { if (this.isTalkMode) this.speak(); }, 1500); this.updateStats();
     }
   }

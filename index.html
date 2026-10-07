@@ -1341,6 +1341,15 @@
         </div>
         <button id="update-check-btn" style="padding: 10px; font-size: 0.75rem; width: 100%;">🔄 Check for updates</button>
         <button id="update-install-btn" class="primary" style="display: none; padding: 10px; font-size: 0.75rem; width: 100%; margin-top: 6px;">⬇️ Download &amp; install</button>
+
+        <!-- Diagnostics Sub-section -->
+        <div style="border-top: 1px dashed #cbd5e1; margin-top: 10px; padding-top: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-light);">REMOTE DEV LOGS</span>
+            <span id="devlog-indicator" style="font-size: 0.65rem; color: #10b981; font-weight: 700;">ONLINE</span>
+          </div>
+          <button id="devlog-test-btn" style="padding: 6px; font-size: 0.7rem; width: 100%; background: #e2e8f0; border: none; border-radius: 8px; cursor: pointer;">📡 Send Test Ping</button>
+        </div>
       </div>
 
       <div style="border-top: 2px solid #e2e8f0; padding-top: 15px; display: flex; flex-direction: column; gap: 8px;">
@@ -1738,6 +1747,9 @@
   <!-- Three.js for 3D Battle Arena -->
   <script src="lib/three.min.js"></script>
   <script src="lib/GLTFLoader.js"></script>
+
+  <!-- DevLog Client (sends diagnostics to local iMac) -->
+  <script src="devlog-client.js"></script>
 
   <!-- Android Speech Recognition Bridge -->
   <script src="speech-bridge.js"></script>

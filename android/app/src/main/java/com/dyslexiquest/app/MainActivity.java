@@ -40,6 +40,7 @@ public class MainActivity extends BridgeActivity {
     private float pendingPitch = 1.0f;
 
     private AppUpdater appUpdater;
+    private ArrayList<String> currentHints = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -115,6 +116,11 @@ public class MainActivity extends BridgeActivity {
 
         @JavascriptInterface
         public void startListening(final String lang) {
+            startListeningWithHints(lang, null);
+        }
+
+        @JavascriptInterface
+        public void startListeningWithHints(final String lang, final String hintsJson) {
             mainHandler.post(() -> {
                 if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                     checkAndRequestAudioPermission();
@@ -122,6 +128,17 @@ public class MainActivity extends BridgeActivity {
                     return;
                 }
 
+                ArrayList<String> list = new ArrayList<>();
+                if (hintsJson != null && !hintsJson.trim().isEmpty()) {
+                    try {
+                        org.json.JSONArray arr = new org.json.JSONArray(hintsJson);
+                        for (int i = 0; i < arr.length(); i++) {
+                            String item = arr.optString(i, "").trim();
+                            if (!item.isEmpty()) list.add(item);
+                        }
+                    } catch (Exception ignored) {}
+                }
+                currentHints = list;
                 startListeningInternal(lang, false);
             });
         }
@@ -324,15 +341,19 @@ public class MainActivity extends BridgeActivity {
                         isListening = false;
 
                         // Automatic fallback on network/server/language unavailable:
-                        if (!isRetryAttempt && (error == SpeechRecognizer.ERROR_NETWORK 
+                        // If fr-CA failed, retry fr-FR. If fr-FR failed, retry fr-CA.
+                        // NEVER fallback to English when the game requested French!
+                        if (!isRetryAttempt && currentTargetLang.toLowerCase().startsWith("fr") 
+                                && (error == SpeechRecognizer.ERROR_NETWORK 
                                 || error == SpeechRecognizer.ERROR_NETWORK_TIMEOUT 
                                 || error == SpeechRecognizer.ERROR_SERVER 
                                 || error == 12 /* ERROR_LANGUAGE_NOT_SUPPORTED */ 
                                 || error == 13 /* ERROR_LANGUAGE_UNAVAILABLE */
                                 || error == 14 /* ERROR_CANNOT_CHECK_SUPPORT */)) {
-                            Log.w(TAG, "Network or language model error " + error + ", falling back to system default speech locale...");
+                            String nextLang = currentTargetLang.equalsIgnoreCase("fr-CA") ? "fr-FR" : "fr-CA";
+                            Log.w(TAG, "French model " + currentTargetLang + " error " + error + ", trying " + nextLang + "...");
                             mainHandler.postDelayed(() -> {
-                                startListeningInternal(Locale.getDefault().toString(), true);
+                                startListeningInternal(nextLang, true);
                             }, 250);
                             return;
                         }
@@ -364,6 +385,10 @@ public class MainActivity extends BridgeActivity {
                             case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
                                 errorMsg = "busy";
                                 break;
+                            case 12: // ERROR_LANGUAGE_NOT_SUPPORTED
+                            case 13: // ERROR_LANGUAGE_UNAVAILABLE
+                                errorMsg = "language-unavailable";
+                                break;
                             default:
                                 errorMsg = "network";
                                 break;
@@ -378,9 +403,9 @@ public class MainActivity extends BridgeActivity {
                         if (results != null) {
                             ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
                             if (matches != null && !matches.isEmpty()) {
-                                String recognized = matches.get(0);
-                                Log.i(TAG, "Speech recognized: " + recognized);
-                                sendJsResult(recognized, true);
+                                Log.i(TAG, "Speech recognized matches: " + matches);
+                                org.json.JSONArray arr = new org.json.JSONArray(matches);
+                                sendJsResult(arr.toString(), true);
                             }
                         }
                         sendJsEvent("end", "");
@@ -391,8 +416,8 @@ public class MainActivity extends BridgeActivity {
                         if (partialResults != null) {
                             ArrayList<String> matches = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
                             if (matches != null && !matches.isEmpty()) {
-                                String partial = matches.get(0);
-                                sendJsResult(partial, false);
+                                org.json.JSONArray arr = new org.json.JSONArray(matches);
+                                sendJsResult(arr.toString(), false);
                             }
                         }
                     }
@@ -421,16 +446,22 @@ public class MainActivity extends BridgeActivity {
             intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
 
             if (currentTargetLang.toLowerCase().startsWith("fr")) {
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "fr-FR");
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "fr-FR");
-                intent.putExtra("android.speech.extra.ADDITIONAL_LANGUAGES", new String[]{"fr-FR", "fr", "en-US", "en"});
+                String primary = currentTargetLang.equalsIgnoreCase("fr-FR") ? "fr-FR" : "fr-CA";
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, primary);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, primary);
+                intent.putExtra("android.speech.extra.ADDITIONAL_LANGUAGES", new String[]{"fr-CA", "fr-FR", "fr"});
             } else {
                 intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, currentTargetLang);
                 intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, currentTargetLang);
-                intent.putExtra("android.speech.extra.ADDITIONAL_LANGUAGES", new String[]{"en-US", "en", "fr-FR", "fr"});
+                intent.putExtra("android.speech.extra.ADDITIONAL_LANGUAGES", new String[]{"en-US", "en-CA", "en-GB"});
             }
 
-            Log.i(TAG, "Starting speech recognition with lang=" + currentTargetLang + ", retry=" + isRetry);
+            // Word biasing on Android 13+ (API 33+)
+            if (currentHints != null && !currentHints.isEmpty()) {
+                intent.putStringArrayListExtra("android.speech.extra.BIASING_STRINGS", currentHints);
+            }
+
+            Log.i(TAG, "Starting speech recognition with lang=" + currentTargetLang + ", retry=" + isRetry + ", hints=" + currentHints.size());
             speechRecognizer.startListening(intent);
         } catch (Exception e) {
             Log.e(TAG, "Exception in startListening", e);
