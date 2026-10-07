@@ -17,10 +17,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.getcapacitor.BridgeActivity;
 import com.getcapacitor.BridgeWebChromeClient;
+import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.Voice;
 import android.util.Log;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Set;
 
 public class MainActivity extends BridgeActivity {
 
@@ -34,6 +37,7 @@ public class MainActivity extends BridgeActivity {
 
     private TextToSpeech textToSpeech;
     private boolean ttsReady = false;
+    private String ttsEngineName = null;
     private String pendingText = null;
     private String pendingLang = null;
     private float pendingRate = 0.85f;
@@ -259,16 +263,69 @@ public class MainActivity extends BridgeActivity {
                 }
             });
         }
+
+        @JavascriptInterface
+        public void openTtsSettings() {
+            mainHandler.post(() -> {
+                boolean opened = false;
+                try {
+                    Intent intent = new Intent("com.android.settings.TTS_SETTINGS");
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    opened = true;
+                } catch (Exception ignored) {}
+
+                if (!opened) {
+                    try {
+                        Intent intent = new Intent(Settings.ACTION_VOICE_INPUT_SETTINGS);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        opened = true;
+                    } catch (Exception ignored) {}
+                }
+
+                if (!opened) {
+                    try {
+                        Intent intent = new Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    } catch (Exception ignored) {}
+                }
+            });
+        }
     }
 
     private void initTextToSpeech() {
         try {
-            textToSpeech = new TextToSpeech(this, status -> {
+            // Samsung devices default to com.samsung.SMT, which often lacks French voice data
+            // out of the box or sounds robotic. Prefer Google TTS (com.google.android.tts) when available.
+            String preferredEngine = null;
+            try {
+                getPackageManager().getPackageInfo("com.google.android.tts", 0);
+                preferredEngine = "com.google.android.tts";
+                Log.i(TAG, "Preferred TTS engine found: com.google.android.tts");
+            } catch (PackageManager.NameNotFoundException ignored) {
+                Log.i(TAG, "Google TTS not installed; will use system default TTS engine");
+            }
+
+            final String engineToUse = preferredEngine;
+            TextToSpeech.OnInitListener listener = status -> {
                 if (status == TextToSpeech.SUCCESS) {
                     ttsReady = true;
                     try {
-                        textToSpeech.setLanguage(Locale.US);
+                        ttsEngineName = textToSpeech.getDefaultEngine();
+                    } catch (Exception ignored) {
+                        ttsEngineName = (engineToUse != null) ? engineToUse : "system-default";
+                    }
+                    Log.i(TAG, "TextToSpeech initialized successfully with engine: " + ttsEngineName);
+
+                    // Pre-warm French Canadian / French
+                    try {
+                        Locale frCa = new Locale("fr", "CA");
+                        int avail = textToSpeech.isLanguageAvailable(frCa);
+                        Log.i(TAG, "French (fr-CA) availability on engine " + ttsEngineName + ": " + avail);
                     } catch (Exception ignored) {}
+
                     if (pendingText != null) {
                         String txt = pendingText;
                         String lng = pendingLang;
@@ -278,10 +335,34 @@ public class MainActivity extends BridgeActivity {
                         pendingLang = null;
                         speakTextInternal(txt, lng, r, p);
                     }
+                } else {
+                    Log.e(TAG, "TextToSpeech init failed (status: " + status + ") with engine: " + engineToUse);
+                    ttsReady = false;
+                    // Fallback to default engine if preferred failed
+                    if (engineToUse != null) {
+                        mainHandler.post(() -> {
+                            try {
+                                textToSpeech = new TextToSpeech(MainActivity.this, s -> {
+                                    if (s == TextToSpeech.SUCCESS) {
+                                        ttsReady = true;
+                                        try {
+                                            ttsEngineName = textToSpeech.getDefaultEngine();
+                                        } catch (Exception ignored) {}
+                                    }
+                                });
+                            } catch (Exception ignored) {}
+                        });
+                    }
                 }
-            });
+            };
+
+            if (preferredEngine != null) {
+                textToSpeech = new TextToSpeech(this, listener, preferredEngine);
+            } else {
+                textToSpeech = new TextToSpeech(this, listener);
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Exception in initTextToSpeech", e);
         }
     }
 
@@ -295,16 +376,102 @@ public class MainActivity extends BridgeActivity {
             return;
         }
         try {
-            Locale loc = ("fr".equalsIgnoreCase(lang) || "fr-FR".equalsIgnoreCase(lang) || "french".equalsIgnoreCase(lang))
-                    ? Locale.FRENCH
-                    : Locale.US;
-            textToSpeech.setLanguage(loc);
-            textToSpeech.setSpeechRate(rate > 0 ? rate : 0.85f);
-            textToSpeech.setPitch(pitch > 0 ? pitch : 1.0f);
+            boolean isFrench = false;
+            if (lang != null) {
+                String l = lang.toLowerCase();
+                isFrench = l.startsWith("fr") || l.contains("french");
+            }
+
+            Locale targetLocale = Locale.US;
+            String voiceUsed = "default";
+            int langResult = -999;
+
+            if (isFrench) {
+                // Try Canadian French first (primary educational curriculum), fallback to France French, then generic French
+                Locale frCa = new Locale("fr", "CA");
+                int availCa = textToSpeech.isLanguageAvailable(frCa);
+                if (availCa >= TextToSpeech.LANG_AVAILABLE) {
+                    targetLocale = frCa;
+                    langResult = textToSpeech.setLanguage(frCa);
+                } else {
+                    Locale frFr = Locale.FRANCE;
+                    int availFr = textToSpeech.isLanguageAvailable(frFr);
+                    if (availFr >= TextToSpeech.LANG_AVAILABLE) {
+                        targetLocale = frFr;
+                        langResult = textToSpeech.setLanguage(frFr);
+                    } else {
+                        targetLocale = Locale.FRENCH;
+                        langResult = textToSpeech.setLanguage(Locale.FRENCH);
+                    }
+                }
+
+                // If voices are available, pick highest quality French voice matching locale
+                try {
+                    Set<Voice> voices = textToSpeech.getVoices();
+                    if (voices != null && !voices.isEmpty()) {
+                        Voice bestVoice = null;
+                        for (Voice v : voices) {
+                            if (v.getLocale() != null && "fr".equalsIgnoreCase(v.getLocale().getLanguage())) {
+                                boolean isCa = "CA".equalsIgnoreCase(v.getLocale().getCountry());
+                                if (bestVoice == null) {
+                                    bestVoice = v;
+                                } else if (isCa && !"CA".equalsIgnoreCase(bestVoice.getLocale().getCountry())) {
+                                    // Prioritize Canadian French voice over European French
+                                    bestVoice = v;
+                                } else if (isCa == "CA".equalsIgnoreCase(bestVoice.getLocale().getCountry()) && v.getQuality() > bestVoice.getQuality()) {
+                                    bestVoice = v;
+                                }
+                            }
+                        }
+                        if (bestVoice != null) {
+                            textToSpeech.setVoice(bestVoice);
+                            voiceUsed = bestVoice.getName();
+                        }
+                    }
+                } catch (Exception ignored) {}
+            } else {
+                targetLocale = Locale.US;
+                langResult = textToSpeech.setLanguage(Locale.US);
+            }
+
+            // Clean, unwarped vocal parameters:
+            // High pitches (>1.0) artificially shift formant frequencies and severely distort French nasal vowels (e.g. "mon" sounding like "me").
+            float finalPitch = isFrench ? 1.0f : ((pitch > 0 && pitch >= 0.8f && pitch <= 1.2f) ? pitch : 1.0f);
+            float finalRate = (rate > 0) ? rate : 0.85f;
+            if (isFrench && finalRate < 0.8f) finalRate = 0.85f;
+
+            textToSpeech.setSpeechRate(finalRate);
+            textToSpeech.setPitch(finalPitch);
+
+            final String diagLang = targetLocale.toLanguageTag();
+            final String diagVoice = voiceUsed;
+            final int diagStatus = langResult;
+            final String diagEngine = (ttsEngineName != null) ? ttsEngineName : "unknown";
+
+            sendTtsLog(text, diagLang, diagEngine, diagVoice, diagStatus);
+
             textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, "dq_tts_" + System.currentTimeMillis());
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Exception in speakTextInternal", e);
         }
+    }
+
+    private void sendTtsLog(String text, String lang, String engine, String voice, int status) {
+        mainHandler.post(() -> {
+            if (bridge != null && bridge.getWebView() != null) {
+                try {
+                    org.json.JSONObject obj = new org.json.JSONObject();
+                    obj.put("text", text);
+                    obj.put("lang", lang);
+                    obj.put("engine", engine);
+                    obj.put("voice", voice);
+                    obj.put("status", status); // >=0 OK, <0 missing data or unsupported
+                    String json = obj.toString().replace("'", "\\'");
+                    String js = "window.DevLog && window.DevLog.log('TTS_SPEAK', " + json + ");";
+                    bridge.getWebView().evaluateJavascript(js, null);
+                } catch (Exception ignored) {}
+            }
+        });
     }
 
     private void startListeningInternal(final String lang, final boolean isRetry) {

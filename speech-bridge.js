@@ -202,8 +202,9 @@
 
     getVoices() {
       return [
-        { voiceURI: 'AndroidNative_en', name: 'Android English', lang: 'en-US', default: true },
-        { voiceURI: 'AndroidNative_fr', name: 'Android French', lang: 'fr-FR', default: false }
+        { voiceURI: 'AndroidNative_en', name: 'Android English (US)', lang: 'en-US', default: true },
+        { voiceURI: 'AndroidNative_fr_CA', name: 'Android French (Canada)', lang: 'fr-CA', default: false },
+        { voiceURI: 'AndroidNative_fr_FR', name: 'Android French (France)', lang: 'fr-FR', default: false }
       ];
     }
   }

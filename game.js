@@ -1014,20 +1014,24 @@ class Game {
 
     // Direct Native Android TextToSpeech
     if (window.AndroidSpeechBridge && typeof window.AndroidSpeechBridge.speakText === 'function') {
-      window.AndroidSpeechBridge.speakText(text, this.isFrench ? 'fr' : 'en', 0.8, 1.05);
+      window.AndroidSpeechBridge.speakText(text, this.isFrench ? 'fr-CA' : 'en-US', 0.85, 1.0);
       return;
     }
 
     const sysSpeak = () => {
-      if (!window.speechSynthesis) return; window.speechSynthesis.cancel();
-      const msg = new SpeechSynthesisUtterance(text); msg.lang = this.isFrench ? 'fr-FR' : 'en-US';
-      if (this.selectedVoiceURI) { const found = window.speechSynthesis.getVoices().find(v => v.voiceURI === this.selectedVoiceURI); if (found) msg.voice = found; }
-      msg.rate = 0.7; msg.pitch = 1.1; window.speechSynthesis.speak(msg);
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const msg = new SpeechSynthesisUtterance(text);
+      msg.lang = this.isFrench ? 'fr-CA' : 'en-US';
+      if (this.selectedVoiceURI) {
+        const found = window.speechSynthesis.getVoices().find(v => v.voiceURI === this.selectedVoiceURI);
+        if (found) msg.voice = found;
+      }
+      msg.rate = 0.85;
+      msg.pitch = 1.0;
+      window.speechSynthesis.speak(msg);
     };
-    if (this.selectedVoiceURI) { sysSpeak(); return; }
-    const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${this.isFrench?'fr':'en'}&client=tw-ob`;
-    this.currentAudio = new Audio(url); let started = false; this.currentAudio.onplay = () => started = true;
-    this.currentAudio.play().catch(() => sysSpeak()); setTimeout(() => { if (!started) sysSpeak(); }, 1000);
+    sysSpeak();
   }
 
   showMicPermissionOnboarding() { 
