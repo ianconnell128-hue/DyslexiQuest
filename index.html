@@ -1189,6 +1189,10 @@
     </div>
     
     <div style="display: flex; align-items: center; gap: 10px;">
+      <!-- Playtime Timer Display Badge -->
+      <div id="hud-timer-badge" style="display: none; align-items: center; gap: 4px; background: #ecfdf5; border: 2px solid #10b981; color: #047857; border-radius: 50px; padding: 4px 10px; font-weight: 800; font-size: 0.8rem; cursor: pointer;" title="Playtime Remaining">
+        ⏳ <span id="hud-timer-text">--:--</span>
+      </div>
       <div id="chest-container" style="cursor: pointer; font-size: 1.8rem; position: relative; transition: transform 0.3s ease;">
         🪙
         <div id="chest-badge" style="position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; display: none;">!</div>
@@ -1353,11 +1357,77 @@
       </div>
 
       <div style="border-top: 2px solid #e2e8f0; padding-top: 15px; display: flex; flex-direction: column; gap: 8px;">
+        <button id="parent-hub-btn" style="background: #4f46e5; color: white; font-size: 0.85rem; font-weight: 800; padding: 12px; border-radius: 15px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">👨‍👩‍👧 Parent Hub & Timer</button>
         <button id="new-game" style="background: #f1f5f9; font-size: 0.75rem; padding: 12px; border-radius: 15px;">🔄 Reset Progress</button>
         <button id="delete-profile-btn" class="danger" style="font-size: 0.75rem; padding: 12px; border-radius: 15px;">🗑️ Delete Profile</button>
       </div>
     </div>
   </aside>
+
+  <!-- Parent Hub / Dashboard Modal -->
+  <div id="parent-modal" class="collection-screen" style="display:none; z-index: 9999;">
+    <div class="collection-content" style="max-width: 650px; text-align: left;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
+        <h2 style="font-family:'Outfit'; font-size: 1.8rem; color: var(--primary); margin: 0;">👨‍👩‍👧 Parent Hub</h2>
+        <button id="close-parent-modal-x" style="background: #f1f5f9; border: none; font-size: 1.2rem; border-radius: 50%; width: 36px; height: 36px; cursor: pointer;">✕</button>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button id="parent-tab-timer" class="primary" style="flex: 1; padding: 10px; font-size: 0.85rem; border-radius: 12px;">⏳ Playtime Limit</button>
+        <button id="parent-tab-progress" style="flex: 1; padding: 10px; font-size: 0.85rem; border-radius: 12px; background: #f1f5f9; color: var(--text-light); border: 1px solid #cbd5e1;">📊 Child Progress</button>
+      </div>
+
+      <!-- Playtime Limit View -->
+      <div id="parent-view-timer" style="display: block;">
+        <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--text);">Set Session Playtime</h3>
+        <p style="color: var(--text-light); font-size: 0.85rem; margin-bottom: 15px;">A live timer will show in the top corner so your child knows how much time remains.</p>
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px;">
+          <button class="timer-preset-btn" data-mins="15" style="padding: 12px; border-radius: 12px; font-weight: 800; border: 2px solid #cbd5e1; background: white;">15 Min</button>
+          <button class="timer-preset-btn" data-mins="30" style="padding: 12px; border-radius: 12px; font-weight: 800; border: 2px solid #cbd5e1; background: white;">30 Min</button>
+          <button class="timer-preset-btn" data-mins="45" style="padding: 12px; border-radius: 12px; font-weight: 800; border: 2px solid #cbd5e1; background: white;">45 Min</button>
+          <button class="timer-preset-btn" data-mins="60" style="padding: 12px; border-radius: 12px; font-weight: 800; border: 2px solid #cbd5e1; background: white;">60 Min</button>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
+          <input type="number" id="custom-timer-input" placeholder="Custom Mins" min="1" max="180" style="padding: 12px; border-radius: 12px; border: 2px solid #cbd5e1; font-weight: 700; width: 140px; font-size: 0.95rem;">
+          <button id="start-timer-btn" class="accent" style="padding: 12px 20px; border-radius: 12px; font-weight: 800; font-size: 0.95rem;">▶️ Start Countdown</button>
+          <button id="stop-timer-btn" class="danger" style="padding: 12px 20px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; display: none;">⏹️ Clear Limit</button>
+        </div>
+
+        <div id="parent-timer-status" style="background: #f8fafc; padding: 12px; border-radius: 14px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: var(--text-light);">
+          No active time limit set.
+        </div>
+      </div>
+
+      <!-- Progress Tracking View -->
+      <div id="parent-view-progress" style="display: none;">
+        <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--text);">Learning Summary</h3>
+        
+        <div id="parent-child-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow-y: auto;">
+          <!-- Dynamically populated per player profile -->
+        </div>
+      </div>
+
+      <button id="close-parent-modal-btn" class="primary" style="margin-top: 20px; width: 100%; border-radius: 14px; padding: 12px;">Close Parent Hub</button>
+    </div>
+  </div>
+
+  <!-- Session Break Modal (When Playtime Limit Expires) -->
+  <div id="session-break-modal" class="collection-screen" style="display:none; z-index: 10000; background: rgba(15, 23, 42, 0.95);">
+    <div class="collection-content" style="max-width: 500px; text-align: center; border: 4px solid #10b981;">
+      <div style="font-size: 4rem; margin-bottom: 10px;">🌟</div>
+      <h2 style="font-family:'Outfit'; font-size: 2.2rem; color: #10b981; margin-bottom: 10px;">Time for a Break!</h2>
+      <p style="color: var(--text); font-weight: 700; font-size: 1.1rem; margin-bottom: 15px;">Awesome job practicing reading today!</p>
+      <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 25px;">Your progress and treasures have been safely saved.</p>
+      
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button id="finish-session-btn" class="primary" style="background: #10b981; border: none; padding: 16px; border-radius: 16px; font-size: 1.1rem; font-weight: 800;">Done Playing 👍</button>
+        <button id="parent-extend-btn" style="background: transparent; color: var(--text-light); border: 2px dashed #cbd5e1; padding: 10px; border-radius: 14px; font-size: 0.85rem; font-weight: 700;">👨‍👩‍👧 Parent: Add 15 More Mins</button>
+      </div>
+    </div>
+  </div>
 
   <div id="loading-overlay">
     <div class="spinner"></div>

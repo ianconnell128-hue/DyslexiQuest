@@ -281,6 +281,7 @@ class Game {
     this.equippedPets = []; this.bgm = new Audio(SONGS[this.currentSong]); this.bgm.loop = true; this.bgm.volume = 0.2;
     this.musicEnabled = true;
     this.dyslexicFont = false;
+    this.timerInterval = null; this.remainingSeconds = 0; this.totalTimerSeconds = 0;
     this.wordBank = { en: {}, fr: {} }; this.users = JSON.parse(localStorage.getItem('dyslexiquest_users')) || {};
     this.currentUser = null; this.canClick = true; this.attemptsForCurrentWord = 0; this.currentAudio = null;
     this.recognition = null; this.isListening = false; this.sounds = {};
@@ -1933,8 +1934,8 @@ class Game {
           </div>
         `;
         const btns = card.querySelectorAll('button');
-        btns[0].onclick = () => this.performSell(ua.originalIndex, price);
-        btns[1].onclick = () => this.initiateGiveAnimal(ua.originalIndex);
+        btns[0].onclick = () => this.performSell(ua.petName, price);
+        btns[1].onclick = () => this.initiateGiveAnimal(ua.petName);
         sellList.appendChild(card);
       });
     };
@@ -2108,19 +2109,35 @@ class Game {
     this.showQuestsScreen();
   }
 
-  performSell(index, price) {
-    const ua = this.unlockedAnimals[index];
+  performSell(petName, price) {
+    const idx = this.unlockedAnimals.findIndex(a => a.petName === petName);
+    if (idx === -1) {
+      alert("Treasure not found in collection!");
+      return;
+    }
+    const ua = this.unlockedAnimals[idx];
     if (!confirm(`Sell "${ua.petName}" for $${price}?`)) return;
-    this.unlockedAnimals.splice(index, 1);
+    
+    // Remove from unlocked animals
+    this.unlockedAnimals.splice(idx, 1);
+    
+    // Remove from equipped pets if equipped
+    this.equippedPets = this.equippedPets.filter(p => p.petName !== petName);
+    
     this.coins += price;
     this.playSFX('correct');
     this.saveProfile();
     this.updateStats();
+    this.updateGameplayVisuals();
     this.showShopScreen();
   }
 
-  initiateGiveAnimal(index) {
-    const ua = this.unlockedAnimals[index];
+  initiateGiveAnimal(petName) {
+    const ua = this.unlockedAnimals.find(a => a.petName === petName);
+    if (!ua) {
+      alert("Treasure not found in collection!");
+      return;
+    }
     const otherUsers = Object.keys(this.users).filter(id => id !== this.currentUser);
     
     if (otherUsers.length === 0) {
@@ -2128,37 +2145,37 @@ class Game {
       return;
     }
 
-    const selectHtml = otherUsers.map(id => `<option value="${id}">${this.users[id].name} (Lvl ${this.users[id].level || 1})</option>`).join('');
-    
-    // Using a simple custom modal or just prompt for simplicity if needed, 
-    // but a confirm with a select is better. Let's use a standard choice prompt.
     const targetId = prompt(`Who would you like to give "${ua.petName}" to?\n\nType the name of the player:\n${otherUsers.map(id => `- ${this.users[id].name}`).join('\n')}`);
     
     if (targetId) {
       const recipientId = otherUsers.find(id => this.users[id].name.toLowerCase() === targetId.toLowerCase().trim());
       if (recipientId) {
-        this.performGiveAnimal(index, recipientId);
+        this.performGiveAnimal(petName, recipientId);
       } else {
         alert("Player not found! Make sure you type the name exactly as it appears.");
       }
     }
   }
 
-  performGiveAnimal(index, recipientId) {
-    const ua = this.unlockedAnimals[index];
+  performGiveAnimal(petName, recipientId) {
+    const idx = this.unlockedAnimals.findIndex(a => a.petName === petName);
+    if (idx === -1) return;
+    const ua = this.unlockedAnimals[idx];
+
     // Reload to prevent stale data loss
     this.users = JSON.parse(localStorage.getItem('dyslexiquest_users')) || {};
     const recipientName = this.users[recipientId] ? this.users[recipientId].name : "Unknown";
     
     if (!confirm(`Are you sure you want to give "${ua.petName}" to ${recipientName}? This animal will leave your collection forever!`)) return;
 
-    // 1. Remove from current user array
-    this.unlockedAnimals.splice(index, 1);
+    // 1. Remove from current user array & equipped pets
+    this.unlockedAnimals.splice(idx, 1);
+    this.equippedPets = this.equippedPets.filter(p => p.petName !== petName);
     
     const notif = {
       type: 'gift',
       title: 'New Gift! 🎁',
-      message: `${this.users[this.currentUser].name} sent you a treasure: ${ua.petName} (${ua.animalName})!`
+      message: `${this.users[this.currentUser] ? this.users[this.currentUser].name : 'A friend'} sent you a treasure: ${ua.petName} (${ua.animalName})!`
     };
 
     // 2. Add to recipient in the main users object
@@ -2173,16 +2190,15 @@ class Game {
       }
     }
     
-    // 3. Save the main users object (which now has the recipient's new animal)
+    // 3. Save state
     localStorage.setItem('dyslexiquest_users', JSON.stringify(this.users));
-    
-    // 4. Save current user's state (which now has one fewer animal)
     this.saveProfile(); 
     
     this.playSFX('levelUp');
     alert(`Success! "${ua.petName}" has been sent to ${recipientName}'s collection! 🎁`);
     
     this.updateStats();
+    this.updateGameplayVisuals();
     this.showShopScreen();
   }
 
@@ -3549,6 +3565,244 @@ class Game {
     document.getElementById('chest-container')?.addEventListener('click', () => { this.playSFX('click'); this.showCollectionScreen(); });
     document.getElementById('collection-btn')?.addEventListener('click', () => { this.playSFX('click'); this.showCollectionScreen(); });
     document.getElementById('continue-btn')?.addEventListener('click', () => { this.playSFX('click'); document.getElementById('level-up-modal').style.display = 'none'; this.checkAnimalUnlock(); });
+
+    // Parent Hub Listeners
+    document.getElementById('parent-hub-btn')?.addEventListener('click', () => {
+      this.playSFX('click');
+      if (this.verifyParentalGate()) {
+        document.getElementById('sidebar')?.classList.remove('open');
+        document.getElementById('sidebar-overlay')?.setAttribute('style', 'display: none;');
+        this.showParentHubModal();
+      }
+    });
+
+    document.getElementById('hud-timer-badge')?.addEventListener('click', () => {
+      this.playSFX('click');
+      if (this.verifyParentalGate()) {
+        this.showParentHubModal();
+      }
+    });
+
+    document.getElementById('close-parent-modal-btn')?.addEventListener('click', () => {
+      document.getElementById('parent-modal').style.display = 'none';
+    });
+    document.getElementById('close-parent-modal-x')?.addEventListener('click', () => {
+      document.getElementById('parent-modal').style.display = 'none';
+    });
+
+    document.getElementById('parent-tab-timer')?.addEventListener('click', () => {
+      document.getElementById('parent-tab-timer').className = 'primary';
+      document.getElementById('parent-tab-progress').className = '';
+      document.getElementById('parent-tab-progress').style.background = '#f1f5f9';
+      document.getElementById('parent-tab-progress').style.color = 'var(--text-light)';
+      document.getElementById('parent-view-timer').style.display = 'block';
+      document.getElementById('parent-view-progress').style.display = 'none';
+    });
+
+    document.getElementById('parent-tab-progress')?.addEventListener('click', () => {
+      document.getElementById('parent-tab-progress').className = 'primary';
+      document.getElementById('parent-tab-progress').style.background = 'var(--primary)';
+      document.getElementById('parent-tab-progress').style.color = 'white';
+      document.getElementById('parent-tab-timer').className = '';
+      document.getElementById('parent-tab-timer').style.background = '#f1f5f9';
+      document.getElementById('parent-tab-timer').style.color = 'var(--text-light)';
+      document.getElementById('parent-view-timer').style.display = 'none';
+      document.getElementById('parent-view-progress').style.display = 'block';
+      this.renderParentProgressList();
+    });
+
+    document.querySelectorAll('.timer-preset-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const mins = parseInt(e.target.getAttribute('data-mins'));
+        this.startPlaytimeTimer(mins);
+      });
+    });
+
+    document.getElementById('start-timer-btn')?.addEventListener('click', () => {
+      const input = document.getElementById('custom-timer-input');
+      const mins = parseInt(input.value);
+      if (mins && mins > 0) {
+        this.startPlaytimeTimer(mins);
+      } else {
+        alert('Please enter a valid number of minutes (1-180).');
+      }
+    });
+
+    document.getElementById('stop-timer-btn')?.addEventListener('click', () => {
+      this.clearPlaytimeTimer();
+    });
+
+    document.getElementById('finish-session-btn')?.addEventListener('click', () => {
+      document.getElementById('session-break-modal').style.display = 'none';
+      this.saveProfile();
+      this.showProfileSelect();
+    });
+
+    document.getElementById('parent-extend-btn')?.addEventListener('click', () => {
+      if (this.verifyParentalGate()) {
+        document.getElementById('session-break-modal').style.display = 'none';
+        this.startPlaytimeTimer(15);
+      }
+    });
+  }
+
+  verifyParentalGate() {
+    const num1 = Math.floor(Math.random() * 6) + 3;
+    const num2 = Math.floor(Math.random() * 7) + 3;
+    const answer = num1 * num2;
+    const input = prompt(`👨‍👩‍👧 PARENT CHECK:\n\nWhat is ${num1} × ${num2}?`);
+    if (input !== null && parseInt(input.trim()) === answer) {
+      return true;
+    } else if (input !== null) {
+      alert("Incorrect math answer. Access restricted.");
+    }
+    return false;
+  }
+
+  showParentHubModal() {
+    this.updateTimerUIStatus();
+    document.getElementById('parent-modal').style.display = 'flex';
+  }
+
+  startPlaytimeTimer(minutes) {
+    this.clearPlaytimeTimer(false);
+    this.totalTimerSeconds = minutes * 60;
+    this.remainingSeconds = minutes * 60;
+
+    const badge = document.getElementById('hud-timer-badge');
+    if (badge) badge.style.display = 'flex';
+
+    this.updateHUDTimerDisplay();
+    this.updateTimerUIStatus();
+
+    this.timerInterval = setInterval(() => {
+      this.remainingSeconds--;
+      this.updateHUDTimerDisplay();
+
+      if (this.remainingSeconds <= 0) {
+        this.onPlaytimeExpired();
+      }
+    }, 1000);
+
+    alert(`⏳ Playtime limit set for ${minutes} minutes! The countdown is now live in the top right corner.`);
+  }
+
+  clearPlaytimeTimer(notify = true) {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+    this.remainingSeconds = 0;
+    this.totalTimerSeconds = 0;
+    const badge = document.getElementById('hud-timer-badge');
+    if (badge) badge.style.display = 'none';
+
+    this.updateTimerUIStatus();
+    if (notify) alert("Playtime limit removed.");
+  }
+
+  updateHUDTimerDisplay() {
+    const badge = document.getElementById('hud-timer-badge');
+    const textEl = document.getElementById('hud-timer-text');
+    if (!badge || !textEl) return;
+
+    if (this.remainingSeconds <= 0) {
+      textEl.textContent = '00:00';
+      return;
+    }
+
+    const mins = Math.floor(this.remainingSeconds / 60);
+    const secs = this.remainingSeconds % 60;
+    textEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+    // Color indicators
+    if (this.remainingSeconds <= 180) { // < 3 mins
+      badge.style.background = '#fef2f2';
+      badge.style.borderColor = '#ef4444';
+      badge.style.color = '#b91c1c';
+    } else if (this.remainingSeconds <= 600) { // < 10 mins
+      badge.style.background = '#fffbebe';
+      badge.style.borderColor = '#f59e0b';
+      badge.style.color = '#b45309';
+    } else {
+      badge.style.background = '#ecfdf5';
+      badge.style.borderColor = '#10b981';
+      badge.style.color = '#047857';
+    }
+  }
+
+  updateTimerUIStatus() {
+    const statusEl = document.getElementById('parent-timer-status');
+    const stopBtn = document.getElementById('stop-timer-btn');
+    if (!statusEl) return;
+
+    if (this.timerInterval && this.remainingSeconds > 0) {
+      const mins = Math.floor(this.remainingSeconds / 60);
+      const secs = this.remainingSeconds % 60;
+      statusEl.innerHTML = `<strong>Active Limit:</strong> ${mins}m ${secs}s remaining (Total: ${Math.round(this.totalTimerSeconds / 60)} mins).`;
+      if (stopBtn) stopBtn.style.display = 'inline-block';
+    } else {
+      statusEl.innerHTML = `No active time limit set.`;
+      if (stopBtn) stopBtn.style.display = 'none';
+    }
+  }
+
+  onPlaytimeExpired() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+    const badge = document.getElementById('hud-timer-badge');
+    if (badge) badge.style.display = 'none';
+
+    this.playSFX('levelUp');
+    document.getElementById('parent-modal').style.display = 'none';
+    document.getElementById('session-break-modal').style.display = 'flex';
+  }
+
+  renderParentProgressList() {
+    const listEl = document.getElementById('parent-child-list');
+    if (!listEl) return;
+    this.users = JSON.parse(localStorage.getItem('dyslexiquest_users')) || {};
+    const userKeys = Object.keys(this.users);
+
+    if (userKeys.length === 0) {
+      listEl.innerHTML = '<p style="color: var(--text-light);">No player profiles found yet.</p>';
+      return;
+    }
+
+    listEl.innerHTML = '';
+    userKeys.forEach(id => {
+      const u = this.users[id];
+      if (!u) return;
+      const petCount = u.unlockedAnimals ? u.unlockedAnimals.length : 0;
+      const coinCount = u.coins || 0;
+      const lvl = u.level || 1;
+      const streak = u.streak || 0;
+      const lang = u.isFrench ? 'French 🇫🇷' : 'English 🇺🇸';
+
+      const item = document.createElement('div');
+      item.style.background = '#f8fafc';
+      item.style.border = '2px solid #e2e8f0';
+      item.style.borderRadius = '16px';
+      item.style.padding = '14px';
+      item.style.display = 'flex';
+      item.style.flexDirection = 'column';
+      item.style.gap = '8px';
+
+      item.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-weight: 800; font-size: 1.1rem; color: var(--primary);">${u.name}</span>
+          <span style="font-size: 0.8rem; font-weight: 700; background: white; padding: 4px 10px; border-radius: 10px; border: 1px solid #cbd5e1;">Level ${lvl} (${lang})</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 0.85rem; background: white; padding: 10px; border-radius: 12px; border: 1px solid #f1f5f9;">
+          <div><b>🪙 Coins:</b> $${coinCount}</div>
+          <div><b>🐾 Treasures:</b> ${petCount}</div>
+          <div><b>🔥 Streak:</b> ${streak} days</div>
+        </div>
+      `;
+      listEl.appendChild(item);
+    });
   }
 }
 
