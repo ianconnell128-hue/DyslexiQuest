@@ -3611,6 +3611,44 @@ class Game {
       this.renderParentProgressList();
     });
 
+    document.getElementById('parent-tab-security')?.addEventListener('click', () => {
+      document.getElementById('parent-tab-security').className = 'primary';
+      document.getElementById('parent-tab-security').style.background = 'var(--primary)';
+      document.getElementById('parent-tab-security').style.color = 'white';
+      document.getElementById('parent-tab-timer').className = '';
+      document.getElementById('parent-tab-timer').style.background = '#f1f5f9';
+      document.getElementById('parent-tab-timer').style.color = 'var(--text-light)';
+      document.getElementById('parent-tab-progress').className = '';
+      document.getElementById('parent-tab-progress').style.background = '#f1f5f9';
+      document.getElementById('parent-tab-progress').style.color = 'var(--text-light)';
+
+      document.getElementById('parent-view-timer').style.display = 'none';
+      document.getElementById('parent-view-progress').style.display = 'none';
+      document.getElementById('parent-view-security').style.display = 'block';
+      this.updateParentPinStatusUI();
+    });
+
+    document.getElementById('save-parent-pin-btn')?.addEventListener('click', () => {
+      const pin = document.getElementById('parent-pin-input').value.trim();
+      if (/^\d{4}$/.test(pin)) {
+        localStorage.setItem('dyslexiquest_parent_pin', pin);
+        alert("🔒 4-Digit Parent PIN saved successfully!");
+        document.getElementById('parent-pin-input').value = '';
+        this.updateParentPinStatusUI();
+      } else {
+        alert("Please enter a valid 4-digit numeric PIN.");
+      }
+    });
+
+    document.getElementById('clear-parent-pin-btn')?.addEventListener('click', () => {
+      if (confirm("Remove Parent PIN and switch back to Math Verification?")) {
+        localStorage.removeItem('dyslexiquest_parent_pin');
+        document.getElementById('parent-pin-input').value = '';
+        this.updateParentPinStatusUI();
+        alert("Parent PIN removed.");
+      }
+    });
+
     document.querySelectorAll('.timer-preset-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const mins = parseInt(e.target.getAttribute('data-mins'));
@@ -3647,6 +3685,18 @@ class Game {
   }
 
   verifyParentalGate() {
+    const savedPin = localStorage.getItem('dyslexiquest_parent_pin');
+    if (savedPin) {
+      const inputPin = prompt("🔒 PARENT VERIFICATION:\n\nEnter your 4-digit Parent PIN:");
+      if (inputPin !== null && inputPin.trim() === savedPin) {
+        return true;
+      } else if (inputPin !== null) {
+        alert("Incorrect Parent PIN. Access restricted.");
+      }
+      return false;
+    }
+
+    // Fallback: Math Verification
     const num1 = Math.floor(Math.random() * 6) + 3;
     const num2 = Math.floor(Math.random() * 7) + 3;
     const answer = num1 * num2;
@@ -3657,6 +3707,18 @@ class Game {
       alert("Incorrect math answer. Access restricted.");
     }
     return false;
+  }
+
+  updateParentPinStatusUI() {
+    const statusText = document.getElementById('parent-pin-status-text');
+    const savedPin = localStorage.getItem('dyslexiquest_parent_pin');
+    if (statusText) {
+      if (savedPin) {
+        statusText.innerHTML = `<span style="color: #10b981;">🔒 Protected by custom 4-digit PIN</span>`;
+      } else {
+        statusText.innerHTML = `<span style="color: #f59e0b;">Status: Using Math Verification fallback (${Math.floor(Math.random()*5+3)} × ${Math.floor(Math.random()*5+3)})</span>`;
+      }
+    }
   }
 
   showParentHubModal() {

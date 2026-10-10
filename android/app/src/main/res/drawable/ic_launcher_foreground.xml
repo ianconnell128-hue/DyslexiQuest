@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Background Shield/Card -->
+    <path
+        android:fillColor="#4F46E5"
+        android:pathData="M18,9h72c4.97,0 9,4.03 9,9v72c0,4.97 -4.03,9 -9,9h-72c-4.97,0 -9,-4.03 -9,-9v-72c0,-4.97 4.03,-9 9,-9z" />
+    
+    <!-- Gold Book Base -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M24,72c15,-4 25,0 30,3c5,-3 15,-7 30,-3v-30c-15,-4 -25,0 -30,3c-5,-3 -15,-7 -30,-3z" />
+    <path
+        android:fillColor="#FBBF24"
+        android:pathData="M24,68c15,-4 25,0 30,3c5,-3 15,-7 30,-3v-28c-15,-4 -25,0 -30,3c-5,-3 -15,-7 -30,-3z" />
+        
+    <!-- Book Spine -->
+    <path
+        android:strokeColor="#B45309"
+        android:strokeWidth="2"
+        android:pathData="M54,43v31" />
+
+    <!-- Magic Sparkle Star -->
+    <path
+        android:fillColor="#FEF08A"
+        android:pathData="M54,16l2.5,7.5l7.5,2.5l-7.5,2.5l-2.5,7.5l-2.5,-7.5l-7.5,-2.5l7.5,-2.5z" />
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M30,26l1.5,4.5l4.5,1.5l-4.5,1.5l-1.5,4.5l-1.5,-4.5l-4.5,-1.5l4.5,-1.5z" />
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M78,26l1.5,4.5l4.5,1.5l-4.5,1.5l-1.5,4.5l-1.5,-4.5l-4.5,-1.5l4.5,-1.5z" />
+</vector>

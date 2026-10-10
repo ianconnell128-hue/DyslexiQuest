@@ -1373,9 +1373,10 @@
       </div>
 
       <!-- Tab Navigation -->
-      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-        <button id="parent-tab-timer" class="primary" style="flex: 1; padding: 10px; font-size: 0.85rem; border-radius: 12px;">⏳ Playtime Limit</button>
-        <button id="parent-tab-progress" style="flex: 1; padding: 10px; font-size: 0.85rem; border-radius: 12px; background: #f1f5f9; color: var(--text-light); border: 1px solid #cbd5e1;">📊 Child Progress</button>
+      <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+        <button id="parent-tab-timer" class="primary" style="flex: 1; padding: 10px 5px; font-size: 0.8rem; border-radius: 12px;">⏳ Playtime Limit</button>
+        <button id="parent-tab-progress" style="flex: 1; padding: 10px 5px; font-size: 0.8rem; border-radius: 12px; background: #f1f5f9; color: var(--text-light); border: 1px solid #cbd5e1;">📊 Child Progress</button>
+        <button id="parent-tab-security" style="flex: 1; padding: 10px 5px; font-size: 0.8rem; border-radius: 12px; background: #f1f5f9; color: var(--text-light); border: 1px solid #cbd5e1;">🔒 Security PIN</button>
       </div>
 
       <!-- Playtime Limit View -->
@@ -1407,6 +1408,22 @@
         
         <div id="parent-child-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow-y: auto;">
           <!-- Dynamically populated per player profile -->
+        </div>
+      </div>
+
+      <!-- Parent Security View -->
+      <div id="parent-view-security" style="display: none;">
+        <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--text);">Parent Verification Method</h3>
+        <p style="color: var(--text-light); font-size: 0.85rem; margin-bottom: 15px;">Set a 4-digit PIN code or use the multiplication check to restrict children from accessing Parent settings or changing timer limits.</p>
+        
+        <div style="background: #f8fafc; padding: 15px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px;">
+          <label style="font-weight: 800; font-size: 0.9rem; color: var(--text);">4-Digit Parent PIN:</label>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="password" id="parent-pin-input" maxlength="4" placeholder="Enter 4 digits" style="padding: 12px; border-radius: 12px; border: 2px solid #cbd5e1; font-weight: 700; width: 150px; font-size: 1.1rem; letter-spacing: 4px; text-align: center;">
+            <button id="save-parent-pin-btn" class="primary" style="padding: 12px 20px; border-radius: 12px; font-size: 0.9rem;">Save PIN</button>
+            <button id="clear-parent-pin-btn" class="danger" style="padding: 12px 15px; border-radius: 12px; font-size: 0.9rem;">Remove PIN</button>
+          </div>
+          <div id="parent-pin-status-text" style="font-size: 0.8rem; color: var(--text-light); font-weight: 700;">Status: Using Math Verification fallback</div>
         </div>
       </div>
 
