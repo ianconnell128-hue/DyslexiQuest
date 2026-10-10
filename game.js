@@ -98,8 +98,8 @@ const RARITY_STATS = {
 };
 
 const MODELS = {
-  cesium: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/CesiumMan/glTF-Binary/CesiumMan.glb',
-  michelle: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/Michelle.glb',
+  cesium: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
+  michelle: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb',
   figure: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/RiggedFigure/glTF-Binary/RiggedFigure.glb',
   astro: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
   fox: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb',
