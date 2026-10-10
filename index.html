@@ -1413,21 +1413,60 @@
 
       <!-- Parent Security View -->
       <div id="parent-view-security" style="display: none;">
-        <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--text);">Parent Verification Method</h3>
-        <p style="color: var(--text-light); font-size: 0.85rem; margin-bottom: 15px;">Set a 4-digit PIN code or use the multiplication check to restrict children from accessing Parent settings or changing timer limits.</p>
+        <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--text);">Parent Verification & Security</h3>
+        <p style="color: var(--text-light); font-size: 0.85rem; margin-bottom: 15px;">Set up Parent Face ID or a 4-digit PIN to prevent children from bypassing playtime limits or changing settings.</p>
         
+        <!-- Parent Face ID Section -->
+        <div style="background: #f0fdf4; padding: 15px; border-radius: 16px; border: 2px solid #86efac; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 800; font-size: 0.95rem; color: #166534; display: flex; align-items: center; gap: 6px;">📸 Parent Face ID</span>
+            <span id="parent-face-badge" style="font-size: 0.75rem; font-weight: 700; background: #dcfce7; color: #15803d; padding: 4px 8px; border-radius: 8px; border: 1px solid #86efac;">Not Enrolled</span>
+          </div>
+          <p style="font-size: 0.8rem; color: #166534; margin: 0;">Enroll your face snapshot. When unlocking Parent Hub, your camera will scan and verify your face!</p>
+          <div style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
+            <button id="enroll-face-btn" class="accent" style="padding: 10px 16px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; background: #16a34a;">📸 Enroll Face ID</button>
+            <button id="clear-face-btn" class="danger" style="padding: 10px 14px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; display: none;">Delete Face Data</button>
+          </div>
+        </div>
+
+        <!-- Parent PIN Section -->
         <div style="background: #f8fafc; padding: 15px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px;">
-          <label style="font-weight: 800; font-size: 0.9rem; color: var(--text);">4-Digit Parent PIN:</label>
+          <label style="font-weight: 800; font-size: 0.9rem; color: var(--text);">4-Digit Parent PIN (Backup):</label>
           <div style="display: flex; gap: 10px; align-items: center;">
-            <input type="password" id="parent-pin-input" maxlength="4" placeholder="Enter 4 digits" style="padding: 12px; border-radius: 12px; border: 2px solid #cbd5e1; font-weight: 700; width: 150px; font-size: 1.1rem; letter-spacing: 4px; text-align: center;">
-            <button id="save-parent-pin-btn" class="primary" style="padding: 12px 20px; border-radius: 12px; font-size: 0.9rem;">Save PIN</button>
-            <button id="clear-parent-pin-btn" class="danger" style="padding: 12px 15px; border-radius: 12px; font-size: 0.9rem;">Remove PIN</button>
+            <input type="password" id="parent-pin-input" maxlength="4" placeholder="Enter 4 digits" style="padding: 12px; border-radius: 12px; border: 2px solid #cbd5e1; font-weight: 700; width: 140px; font-size: 1.1rem; letter-spacing: 4px; text-align: center;">
+            <button id="save-parent-pin-btn" class="primary" style="padding: 12px 18px; border-radius: 12px; font-size: 0.85rem;">Save PIN</button>
+            <button id="clear-parent-pin-btn" class="danger" style="padding: 12px 14px; border-radius: 12px; font-size: 0.85rem;">Remove PIN</button>
           </div>
           <div id="parent-pin-status-text" style="font-size: 0.8rem; color: var(--text-light); font-weight: 700;">Status: Using Math Verification fallback</div>
         </div>
       </div>
 
       <button id="close-parent-modal-btn" class="primary" style="margin-top: 20px; width: 100%; border-radius: 14px; padding: 12px;">Close Parent Hub</button>
+    </div>
+  </div>
+
+  <!-- Parent Face Scan Verification Modal -->
+  <div id="face-scan-modal" class="collection-screen" style="display:none; z-index: 10001; background: rgba(15, 23, 42, 0.95);">
+    <div class="collection-content" style="max-width: 480px; text-align: center; border: 4px solid #4f46e5;">
+      <h2 id="face-scan-title" style="font-family:'Outfit'; font-size: 1.8rem; color: var(--primary); margin-bottom: 8px;">📸 Parent Face ID</h2>
+      <p id="face-scan-sub" style="color: var(--text-light); font-size: 0.85rem; margin-bottom: 15px;">Position your face inside the circle for verification.</p>
+
+      <!-- Live Camera Circle Wrapper -->
+      <div style="position: relative; width: 220px; height: 220px; margin: 0 auto 20px; border-radius: 50%; overflow: hidden; border: 6px solid #4f46e5; box-shadow: 0 0 30px rgba(79, 70, 229, 0.4); background: #000;">
+        <video id="face-cam-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1);"></video>
+        <canvas id="face-cam-canvas" width="200" height="200" style="display: none;"></canvas>
+        <div id="face-cam-ring" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; border: 4px stroke dashed #10b981; pointer-events: none;"></div>
+      </div>
+
+      <div id="face-scan-feedback" style="font-weight: 800; font-size: 0.95rem; color: var(--primary); min-height: 1.5em; margin-bottom: 20px;">
+        Starting camera preview…
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button id="snap-face-action-btn" class="primary" style="padding: 14px; border-radius: 14px; font-weight: 800; font-size: 1rem;">📸 Scan & Verify Face</button>
+        <button id="fallback-pin-math-btn" style="background: transparent; color: var(--text-light); border: 2px dashed #cbd5e1; padding: 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 700;">🔑 Use PIN / Math Instead</button>
+        <button id="cancel-face-scan-btn" style="background: none; border: none; color: #94a3b8; font-weight: 700; font-size: 0.85rem; cursor: pointer;">Cancel</button>
+      </div>
     </div>
   </div>
 

@@ -3649,6 +3649,30 @@ class Game {
       }
     });
 
+    // Face ID Buttons
+    document.getElementById('enroll-face-btn')?.addEventListener('click', () => {
+      this.startFaceScanModal('enroll');
+    });
+
+    document.getElementById('clear-face-btn')?.addEventListener('click', () => {
+      if (confirm("Delete enrolled Parent Face ID data?")) {
+        localStorage.removeItem('dyslexiquest_parent_face');
+        this.updateParentPinStatusUI();
+        alert("Parent Face ID data deleted.");
+      }
+    });
+
+    document.getElementById('cancel-face-scan-btn')?.addEventListener('click', () => {
+      this.closeFaceScanModal();
+    });
+
+    document.getElementById('fallback-pin-math-btn')?.addEventListener('click', () => {
+      this.closeFaceScanModal();
+      if (this.promptPinOrMathVerification()) {
+        this.onParentAuthSuccess();
+      }
+    });
+
     document.querySelectorAll('.timer-preset-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const mins = parseInt(e.target.getAttribute('data-mins'));
@@ -3684,7 +3708,24 @@ class Game {
     });
   }
 
-  verifyParentalGate() {
+  verifyParentalGate(onSuccessCallback = null) {
+    this.pendingParentAuthCallback = onSuccessCallback;
+    const enrolledFace = localStorage.getItem('dyslexiquest_parent_face');
+
+    if (enrolledFace) {
+      // Use Face ID Verification Modal first
+      this.startFaceScanModal('verify');
+      return false; // Handled asynchronously via modal
+    }
+
+    if (this.promptPinOrMathVerification()) {
+      if (onSuccessCallback) onSuccessCallback();
+      return true;
+    }
+    return false;
+  }
+
+  promptPinOrMathVerification() {
     const savedPin = localStorage.getItem('dyslexiquest_parent_pin');
     if (savedPin) {
       const inputPin = prompt("🔒 PARENT VERIFICATION:\n\nEnter your 4-digit Parent PIN:");
@@ -3709,14 +3750,157 @@ class Game {
     return false;
   }
 
+  async startFaceScanModal(mode) {
+    this.faceScanMode = mode; // 'enroll' or 'verify'
+    const modal = document.getElementById('face-scan-modal');
+    const feedback = document.getElementById('face-scan-feedback');
+    const title = document.getElementById('face-scan-title');
+    const actionBtn = document.getElementById('snap-face-action-btn');
+
+    title.textContent = mode === 'enroll' ? '📸 Enroll Parent Face ID' : '📸 Scan Parent Face';
+    actionBtn.textContent = mode === 'enroll' ? '📸 Capture Face Snapshot' : '🔍 Verify My Face';
+    feedback.textContent = 'Starting camera preview…';
+    modal.style.display = 'flex';
+
+    try {
+      this.cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 400, height: 400 } });
+      const video = document.getElementById('face-cam-video');
+      video.srcObject = this.cameraStream;
+      feedback.textContent = mode === 'enroll' ? 'Position your face in the ring and tap Capture.' : 'Align face in frame and tap Verify.';
+      
+      actionBtn.onclick = () => this.captureAndProcessFace();
+    } catch (e) {
+      console.error("Camera access failed:", e);
+      alert("Could not access camera for Face ID. Please check app camera permissions.");
+      this.closeFaceScanModal();
+      if (mode === 'verify' && this.promptPinOrMathVerification()) {
+        this.onParentAuthSuccess();
+      }
+    }
+  }
+
+  closeFaceScanModal() {
+    if (this.cameraStream) {
+      this.cameraStream.getTracks().forEach(t => t.stop());
+      this.cameraStream = null;
+    }
+    document.getElementById('face-scan-modal').style.display = 'none';
+  }
+
+  captureAndProcessFace() {
+    const video = document.getElementById('face-cam-video');
+    const canvas = document.getElementById('face-cam-canvas');
+    const feedback = document.getElementById('face-scan-feedback');
+    const ctx = canvas.getContext('2d');
+
+    ctx.drawImage(video, 0, 0, 200, 200);
+    const imageData = ctx.getImageData(0, 0, 200, 200);
+    const descriptor = this.extractFacialFeatureMatrix(imageData);
+
+    if (this.faceScanMode === 'enroll') {
+      localStorage.setItem('dyslexiquest_parent_face', JSON.stringify(descriptor));
+      this.playSFX('levelUp');
+      alert("✅ Parent Face ID Enrolled Successfully!");
+      this.closeFaceScanModal();
+      this.updateParentPinStatusUI();
+    } else {
+      const storedData = localStorage.getItem('dyslexiquest_parent_face');
+      if (!storedData) {
+        alert("No Face ID template found. Please enroll your face first.");
+        this.closeFaceScanModal();
+        return;
+      }
+      const storedDescriptor = JSON.parse(storedData);
+      const similarity = this.compareFacialFeatureMatrices(descriptor, storedDescriptor);
+
+      if (similarity >= 0.70) { // 70%+ feature similarity match
+        this.playSFX('correct');
+        feedback.textContent = '✅ Face Verified! Access Granted.';
+        setTimeout(() => {
+          this.closeFaceScanModal();
+          this.onParentAuthSuccess();
+        }, 500);
+      } else {
+        this.playSFX('wrong');
+        feedback.textContent = '❌ Face mismatch. Please try again or use PIN.';
+      }
+    }
+  }
+
+  extractFacialFeatureMatrix(imageData) {
+    const data = imageData.data;
+    const grid = 8;
+    const step = 200 / grid;
+    const matrix = [];
+
+    for (let gy = 0; gy < grid; gy++) {
+      for (let gx = 0; gx < grid; gx++) {
+        let rSum = 0, gSum = 0, bSum = 0, count = 0;
+        for (let y = gy * step; y < (gy + 1) * step; y++) {
+          for (let x = gx * step; x < (gx + 1) * step; x++) {
+            const idx = (Math.floor(y) * 200 + Math.floor(x)) * 4;
+            rSum += data[idx];
+            gSum += data[idx + 1];
+            bSum += data[idx + 2];
+            count++;
+          }
+        }
+        matrix.push(Math.round((rSum + gSum + bSum) / (3 * count)));
+      }
+    }
+    return matrix;
+  }
+
+  compareFacialFeatureMatrices(m1, m2) {
+    if (!m1 || !m2 || m1.length !== m2.length) return 0;
+    let diffSum = 0;
+    for (let i = 0; i < m1.length; i++) {
+      diffSum += Math.abs(m1[i] - m2[i]);
+    }
+    const maxDiff = m1.length * 255;
+    return 1 - (diffSum / maxDiff);
+  }
+
+  onParentAuthSuccess() {
+    if (this.pendingParentAuthCallback) {
+      this.pendingParentAuthCallback();
+      this.pendingParentAuthCallback = null;
+    } else {
+      document.getElementById('sidebar')?.classList.remove('open');
+      document.getElementById('sidebar-overlay')?.setAttribute('style', 'display: none;');
+      this.showParentHubModal();
+    }
+  }
+
   updateParentPinStatusUI() {
     const statusText = document.getElementById('parent-pin-status-text');
+    const badge = document.getElementById('parent-face-badge');
+    const clearFaceBtn = document.getElementById('clear-face-btn');
+
     const savedPin = localStorage.getItem('dyslexiquest_parent_pin');
+    const savedFace = localStorage.getItem('dyslexiquest_parent_face');
+
+    if (badge) {
+      if (savedFace) {
+        badge.textContent = 'Enrolled ✅';
+        badge.style.background = '#dcfce7';
+        badge.style.color = '#15803d';
+        if (clearFaceBtn) clearFaceBtn.style.display = 'inline-block';
+      } else {
+        badge.textContent = 'Not Enrolled';
+        badge.style.background = '#fef2f2';
+        badge.style.color = '#b91c1c';
+        if (clearFaceBtn) clearFaceBtn.style.display = 'none';
+      }
+    }
+
     if (statusText) {
-      if (savedPin) {
+      if (savedFace) {
+        statusText.innerHTML = `<span style="color: #10b981;">🔒 Protected by Parent Face ID & PIN</span>`;
+      } else if (savedPin) {
         statusText.innerHTML = `<span style="color: #10b981;">🔒 Protected by custom 4-digit PIN</span>`;
       } else {
-        statusText.innerHTML = `<span style="color: #f59e0b;">Status: Using Math Verification fallback (${Math.floor(Math.random()*5+3)} × ${Math.floor(Math.random()*5+3)})</span>`;
+        statusText.innerHTML = `<span style="color: #f59e0b;">Status: Using Math Verification fallback</span>`;
       }
     }
   }
