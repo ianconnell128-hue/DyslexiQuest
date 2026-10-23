@@ -142,7 +142,103 @@
       });
     }
 
+    function openShareModal() {
+      const modal = $('share-modal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeShareModal() {
+      const modal = $('share-modal');
+      if (modal) modal.style.display = 'none';
+      const toast = $('share-copy-toast');
+      if (toast) toast.style.display = 'none';
+    }
+
+    const shareBtn = $('share-apk-btn');
+    if (shareBtn) shareBtn.addEventListener('click', openShareModal);
+
+    const shareSidebarBtn = $('share-sidebar-btn');
+    if (shareSidebarBtn) shareSidebarBtn.addEventListener('click', openShareModal);
+
+    const closeShareBtn = $('close-share-modal-btn');
+    if (closeShareBtn) closeShareBtn.addEventListener('click', closeShareModal);
+
+    // Option 1: Gmail / Email
+    const emailOpt = $('share-option-email');
+    if (emailOpt) {
+      emailOpt.addEventListener('click', () => {
+        closeShareModal();
+        const activeBridge = (window.AndroidUpdater && typeof window.AndroidUpdater.shareEmail === 'function')
+          ? window.AndroidUpdater
+          : null;
+
+        const downloadUrl = (activeBridge && typeof activeBridge.getLatestDownloadUrl === 'function')
+          ? activeBridge.getLatestDownloadUrl()
+          : 'https://github.com/thundergeek/dyslexiquest-releases/releases/latest';
+
+        if (activeBridge) {
+          activeBridge.shareEmail(downloadUrl);
+        } else {
+          const subject = encodeURIComponent('Play DyslexiQuest - Interactive Reading Game!');
+          const body = encodeURIComponent(
+            'Hi!\n\nHere is DyslexiQuest, a fun reading and speech game for kids with 3D pets, quests, and mini-games!\n\nTap here to download and install on Android:\n' + downloadUrl + '\n\nEnjoy the quest!'
+          );
+          window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        }
+      });
+    }
+
+    // Option 2: Send Raw APK File
+    const fileOpt = $('share-option-file');
+    if (fileOpt) {
+      fileOpt.addEventListener('click', () => {
+        closeShareModal();
+        const activeBridge = (window.AndroidUpdater && typeof window.AndroidUpdater.shareApk === 'function')
+          ? window.AndroidUpdater
+          : null;
+
+        if (activeBridge) {
+          activeBridge.shareApk();
+        } else if (navigator.share) {
+          navigator.share({
+            title: 'DyslexiQuest APK',
+            text: 'Download DyslexiQuest Android app:',
+            url: 'https://github.com/thundergeek/dyslexiquest-releases/releases/latest'
+          }).catch(() => {});
+        } else {
+          window.open('https://github.com/thundergeek/dyslexiquest-releases/releases/latest', '_blank');
+        }
+      });
+    }
+
+    // Option 3: Copy Direct Link
+    const copyOpt = $('share-option-copy');
+    if (copyOpt) {
+      copyOpt.addEventListener('click', () => {
+        const activeBridge = (window.AndroidUpdater && typeof window.AndroidUpdater.getLatestDownloadUrl === 'function')
+          ? window.AndroidUpdater
+          : null;
+
+        const downloadUrl = (activeBridge && typeof activeBridge.getLatestDownloadUrl === 'function')
+          ? activeBridge.getLatestDownloadUrl()
+          : 'https://github.com/thundergeek/dyslexiquest-releases/releases/latest';
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(downloadUrl).then(() => {
+            const toast = $('share-copy-toast');
+            if (toast) toast.style.display = 'block';
+          }).catch(() => {
+            prompt('Copy this download link:', downloadUrl);
+          });
+        } else {
+          prompt('Copy this download link:', downloadUrl);
+        }
+      });
+    }
+
+
     // When returning from Android's permission screen, continue the install.
+
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible' && waitingForPermission && b.canInstall()) {
         b.resumeInstall();

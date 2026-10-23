@@ -1,16 +1,17 @@
 apply plugin: 'com.android.application'
 
 // ---------------------------------------------------------------------------
-// Versioning: versionCode = number of git commits, so every committed build is
-// strictly newer than the last. Override with -PdqVersionCode=N if needed.
+// Versioning: versionCode starts at 126 to strictly supersede all prior
+// releases (including v125), incrementing with new commits.
 // ---------------------------------------------------------------------------
 def gitCommitCount = { ->
     try {
         def p = ['git', 'rev-list', '--count', 'HEAD'].execute(null, rootProject.projectDir.parentFile)
         p.waitFor()
-        return p.text.trim().toInteger()
+        def count = p.text.trim().toInteger()
+        return Math.max(126, count)
     } catch (ignored) {
-        return 1
+        return 126
     }
 }
 def dqVersionCode = project.hasProperty('dqVersionCode') ? project.property('dqVersionCode').toInteger() : gitCommitCount()

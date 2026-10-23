@@ -1345,6 +1345,9 @@
         </div>
         <button id="update-check-btn" style="padding: 10px; font-size: 0.75rem; width: 100%;">🔄 Check for updates</button>
         <button id="update-install-btn" class="primary" style="display: none; padding: 10px; font-size: 0.75rem; width: 100%; margin-top: 6px;">⬇️ Download &amp; install</button>
+        <button id="share-apk-btn" style="padding: 10px; font-size: 0.75rem; width: 100%; margin-top: 6px; background: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <span>📤 Share APK with Friends</span>
+        </button>
 
         <!-- Diagnostics Sub-section -->
         <div style="border-top: 1px dashed #cbd5e1; margin-top: 10px; padding-top: 8px;">
@@ -1466,6 +1469,53 @@
         <button id="snap-face-action-btn" class="primary" style="padding: 14px; border-radius: 14px; font-weight: 800; font-size: 1rem;">📸 Scan & Verify Face</button>
         <button id="fallback-pin-math-btn" style="background: transparent; color: var(--text-light); border: 2px dashed #cbd5e1; padding: 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 700;">🔑 Use PIN / Math Instead</button>
         <button id="cancel-face-scan-btn" style="background: none; border: none; color: #94a3b8; font-weight: 700; font-size: 0.85rem; cursor: pointer;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share App / APK Modal -->
+  <div id="share-modal" class="collection-screen" style="display:none; z-index: 10002; background: rgba(15, 23, 42, 0.85);">
+    <div class="collection-content" style="max-width: 480px; text-align: left; padding: 25px; border-radius: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
+        <h2 style="font-family:'Outfit'; font-size: 1.6rem; color: var(--primary); margin: 0;">📤 Share DyslexiQuest</h2>
+        <button id="close-share-modal-btn" style="background: #f1f5f9; border: none; font-size: 1.2rem; border-radius: 50%; width: 36px; height: 36px; cursor: pointer;">✕</button>
+      </div>
+
+      <p style="color: var(--text-light); font-size: 0.85rem; margin-bottom: 20px;">
+        Share DyslexiQuest with your friends, family, or students! Choose how you'd like to send it:
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+        <!-- Option 1: Gmail / Email -->
+        <button id="share-option-email" style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 16px; border: 2px solid #e0e7ff; background: #eef2ff; text-align: left; cursor: pointer; transition: all 0.2s;">
+          <span style="font-size: 1.8rem;">✉️</span>
+          <div>
+            <div style="font-weight: 800; font-size: 0.95rem; color: #3730a3;">Email / Gmail (1-Tap Install Link)</div>
+            <div style="font-size: 0.75rem; color: #4f46e5; margin-top: 2px;">Opens Gmail. Note: Gmail blocks raw .apk attachments for security, so this sends a safe 1-tap download link!</div>
+          </div>
+        </button>
+
+        <!-- Option 2: Raw APK file -->
+        <button id="share-option-file" style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 16px; border: 2px solid #dcfce7; background: #f0fdf4; text-align: left; cursor: pointer; transition: all 0.2s;">
+          <span style="font-size: 1.8rem;">📦</span>
+          <div>
+            <div style="font-weight: 800; font-size: 0.95rem; color: #166534;">Send Raw APK File (Messaging Apps)</div>
+            <div style="font-size: 0.75rem; color: #15803d; margin-top: 2px;">Attaches complete .apk file. Best for WhatsApp, Quick Share, Google Drive, or Bluetooth.</div>
+          </div>
+        </button>
+
+        <!-- Option 3: Copy Link -->
+        <button id="share-option-copy" style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 16px; border: 2px solid #e2e8f0; background: white; text-align: left; cursor: pointer; transition: all 0.2s;">
+          <span style="font-size: 1.8rem;">📋</span>
+          <div>
+            <div style="font-weight: 800; font-size: 0.95rem; color: var(--text);">Copy Direct Download Link</div>
+            <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 2px;">Copies direct download link to clipboard to paste in any message.</div>
+          </div>
+        </button>
+      </div>
+
+      <div id="share-copy-toast" style="display: none; background: #10b981; color: white; padding: 10px; border-radius: 12px; text-align: center; font-weight: 700; font-size: 0.85rem; margin-bottom: 10px;">
+        ✅ Direct APK link copied to clipboard!
       </div>
     </div>
   </div>
@@ -1885,5 +1935,6 @@
 
   <!-- In-app updater UI (Android app only) -->
   <script src="updater-ui.js"></script>
+  <script src="notifications-ui.js"></script>
 </body>
 </html>
