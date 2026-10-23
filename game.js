@@ -942,7 +942,7 @@ class Game {
     if (this.level >= 2 && (this.level % 2 === 0)) {
       const animal = this.getAnimalForLevel();
       if (animal) {
-        this.startCatchingSequence(animal);
+        this.showUnlockScreen(animal);
         return;
       }
     }
@@ -2292,7 +2292,7 @@ class Game {
     this.saveProfile();
     const animal = this.getAnimalForLevel();
     if (animal) {
-      this.startCatchingSequence(animal);
+      this.showUnlockScreen(animal);
       return true;
     }
     this.newTarget();
@@ -3277,7 +3277,63 @@ class Game {
     }
   }
 
-  showUnlockScreen(animal) { this.startCatchingSequence(animal); }
+  showUnlockScreen(animal) {
+    this.playSFX('levelUp');
+    const usedNames = this.unlockedAnimals.map(u => u.petName);
+    const availableNames = PET_NAMES.filter(n => !usedNames.includes(n));
+    const petName = availableNames[Math.floor(Math.random() * availableNames.length)] || `${animal.name} #${this.unlockedAnimals.length + 1}`;
+    
+    // Add animal to collection immediately
+    this.unlockedAnimals.push({ animalName: animal.name, petName: petName, level: this.level });
+    this.updateQuestProgress('capture_animal', 1);
+    this.updateCollectionButton();
+    this.saveProfile();
+
+    const screen = document.getElementById('unlock-screen');
+    const content = document.getElementById('unlock-content');
+    if (screen && content) {
+      content.innerHTML = `
+        <div class="unlock-title" style="font-family:'Outfit'; font-size:1.8rem; font-weight:800; color:var(--primary); text-align:center; margin-bottom:6px;">✨ NEW TREASURE UNLOCKED! ✨</div>
+        <div class="rarity-display rarity-${animal.rarity ? animal.rarity.toLowerCase() : 'common'}" style="text-align:center; font-weight:700; margin-bottom:8px;">${animal.rarity || 'Common'}</div>
+        <h2 style="font-size:2rem; margin:6px 0; font-family:'Outfit'; text-align:center;">${petName}</h2>
+        <p style="color:var(--text-light); margin-bottom:15px; text-align:center;">The ${animal.name}</p>
+        <div class="unlock-animal-container" id="prize-model-container" style="width:240px; height:240px; margin:0 auto 15px auto;">
+          <model-viewer id="prize-model" src="${animal.model}" shadow-intensity="1" camera-controls auto-rotate ar style="width:100%;height:100%;--poster-color:transparent" class="unlock-animal-model" alt="${animal.name}"></model-viewer>
+        </div>
+        <button id="continue-unlock-btn" class="unlock-btn" style="background:var(--primary); color:white; border:none; padding:14px 32px; border-radius:50px; font-size:1.1rem; font-weight:800; cursor:pointer; display:block; margin:0 auto; box-shadow:0 6px 20px rgba(59,130,246,0.4);">Claim Treasure!</button>
+      `;
+      const btn = document.getElementById('continue-unlock-btn');
+      if (btn) {
+        btn.addEventListener('click', () => {
+          this.playSFX('click');
+          this.animatePrizeToChest();
+        });
+      }
+      screen.style.display = 'flex';
+    } else {
+      this.animatePrizeToChest();
+    }
+  }
+
+  animatePrizeToChest() {
+    const screen = document.getElementById('unlock-screen');
+    if (screen) screen.style.display = 'none';
+
+    const chest = document.getElementById('chest-container');
+    if (chest) {
+      chest.style.transform = 'scale(1.5) rotate(15deg)';
+      setTimeout(() => {
+        chest.style.transform = 'scale(1) rotate(0deg)';
+        const badge = document.getElementById('chest-badge');
+        if (badge) {
+          badge.style.display = 'block';
+          badge.textContent = this.unlockedAnimals.length;
+        }
+        this.playSFX('correct');
+      }, 300);
+    }
+    this.newTarget();
+  }
 
   showCollectionScreen() {
     this.playSFX('click');
