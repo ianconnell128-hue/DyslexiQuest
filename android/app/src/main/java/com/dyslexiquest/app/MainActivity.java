@@ -129,19 +129,32 @@ public class MainActivity extends BridgeActivity {
                         try {
                             Intent intent = Intent.parseUri(urlStr, Intent.URI_INTENT_SCHEME);
                             if (intent != null) {
-                                if (getPackageManager().resolveActivity(intent, 0) != null) {
+                                // Add NEW_TASK flag so it opens as an external independent activity
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                if (intent.resolveActivity(getPackageManager()) != null) {
                                     startActivity(intent);
                                     return true;
+                                }
+                                // Try without package restriction if specific Google app package isn't matched
+                                if (intent.getPackage() != null) {
+                                    Intent genericIntent = new Intent(intent);
+                                    genericIntent.setPackage(null);
+                                    if (genericIntent.resolveActivity(getPackageManager()) != null) {
+                                        startActivity(genericIntent);
+                                        return true;
+                                    }
                                 }
                                 // Fallback to browser fallback url if present
                                 String fallback = intent.getStringExtra("browser_fallback_url");
                                 if (fallback != null) {
-                                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(fallback)));
+                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(fallback));
+                                    browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(browserIntent);
                                     return true;
                                 }
                             }
-                        } catch (URISyntaxException e) {
-                            Log.e(TAG, "Failed to parse AR intent: " + urlStr, e);
+                        } catch (Exception e) {
+                            Log.e(TAG, "Failed to launch AR intent: " + urlStr, e);
                         }
                     }
                 }
