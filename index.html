@@ -1289,9 +1289,7 @@
       <p style="color:var(--text-light); margin-bottom: 20px;">Choose your hero for the adventure!</p>
       
       <div style="height: 250px; margin-bottom: 20px; background: radial-gradient(circle, #f8fafc 0%, #ffffff 100%); border-radius: 24px; position: relative;">
-        <model-viewer ar ar-modes="scene-viewer webxr quick-look" ar-scale="auto" camera-controls autoplay id="avatar-preview-model" shadow-intensity="1" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" autoplay animation-name="Idle" style="width:100%; height:100%;">
-          <button slot="ar-button" class="custom-ar-button">📱 AR</button>
-        </model-viewer>
+        <model-viewer camera-controls autoplay id="avatar-preview-model" shadow-intensity="1" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" animation-name="Idle" style="width:100%; height:100%;"></model-viewer>
       </div>
 
       <div style="text-align: left; margin-bottom: 20px;">
@@ -1883,9 +1881,7 @@
       <p id="detail-animal-name" style="color:var(--text-light); font-weight:700; text-transform:uppercase; font-size:0.9rem; margin-bottom:20px;"></p>
       
       <div class="unlock-animal-container" style="height: 250px; margin-bottom: 20px; position: relative;">
-        <model-viewer ar ar-modes="scene-viewer webxr quick-look" ar-scale="auto" camera-controls autoplay id="detail-model" shadow-intensity="1" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" autoplay animation-name="Idle" style="width:100%; height:100%; --poster-color:#ffffff; filter: drop-shadow(0 0 10px white) drop-shadow(0 0 5px white);">
-          <button slot="ar-button" class="custom-ar-button">📱 VIEW IN AR</button>
-        </model-viewer>
+        <model-viewer camera-controls autoplay id="detail-model" shadow-intensity="1" camera-orbit="0deg 75deg auto" disable-zoom interaction-prompt="none" animation-name="Idle" style="width:100%; height:100%; --poster-color:#ffffff; filter: drop-shadow(0 0 10px white) drop-shadow(0 0 5px white);"></model-viewer>
       </div>
 
       <div style="text-align: left; background: #f8fafc; padding: 20px; border-radius: 20px; margin-bottom: 20px;">

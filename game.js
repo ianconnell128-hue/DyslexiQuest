@@ -3579,7 +3579,7 @@ class Game {
         <h2 style="font-size:2rem; margin:6px 0; font-family:'Outfit'; text-align:center;">${petName}</h2>
         <p style="color:var(--text-light); margin-bottom:15px; text-align:center;">The ${animal.name}</p>
         <div class="unlock-animal-container" id="prize-model-container" style="width:240px; height:240px; margin:0 auto 15px auto;">
-          <model-viewer id="prize-model" src="${animal.model}" shadow-intensity="1" camera-controls auto-rotate ar style="width:100%;height:100%;--poster-color:transparent" class="unlock-animal-model" alt="${animal.name}"></model-viewer>
+          <model-viewer id="prize-model" src="${animal.model}" shadow-intensity="1" camera-controls auto-rotate style="width:100%;height:100%;--poster-color:transparent" class="unlock-animal-model" alt="${animal.name}"></model-viewer>
         </div>
         <button id="continue-unlock-btn" class="unlock-btn" style="background:var(--primary); color:white; border:none; padding:14px 32px; border-radius:50px; font-size:1.1rem; font-weight:800; cursor:pointer; display:block; margin:0 auto; box-shadow:0 6px 20px rgba(59,130,246,0.4);">Claim Treasure!</button>
       `;
