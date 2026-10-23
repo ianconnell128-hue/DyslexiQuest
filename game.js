@@ -15,11 +15,11 @@ const QUEST_TEMPLATES = [
 ];
 
 const SONGS = {
-  1: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-  2: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-  3: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-  4: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
-  5: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
+  1: 'music/epique_celte.mp3', // DyslexiQuest Official Theme Song (Epique Celte)
+  2: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+  3: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+  4: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+  5: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
   6: 'https://raw.githubusercontent.com/effacestudios/Royalty-Free-Music-Pack/master/technologist.mp3',
   7: 'https://raw.githubusercontent.com/Solanacean/GrimoireDigiMusicDLL/master/Music/!UPBEAT.mp3'
 };
