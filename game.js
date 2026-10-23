@@ -278,7 +278,11 @@ class Game {
     this.avatarColors = { skin: COLORS.skin[0], hair: COLORS.hair[0], eye: COLORS.eye[0] };
     this.activeQuests = []; this.lastQuestRefresh = null;
     this.currentSong = 1;
-    this.equippedPets = []; this.bgm = new Audio(SONGS[this.currentSong]); this.bgm.loop = true; this.bgm.volume = 0.2;
+    this.equippedPets = []; this.bgm = new Audio(SONGS[this.currentSong]); this.bgm.loop = true; 
+    this.normalBgmVolume = 0.25;
+    this.duckedBgmVolume = 0.04;
+    this.isAudioDucked = false;
+    this.bgm.volume = this.normalBgmVolume;
     this.musicEnabled = true;
     this.dyslexicFont = false;
     this.timerInterval = null; this.remainingSeconds = 0; this.totalTimerSeconds = 0;
@@ -287,6 +291,26 @@ class Game {
     this.recognition = null; this.isListening = false; this.sounds = {};
     Object.entries(SFX).forEach(([key, url]) => { this.sounds[key] = new Audio(url); this.sounds[key].volume = 0.5; });
     this.initSpeechRecognition();
+  }
+
+  duckMusic(durationMs = 0) {
+    if (!this.bgm) return;
+    this.isAudioDucked = true;
+    this.bgm.volume = this.duckedBgmVolume;
+    if (this._duckTimer) { clearTimeout(this._duckTimer); this._duckTimer = null; }
+    if (durationMs > 0) {
+      this._duckTimer = setTimeout(() => {
+        this.restoreMusic();
+      }, durationMs);
+    }
+  }
+
+  restoreMusic() {
+    if (this._duckTimer) { clearTimeout(this._duckTimer); this._duckTimer = null; }
+    this.isAudioDucked = false;
+    if (this.bgm) {
+      this.bgm.volume = this.normalBgmVolume;
+    }
   }
 
   initSpeechRecognition() {
@@ -299,6 +323,7 @@ class Game {
 
       this.recognition.onstart = () => {
         this.isListening = true;
+        this.duckMusic();
         const targetId = this.isTestMode ? 'mic-test-btn' : 'mic-btn';
         const micBtn = document.getElementById(targetId);
         if (micBtn) micBtn.classList.add('mic-listening');
@@ -344,6 +369,7 @@ class Game {
       this.recognition.onerror = (event) => {
         console.error("Speech recognition error:", event.error);
         this.isListening = false;
+        this.restoreMusic();
         const feedbackId = this.isTestMode ? 'mic-test-feedback' : 'speech-feedback';
         const feedback = document.getElementById(feedbackId);
         if (feedback) {
@@ -360,6 +386,7 @@ class Game {
 
       this.recognition.onend = () => {
         this.isListening = false;
+        this.restoreMusic();
         const targetId = this.isTestMode ? 'mic-test-btn' : 'mic-btn';
         const micBtn = document.getElementById(targetId);
         if (micBtn) micBtn.classList.remove('mic-listening');
@@ -1013,6 +1040,11 @@ class Game {
     const speakBtn = document.getElementById('speak-btn'); if (speakBtn) { speakBtn.classList.add('listen-pulse'); setTimeout(() => speakBtn.classList.remove('listen-pulse'), 2000); }
     if (this.currentAudio) { this.currentAudio.pause(); this.currentAudio = null; }
 
+    // Duck music down while the voice speaks
+    // Estimated speech duration based on word length, minimum 1600ms
+    const estimatedSpeechDuration = Math.max(1600, (text.length * 150) + 700);
+    this.duckMusic(estimatedSpeechDuration);
+
     // Direct Native Android TextToSpeech
     if (window.AndroidSpeechBridge && typeof window.AndroidSpeechBridge.speakText === 'function') {
       window.AndroidSpeechBridge.speakText(text, this.isFrench ? 'fr-CA' : 'en-US', 0.85, 1.0);
@@ -1030,6 +1062,8 @@ class Game {
       }
       msg.rate = 0.85;
       msg.pitch = 1.0;
+      msg.onend = () => { this.restoreMusic(); };
+      msg.onerror = () => { this.restoreMusic(); };
       window.speechSynthesis.speak(msg);
     };
     sysSpeak();
