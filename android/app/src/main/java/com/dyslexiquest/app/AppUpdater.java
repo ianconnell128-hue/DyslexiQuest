@@ -45,8 +45,13 @@ import java.util.concurrent.Executors;
 public class AppUpdater {
 
     private static final String TAG = "DyslexiQuestUpdater";
-    // Only download APKs from our own releases repo (and GitHub's download CDN it redirects to).
+    // Allowed download locations: local Play Store portal, raw GitHub, or GitHub release assets
     private static final String[] ALLOWED_APK_PREFIXES = {
+            "http://192.168.1.221:8089/",
+            "http://10.0.2.2:8089/",
+            "https://github.com/ianconnell128-hue/DyslexiQuest/",
+            "https://raw.githubusercontent.com/ianconnell128-hue/DyslexiQuest/",
+            "https://objects.githubusercontent.com/",
             "https://github.com/thundergeek/dyslexiquest-releases/",
     };
     private static final int MAX_MANIFEST_BYTES = 64 * 1024;
@@ -87,7 +92,25 @@ public class AppUpdater {
             JSONObject result = new JSONObject();
             try {
                 result.put("current", BuildConfig.VERSION_CODE);
-                String body = httpGetString(BuildConfig.UPDATE_MANIFEST_URL);
+                String body = null;
+                // Try local playstore portal first, then fallback to configured buildConfig URL
+                String[] candidateUrls = {
+                    "http://192.168.1.221:8089/latest.json",
+                    "https://raw.githubusercontent.com/ianconnell128-hue/DyslexiQuest/android-app/dist/latest.json",
+                    BuildConfig.UPDATE_MANIFEST_URL
+                };
+                Exception lastEx = null;
+                for (String u : candidateUrls) {
+                    try {
+                        body = httpGetString(u);
+                        if (body != null && body.trim().startsWith("{")) break;
+                    } catch (Exception ex) {
+                        lastEx = ex;
+                    }
+                }
+                if (body == null) {
+                    throw (lastEx != null) ? lastEx : new Exception("Unable to reach update server");
+                }
                 JSONObject m = new JSONObject(body);
                 int latest = m.getInt("versionCode");
                 lastManifest = m;
