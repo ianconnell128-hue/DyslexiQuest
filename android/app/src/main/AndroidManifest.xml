@@ -34,21 +34,31 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
+
+        <!-- Google Play Services for AR (ARCore) Optional metadata -->
+        <meta-data android:name="com.google.ar.core" android:value="optional" />
     </application>
 
     <!-- Permissions -->
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.ar" android:required="false" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- In-app updater (sideloaded builds only). Remove for a Google Play build: Play restricts this permission. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
-    <!-- Queries required for Android 11+ SpeechRecognizer & TextToSpeech -->
+    <!-- Queries required for Android 11+ Scene Viewer Intent, ARCore, Speech & TTS -->
     <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="intent" />
+        </intent>
+        <package android:name="com.google.ar.core" />
         <intent>
             <action android:name="android.speech.RecognitionService" />
         </intent>
