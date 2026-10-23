@@ -1732,6 +1732,40 @@
     </div>
   </div>
 
+  <!-- Mystery Bags XP Level-up Carousel Modal -->
+  <div id="mystery-bag-modal" class="modal" style="display:none; z-index: 10005; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(10px);">
+    <div class="modal-content" style="max-width: 520px; width: 94%; padding: 24px 18px; border-radius: 32px; border: 4px solid #f59e0b; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; position: relative; overflow: hidden;">
+      
+      <!-- Sparkle Header -->
+      <div style="font-size: 0.95rem; font-weight: 800; color: #f59e0b; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px;">XP Bar Full! • Level Up!</div>
+      <h2 id="mystery-bag-title" style="font-family:'Outfit'; font-size: 2rem; color: #1e293b; margin: 0 0 6px 0;">Mystery Bag Roll</h2>
+      <p id="mystery-bag-subtitle" style="font-size: 0.95rem; color: var(--text-light); margin: 0 0 16px 0;">Cycling through mystery bags...</p>
+
+      <!-- Conveyor / Slot Carousel Window -->
+      <div style="position: relative; width: 100%; height: 140px; background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%); border-radius: 20px; border: 3px solid #cbd5e1; overflow: hidden; margin-bottom: 18px; box-shadow: inset 0 4px 12px rgba(0,0,0,0.08);">
+        
+        <!-- Center Target Indicator / Selector Arrow -->
+        <div style="position: absolute; top: 0; bottom: 0; left: 50%; width: 106px; transform: translateX(-50%); border: 3px solid #f59e0b; border-radius: 16px; pointer-events: none; z-index: 10; box-shadow: 0 0 20px rgba(245, 158, 11, 0.45); background: rgba(254, 243, 199, 0.2);">
+          <div style="position: absolute; top: -2px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 9px solid transparent; border-right: 9px solid transparent; border-top: 10px solid #f59e0b;"></div>
+          <div style="position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 9px solid transparent; border-right: 9px solid transparent; border-bottom: 10px solid #f59e0b;"></div>
+        </div>
+
+        <!-- Sliding Track -->
+        <div id="mystery-bag-track" style="display: flex; align-items: center; height: 100%; position: absolute; left: 0; top: 0; will-change: transform;"></div>
+      </div>
+
+      <!-- Loot Reveal Stage (Appears when landed) -->
+      <div id="mystery-bag-loot-area" style="display: none; background: #f8fafc; border: 2px dashed #f59e0b; border-radius: 22px; padding: 16px 14px; margin-bottom: 16px; animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+        <div id="mystery-bag-loot-badge" style="display: inline-block; padding: 4px 14px; border-radius: 50px; font-weight: 800; font-size: 0.8rem; margin-bottom: 8px; color: white;">BAG UNLOCKED!</div>
+        <div id="mystery-bag-loot-icon" style="font-size: 3rem; line-height: 1; margin: 4px 0 8px 0;">🎁</div>
+        <div id="mystery-bag-loot-title" style="font-family:'Outfit'; font-size: 1.4rem; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Item Name</div>
+        <div id="mystery-bag-loot-desc" style="font-size: 0.9rem; color: var(--text-light); line-height: 1.4;">Item Description</div>
+      </div>
+
+      <button id="mystery-bag-claim-btn" class="unlock-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; padding: 14px 36px; border-radius: 50px; font-size: 1.05rem; font-weight: 800; cursor: pointer; display: none; margin: 0 auto; box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4); text-transform: uppercase; letter-spacing: 1px;">Claim Items & Continue!</button>
+    </div>
+  </div>
+
   <!-- Animal unlock screen -->
   <div id="unlock-screen" class="unlock-screen" style="display:none">
     <div id="unlock-content" class="unlock-content"></div>

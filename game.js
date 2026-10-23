@@ -2270,15 +2270,220 @@ class Game {
     this.updateQuestProgress('level_up', 1);
     this.updateStats(); this.saveProfile();
 
-    // Unlock a treasure every second level (2, 4, 6...)
-    if (this.level >= 2 && (this.level % 2 === 0)) {
-      if (this.checkAnimalUnlock()) return;
+    // Trigger Mystery Bags Carousel on XP line full
+    this.startMysteryBagCarousel();
+  }
+
+  startMysteryBagCarousel() {
+    const modal = document.getElementById('mystery-bag-modal');
+    const track = document.getElementById('mystery-bag-track');
+    const titleEl = document.getElementById('mystery-bag-title');
+    const subEl = document.getElementById('mystery-bag-subtitle');
+    const lootArea = document.getElementById('mystery-bag-loot-area');
+    const claimBtn = document.getElementById('mystery-bag-claim-btn');
+    if (!modal || !track) {
+      this.checkAnimalUnlock();
+      return;
     }
 
-    const newLevelEl = document.getElementById('new-level');
-    if (newLevelEl) newLevelEl.textContent = this.level;
-    const levelUpModal = document.getElementById('level-up-modal');
-    if (levelUpModal) levelUpModal.style.display = 'flex';
+    // Reset modal UI state
+    titleEl.textContent = `Level ${this.level} Unlocked!`;
+    subEl.textContent = "Cycling through mystery bags...";
+    lootArea.style.display = 'none';
+    claimBtn.style.display = 'none';
+    track.style.transition = 'none';
+    track.style.transform = 'translateX(0px)';
+    track.innerHTML = '';
+
+    // Mystery Bag Archetypes
+    const bagTypes = [
+      { id: 'bronze', name: 'Bronze Treasure Sack', color: '#b45309', bg: 'linear-gradient(135deg, #fef3c7, #d97706)', icon: '🎒', rarity: 'Common' },
+      { id: 'silver', name: 'Silver Rune Pouch', color: '#64748b', bg: 'linear-gradient(135deg, #f1f5f9, #94a3b8)', icon: '👛', rarity: 'Uncommon' },
+      { id: 'gold', name: 'Golden Mystery Box', color: '#f59e0b', bg: 'linear-gradient(135deg, #fffbeb, #f59e0b)', icon: '📦', rarity: 'Rare' },
+      { id: 'gem', name: 'Jeweled Arcane Chest', color: '#8b5cf6', bg: 'linear-gradient(135deg, #ede9fe, #8b5cf6)', icon: '💎', rarity: 'Epic' },
+      { id: 'celestial', name: 'Celestial Star Bag', color: '#ec4899', bg: 'linear-gradient(135deg, #fdf2f8, #db2777)', icon: '✨', rarity: 'Legendary' }
+    ];
+
+    // Card width + margin setup: 110px card width, 12px margin = 122px step
+    const stepWidth = 122;
+    const totalSlots = 35;
+    const landingIndex = 25; // Stop on slot 25 for a great spinning duration
+
+    const sequence = [];
+    for (let i = 0; i < totalSlots; i++) {
+      const bag = bagTypes[Math.floor(Math.random() * bagTypes.length)];
+      sequence.push(bag);
+
+      const card = document.createElement('div');
+      card.style.cssText = `
+        width: 110px;
+        height: 116px;
+        margin-right: 12px;
+        flex-shrink: 0;
+        background: ${bag.bg};
+        border: 3px solid ${bag.color};
+        border-radius: 18px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        user-select: none;
+      `;
+      card.innerHTML = `
+        <div style="font-size: 2.2rem; line-height: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">${bag.icon}</div>
+        <div style="font-weight: 800; font-size: 0.72rem; color: #1e293b; margin-top: 4px; text-align: center; padding: 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px;">${bag.name}</div>
+        <div style="font-size: 0.6rem; font-weight: 700; color: ${bag.color}; text-transform: uppercase;">${bag.rarity}</div>
+      `;
+      track.appendChild(card);
+    }
+
+    modal.style.display = 'flex';
+
+    // Calculate winning bag & item payload
+    const winningBag = sequence[landingIndex];
+    let reward = null;
+
+    // High chance of awarding a collectible animal or generous coins / gear
+    const lootRoll = Math.random();
+    if (lootRoll < 0.45) {
+      // Animal Treasure
+      const targetRarity = winningBag.rarity;
+      const matchingAnimals = ANIMALS.filter(a => a.rarity === targetRarity);
+      const animal = matchingAnimals.length > 0 ? matchingAnimals[Math.floor(Math.random() * matchingAnimals.length)] : this.getAnimalForLevel();
+      const availableNames = PET_NAMES.filter(n => !this.unlockedAnimals.some(u => u.petName === n));
+      const petName = availableNames[Math.floor(Math.random() * availableNames.length)] || `${animal.name} #${this.unlockedAnimals.length + 1}`;
+      reward = {
+        type: 'animal',
+        animal: animal,
+        petName: petName,
+        title: `${petName} (${animal.name})`,
+        desc: `A new ${animal.rarity} 3D treasure unlocked directly into your chest!`,
+        icon: '🐾',
+        badge: `${animal.rarity.toUpperCase()} TREASURE`
+      };
+    } else if (lootRoll < 0.75) {
+      // DyslexiCoins
+      const coinsAmount = winningBag.rarity === 'Legendary' ? 600 : winningBag.rarity === 'Epic' ? 400 : winningBag.rarity === 'Rare' ? 250 : 150;
+      reward = {
+        type: 'coins',
+        amount: coinsAmount,
+        title: `${coinsAmount} DyslexiCoins!`,
+        desc: `Shiny golden coins added to your pouch to spend at the DyslexiShop!`,
+        icon: '🪙',
+        badge: 'GOLD COINS'
+      };
+    } else {
+      // Exclusive Hero Gear / Avatar Unlock
+      const unownedGear = GEAR_SHOP.filter(g => !this.unlockedAvatars.includes(g.id));
+      if (unownedGear.length > 0) {
+        const gear = unownedGear[Math.floor(Math.random() * unownedGear.length)];
+        reward = {
+          type: 'gear',
+          gear: gear,
+          title: gear.name,
+          desc: `New ${gear.cat} wardrobe item! Check it out in the Avatar Designer!`,
+          icon: gear.icon || '👕',
+          badge: 'HERO GEAR'
+        };
+      } else {
+        const bonusCoins = 350;
+        reward = {
+          type: 'coins',
+          amount: bonusCoins,
+          title: `${bonusCoins} DyslexiCoins!`,
+          desc: `Bonus coins added to your hero treasury!`,
+          icon: '🪙',
+          badge: 'BONUS LOOT'
+        };
+      }
+    }
+
+    // Measure carousel viewport to center the winning card exactly under pointer
+    setTimeout(() => {
+      const containerWidth = track.parentElement.offsetWidth || 400;
+      const targetCenter = (containerWidth / 2) - (110 / 2);
+      const targetOffset = -(landingIndex * stepWidth) + targetCenter;
+
+      // Animate carousel slide with cubic bezier slowdown
+      track.style.transition = 'transform 3.8s cubic-bezier(0.12, 0.8, 0.18, 1)';
+      track.style.transform = `translateX(${targetOffset}px)`;
+
+      // Play continuous ticking sounds during deceleration
+      let tickCount = 0;
+      const tickInterval = setInterval(() => {
+        tickCount++;
+        this.playSFX('click');
+        if (tickCount >= 18) clearInterval(tickInterval);
+      }, 180);
+
+      // On landing
+      setTimeout(() => {
+        clearInterval(tickInterval);
+        this.playSFX('levelUp');
+
+        // Highlight landed card
+        const landedCard = track.children[landingIndex];
+        if (landedCard) {
+          landedCard.style.boxShadow = `0 0 25px ${winningBag.color}`;
+          landedCard.style.transform = 'scale(1.08)';
+          landedCard.style.transition = 'all 0.3s ease';
+        }
+
+        titleEl.textContent = `Landed on ${winningBag.name}!`;
+        subEl.textContent = "The mystery bag bursts open to reveal your prize!";
+
+        // Show loot area
+        const badgeEl = document.getElementById('mystery-bag-loot-badge');
+        const iconEl = document.getElementById('mystery-bag-loot-icon');
+        const lootTitleEl = document.getElementById('mystery-bag-loot-title');
+        const lootDescEl = document.getElementById('mystery-bag-loot-desc');
+
+        badgeEl.textContent = reward.badge;
+        badgeEl.style.background = winningBag.color;
+        iconEl.textContent = reward.icon;
+        lootTitleEl.textContent = reward.title;
+        lootDescEl.textContent = reward.desc;
+
+        lootArea.style.display = 'block';
+        claimBtn.style.display = 'block';
+
+        claimBtn.onclick = () => {
+          this.playSFX('correct');
+          modal.style.display = 'none';
+
+          // Apply rewards
+          if (reward.type === 'animal') {
+            this.unlockedAnimals.push({ animalName: reward.animal.name, petName: reward.petName, level: this.level });
+            this.updateQuestProgress('capture_animal', 1);
+            this.updateCollectionButton();
+          } else if (reward.type === 'coins') {
+            this.coins += reward.amount;
+          } else if (reward.type === 'gear') {
+            this.unlockedAvatars.push(reward.gear.id);
+          }
+
+          this.saveProfile();
+          this.updateStats();
+
+          // Animate chest or continue target
+          const chest = document.getElementById('chest-container');
+          if (chest) {
+            chest.style.transform = 'scale(1.4) rotate(15deg)';
+            setTimeout(() => {
+              chest.style.transform = 'scale(1) rotate(0deg)';
+              const badge = document.getElementById('chest-badge');
+              if (badge) {
+                badge.style.display = 'block';
+                badge.textContent = this.unlockedAnimals.length;
+              }
+            }, 300);
+          }
+
+          this.newTarget();
+        };
+      }, 4000);
+    }, 150);
   }
   getAnimalForLevel() { 
     const roll = Math.random() * 100; let accumulated = 0, selectedRarity = 'Common';
