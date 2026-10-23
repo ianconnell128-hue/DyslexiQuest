@@ -3810,6 +3810,22 @@ class Game {
       }
     }
 
+    const sellBtn = document.getElementById('sell-pet-direct-btn');
+    if (sellBtn) {
+      if (animalData.name === 'Mystery Box') {
+        sellBtn.style.display = 'none';
+      } else {
+        const sellPrice = SELL_PRICES[animalData.rarity] || 50;
+        sellBtn.style.display = 'block';
+        sellBtn.textContent = `🪙 Sell for $${sellPrice}`;
+        sellBtn.onclick = () => {
+          modal.style.display = 'none';
+          this.performSell(userAnimal.petName, sellPrice);
+          this.showCollectionScreen();
+        };
+      }
+    }
+
     document.getElementById('close-detail-btn').onclick = () => { this.playSFX('click'); modal.style.display = 'none'; };
     modal.style.display = 'flex';
   }
