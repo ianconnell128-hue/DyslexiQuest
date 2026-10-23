@@ -174,7 +174,7 @@
 
         const downloadUrl = (activeBridge && typeof activeBridge.getLatestDownloadUrl === 'function')
           ? activeBridge.getLatestDownloadUrl()
-          : 'https://github.com/thundergeek/dyslexiquest-releases/releases/latest';
+          : 'https://github.com/ianconnell128-hue/DyslexiQuest/releases/latest';
 
         if (activeBridge) {
           activeBridge.shareEmail(downloadUrl);
@@ -221,7 +221,7 @@
 
         const downloadUrl = (activeBridge && typeof activeBridge.getLatestDownloadUrl === 'function')
           ? activeBridge.getLatestDownloadUrl()
-          : 'https://github.com/thundergeek/dyslexiquest-releases/releases/latest';
+          : 'https://github.com/ianconnell128-hue/DyslexiQuest/releases/latest';
 
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(downloadUrl).then(() => {
