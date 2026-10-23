@@ -2431,60 +2431,136 @@ class Game {
         }
 
         titleEl.textContent = `Landed on ${winningBag.name}!`;
-        subEl.textContent = "The mystery bag bursts open to reveal your prize!";
+        subEl.textContent = "Your mystery bag is spinning the Pet Wheel!";
 
-        // Show loot area
+        // Show loot area with a button to spin the Pet Wheel
         const badgeEl = document.getElementById('mystery-bag-loot-badge');
         const iconEl = document.getElementById('mystery-bag-loot-icon');
         const lootTitleEl = document.getElementById('mystery-bag-loot-title');
         const lootDescEl = document.getElementById('mystery-bag-loot-desc');
 
-        badgeEl.textContent = reward.badge;
+        badgeEl.textContent = winningBag.name.toUpperCase();
         badgeEl.style.background = winningBag.color;
-        iconEl.textContent = reward.icon;
-        lootTitleEl.textContent = reward.title;
-        lootDescEl.textContent = reward.desc;
+        iconEl.textContent = '🎡';
+        lootTitleEl.textContent = 'Spin the Pet Wheel!';
+        lootDescEl.textContent = `Your ${winningBag.name} unlocked a spin on the Pet Wheel!`;
 
         lootArea.style.display = 'block';
         claimBtn.style.display = 'block';
+        claimBtn.textContent = '🎡 SPIN PET WHEEL!';
 
         claimBtn.onclick = () => {
-          this.playSFX('correct');
+          this.playSFX('click');
           modal.style.display = 'none';
 
-          // Apply rewards
-          if (reward.type === 'animal') {
-            this.unlockedAnimals.push({ animalName: reward.animal.name, petName: reward.petName, level: this.level });
-            this.updateQuestProgress('capture_animal', 1);
-            this.updateCollectionButton();
-          } else if (reward.type === 'coins') {
-            this.coins += reward.amount;
-          } else if (reward.type === 'gear') {
-            this.unlockedAvatars.push(reward.gear.id);
-          }
-
-          this.saveProfile();
-          this.updateStats();
-
-          // Animate chest or continue target
-          const chest = document.getElementById('chest-container');
-          if (chest) {
-            chest.style.transform = 'scale(1.4) rotate(15deg)';
-            setTimeout(() => {
-              chest.style.transform = 'scale(1) rotate(0deg)';
-              const badge = document.getElementById('chest-badge');
-              if (badge) {
-                badge.style.display = 'block';
-                badge.textContent = this.unlockedAnimals.length;
-              }
-            }, 300);
-          }
-
-          this.newTarget();
+          // Open the Pet Wheel with animals tailored to this bag
+          this.openMysteryBagPetWheel(winningBag);
         };
       }, 4000);
     }, 150);
   }
+  openMysteryBagPetWheel(bag) {
+    const screen = document.getElementById('wheel-screen');
+    const container = document.getElementById('wheel-container');
+    const canvas = document.getElementById('wheel-canvas');
+    if (!screen || !container || !canvas) {
+      this.checkAnimalUnlock();
+      return;
+    }
+    const ctx = canvas.getContext('2d');
+    const spinBtn = document.getElementById('spin-btn');
+    const closeBtn = document.getElementById('close-wheel-btn');
+
+    document.getElementById('wheel-title').textContent = `${bag.name}!`;
+    document.getElementById('wheel-subtitle').textContent = `Spin to win your new Pet Treasure!`;
+
+    // Select 8 animals tailored to this bag
+    let pool = ANIMALS.filter(a => a.rarity === bag.rarity);
+    if (pool.length < 4) {
+      pool = ANIMALS;
+    }
+
+    const prizes = [];
+    for (let i = 0; i < 8; i++) {
+      const a = pool[Math.floor(Math.random() * pool.length)];
+      prizes.push({ type: 'treasure', value: a, label: a.name, color: a.color || bag.color });
+    }
+    prizes.sort(() => Math.random() - 0.5);
+
+    const drawWheel = () => {
+      const arc = (2 * Math.PI) / prizes.length;
+      prizes.forEach((p, i) => {
+        const angle = i * arc;
+        ctx.fillStyle = i % 2 === 0 ? bag.color : '#1e293b';
+        ctx.beginPath();
+        ctx.moveTo(160, 160);
+        ctx.arc(160, 160, 160, angle, angle + arc);
+        ctx.fill();
+
+        ctx.save();
+        ctx.translate(160, 160);
+        ctx.rotate(angle + arc / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 11px Outfit';
+        ctx.fillText(p.label, 150, 5);
+        ctx.restore();
+      });
+    };
+
+    drawWheel();
+    screen.style.display = 'flex';
+    spinBtn.style.display = 'block';
+    closeBtn.style.display = 'none';
+    container.style.transform = 'rotate(0deg)';
+
+    spinBtn.onclick = () => {
+      spinBtn.style.display = 'none';
+      const extraDegrees = 1800 + Math.floor(Math.random() * 360);
+      container.style.transform = `rotate(${extraDegrees}deg)`;
+
+      setTimeout(() => {
+        const actualDeg = extraDegrees % 360;
+        const prizeIndex = Math.floor(((360 - actualDeg + 270) % 360) / (360 / prizes.length));
+        const win = prizes[prizeIndex];
+
+        document.getElementById('wheel-title').textContent = "NEW PET WON!";
+        document.getElementById('wheel-subtitle').textContent = `Treasure Unlocked: ${win.value.name}!`;
+
+        const availableNames = PET_NAMES.filter(n => !this.unlockedAnimals.some(u => u.petName === n));
+        const petName = availableNames[Math.floor(Math.random() * availableNames.length)] || `${win.value.name} #${this.unlockedAnimals.length + 1}`;
+
+        this.unlockedAnimals.push({ petName: petName, animalName: win.value.name, level: this.level });
+        this.updateQuestProgress('capture_animal', 1);
+        this.updateStats();
+        this.updateCollectionButton();
+        this.saveProfile();
+
+        closeBtn.style.display = 'block';
+        closeBtn.textContent = 'Add to Treasures!';
+        this.playSFX('levelUp');
+      }, 4000);
+    };
+
+    closeBtn.onclick = () => {
+      this.playSFX('correct');
+      screen.style.display = 'none';
+      const chest = document.getElementById('chest-container');
+      if (chest) {
+        chest.style.transform = 'scale(1.4) rotate(15deg)';
+        setTimeout(() => {
+          chest.style.transform = 'scale(1) rotate(0deg)';
+          const badge = document.getElementById('chest-badge');
+          if (badge) {
+            badge.style.display = 'block';
+            badge.textContent = this.unlockedAnimals.length;
+          }
+        }, 300);
+      }
+      this.newTarget();
+    };
+  }
+
   getAnimalForLevel() { 
     const roll = Math.random() * 100; let accumulated = 0, selectedRarity = 'Common';
     const rarities = [...RARITY_ORDER].reverse(); 
