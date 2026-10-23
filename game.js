@@ -285,6 +285,7 @@ class Game {
     this.bgm.volume = this.normalBgmVolume;
     this.musicEnabled = true;
     this.dyslexicFont = false;
+    this.isTvMode = false;
     this.timerInterval = null; this.remainingSeconds = 0; this.totalTimerSeconds = 0;
     this.wordBank = { en: {}, fr: {} }; this.users = JSON.parse(localStorage.getItem('dyslexiquest_users')) || {};
     this.currentUser = null; this.canClick = true; this.attemptsForCurrentWord = 0; this.currentAudio = null;
@@ -593,6 +594,7 @@ class Game {
     this.notifications = u.notifications || [];
     this.friends = u.friends || [];
     this.dyslexicFont = u.dyslexicFont || false;
+    this.isTvMode = u.isTvMode || false;
     this.musicEnabled = (u.musicEnabled !== undefined) ? u.musicEnabled : true;
     this.currentSong = u.currentSong || 1;
     this.setSong(this.currentSong, false); 
@@ -634,6 +636,7 @@ class Game {
       coins: this.coins, unlockedAvatars: this.unlockedAvatars, avatarColors: this.avatarColors,
       activeQuests: this.activeQuests, lastQuestRefresh: this.lastQuestRefresh,
       equippedPets: this.equippedPets, notifications: this.notifications, friends: this.friends, dyslexicFont: this.dyslexicFont,
+      isTvMode: this.isTvMode,
       musicEnabled: this.musicEnabled, currentSong: this.currentSong
     };
     allUsers[this.currentUser] = {
@@ -920,6 +923,7 @@ class Game {
     document.getElementById('start-overlay').style.display = 'none'; 
     this.updateStats(); this.updateCollectionButton(); this.populateVoiceList(); 
     this.checkDailyRefresh(); this.updateGameplayVisuals(); this.setFont(this.dyslexicFont);
+    this.setTvMode(this.isTvMode);
     this.setMusic(this.musicEnabled);
     document.getElementById('new-player-en')?.classList.toggle('active', !this.isFrench);
     document.getElementById('new-player-fr')?.classList.toggle('active', this.isFrench);
@@ -965,6 +969,14 @@ class Game {
     document.body.classList.toggle('font-dyslexic', isDyslexic);
     document.getElementById('font-standard-btn')?.classList.toggle('active', !isDyslexic);
     document.getElementById('font-dyslexic-btn')?.classList.toggle('active', isDyslexic);
+    this.saveProfile();
+  }
+
+  setTvMode(enabled) {
+    this.isTvMode = !!enabled;
+    document.body.classList.toggle('tv-display-mode', this.isTvMode);
+    document.getElementById('tv-mode-phone-btn')?.classList.toggle('active', !this.isTvMode);
+    document.getElementById('tv-mode-tv-btn')?.classList.toggle('active', this.isTvMode);
     this.saveProfile();
   }
 
@@ -3548,6 +3560,8 @@ class Game {
     document.getElementById('font-dyslexic-btn')?.addEventListener('click', () => this.setFont(true));
     document.getElementById('music-on-btn')?.addEventListener('click', () => { this.playSFX('click'); this.setMusic(true); });
     document.getElementById('music-off-btn')?.addEventListener('click', () => { this.playSFX('click'); this.setMusic(false); });
+    document.getElementById('tv-mode-phone-btn')?.addEventListener('click', () => { this.playSFX('click'); this.setTvMode(false); });
+    document.getElementById('tv-mode-tv-btn')?.addEventListener('click', () => { this.playSFX('click'); this.setTvMode(true); });
     document.getElementById('song-selector')?.addEventListener('change', (e) => {
       this.playSFX('click');
       this.setSong(parseInt(e.target.value));

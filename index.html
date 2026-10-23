@@ -318,6 +318,58 @@
       display: none;
     }
 
+    /* ── TV Screen & Big Display Fit Mode ── */
+    body.tv-display-mode {
+      --tv-overscan: 4vw;
+      padding: var(--tv-overscan) !important;
+      overflow-y: auto;
+    }
+
+    body.tv-display-mode .top-bar {
+      padding: 16px 24px !important;
+      border-radius: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    body.tv-display-mode .game-container {
+      max-width: 1500px;
+      padding: 20px 40px;
+    }
+
+    body.tv-display-mode #word-prompt {
+      font-size: clamp(3.2rem, 6vw, 5.5rem);
+      margin: 30px 0 30px;
+    }
+
+    body.tv-display-mode .card {
+      min-width: 200px;
+      min-height: 240px;
+      padding: 24px;
+      border-radius: 28px;
+    }
+
+    body.tv-display-mode .card-word {
+      font-size: clamp(2.4rem, 5vw, 4rem) !important;
+    }
+
+    body.tv-display-mode #gameplay-visuals {
+      transform: scale(1.35);
+      transform-origin: bottom left;
+      left: 4vw;
+      bottom: 4vw;
+    }
+
+    body.tv-display-mode .collection-content {
+      max-width: 850px !important;
+      padding: 36px !important;
+      border-radius: 32px !important;
+    }
+
+    body.tv-display-mode button {
+      font-size: 1.05rem;
+    }
+
     /* ── Main Gameplay ── */
     .game-container {
       max-width: 1200px;
@@ -1326,6 +1378,14 @@
           <option value="6">🎵 Techno Adventure</option>
           <option value="7">🎵 Hyper Adventure</option>
         </select>
+      </div>
+
+      <div style="background: #f8fafc; padding: 12px; border-radius: 20px; border: 2px solid #e2e8f0;">
+        <label style="font-size: 0.7rem; font-weight: 800; color: var(--text-light); margin-bottom: 8px; display: block;">DISPLAY &amp; TV MODE</label>
+        <div style="display: flex; gap: 5px;">
+          <button id="tv-mode-phone-btn" class="active" style="padding: 8px; font-size: 0.75rem; flex: 1;">📱 Phone</button>
+          <button id="tv-mode-tv-btn" style="padding: 8px; font-size: 0.75rem; flex: 1;">📺 Fit to TV</button>
+        </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
