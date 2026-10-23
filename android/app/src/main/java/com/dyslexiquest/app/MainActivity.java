@@ -31,7 +31,7 @@ import java.util.Set;
 
 public class MainActivity extends BridgeActivity {
 
-    private static final int PERMISSION_RECORD_AUDIO = 2001;
+    private static final int PERMISSION_REQ_CODE = 2001;
     private static final String TAG = "DyslexiQuestSpeech";
     private SpeechRecognizer speechRecognizer;
     private boolean isListening = false;
@@ -57,8 +57,8 @@ public class MainActivity extends BridgeActivity {
         // Initialize Android TextToSpeech engine
         initTextToSpeech();
 
-        // Pre-request RECORD_AUDIO permission if needed
-        checkAndRequestAudioPermission();
+        // Pre-request RECORD_AUDIO and CAMERA permissions if needed
+        checkAndRequestAppPermissions();
 
         // Inject SpeechInterface into the Capacitor WebView
         if (bridge != null && bridge.getWebView() != null) {
@@ -81,9 +81,16 @@ public class MainActivity extends BridgeActivity {
         if (appUpdater != null) appUpdater.resumeIfPermitted();
     }
 
-    private void checkAndRequestAudioPermission() {
+    private void checkAndRequestAppPermissions() {
+        ArrayList<String> permsNeeded = new ArrayList<>();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSION_RECORD_AUDIO);
+            permsNeeded.add(Manifest.permission.RECORD_AUDIO);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            permsNeeded.add(Manifest.permission.CAMERA);
+        }
+        if (!permsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this, permsNeeded.toArray(new String[0]), PERMISSION_REQ_CODE);
         }
     }
 
@@ -94,15 +101,17 @@ public class MainActivity extends BridgeActivity {
         if (appUpdater == null) appUpdater = new AppUpdater(this, webView);
         webView.addJavascriptInterface(appUpdater, "AndroidUpdater");
 
-        // Custom WebChromeClient to grant WebRTC / getUserMedia audio capture
+        // Custom WebChromeClient to grant WebRTC / getUserMedia camera & audio capture
         webView.setWebChromeClient(new BridgeWebChromeClient(bridge) {
             @Override
             public void onPermissionRequest(final PermissionRequest request) {
                 runOnUiThread(() -> {
-                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                    boolean audioOk = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
+                    boolean cameraOk = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
+                    if (audioOk && cameraOk) {
                         request.grant(request.getResources());
                     } else {
-                        checkAndRequestAudioPermission();
+                        checkAndRequestAppPermissions();
                         request.grant(request.getResources());
                     }
                 });
@@ -150,7 +159,7 @@ public class MainActivity extends BridgeActivity {
 
         @JavascriptInterface
         public void requestPermission() {
-            runOnUiThread(() -> checkAndRequestAudioPermission());
+            runOnUiThread(() -> checkAndRequestAppPermissions());
         }
 
         @JavascriptInterface
@@ -162,7 +171,7 @@ public class MainActivity extends BridgeActivity {
         public void startListeningWithHints(final String lang, final String hintsJson) {
             mainHandler.post(() -> {
                 if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                    checkAndRequestAudioPermission();
+                    checkAndRequestAppPermissions();
                     sendJsEvent("error", "not-allowed");
                     return;
                 }
