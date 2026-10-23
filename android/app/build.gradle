@@ -1,20 +1,9 @@
 apply plugin: 'com.android.application'
 
 // ---------------------------------------------------------------------------
-// Versioning: versionCode starts at 126 to strictly supersede all prior
-// releases (including v125), incrementing with new commits.
+// Versioning: versionCode starts at 130 (v0.130)
 // ---------------------------------------------------------------------------
-def gitCommitCount = { ->
-    try {
-        def p = ['git', 'rev-list', '--count', 'HEAD'].execute(null, rootProject.projectDir.parentFile)
-        p.waitFor()
-        def count = p.text.trim().toInteger()
-        return Math.max(126, count)
-    } catch (ignored) {
-        return 126
-    }
-}
-def dqVersionCode = project.hasProperty('dqVersionCode') ? project.property('dqVersionCode').toInteger() : gitCommitCount()
+def dqVersionCode = project.hasProperty('dqVersionCode') ? project.property('dqVersionCode').toInteger() : 130
 def dqVersionName = project.hasProperty('dqVersionName') ? project.property('dqVersionName') : "0.${dqVersionCode}"
 
 // ---------------------------------------------------------------------------
