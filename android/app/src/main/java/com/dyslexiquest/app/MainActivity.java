@@ -17,6 +17,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.getcapacitor.BridgeActivity;
 import com.getcapacitor.BridgeWebChromeClient;
+import com.getcapacitor.BridgeWebViewClient;
+import android.webkit.WebResourceRequest;
+import android.net.Uri;
+import java.net.URISyntaxException;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.Voice;
@@ -102,6 +106,37 @@ public class MainActivity extends BridgeActivity {
                         request.grant(request.getResources());
                     }
                 });
+            }
+        });
+
+        // Custom BridgeWebViewClient to intercept intent:// and SceneViewer AR URLs
+        bridge.setWebViewClient(new BridgeWebViewClient(bridge) {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                Uri url = request.getUrl();
+                if (url != null) {
+                    String urlStr = url.toString();
+                    if (urlStr.startsWith("intent://") || urlStr.startsWith("intent:")) {
+                        try {
+                            Intent intent = Intent.parseUri(urlStr, Intent.URI_INTENT_SCHEME);
+                            if (intent != null) {
+                                if (getPackageManager().resolveActivity(intent, 0) != null) {
+                                    startActivity(intent);
+                                    return true;
+                                }
+                                // Fallback to browser fallback url if present
+                                String fallback = intent.getStringExtra("browser_fallback_url");
+                                if (fallback != null) {
+                                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(fallback)));
+                                    return true;
+                                }
+                            }
+                        } catch (URISyntaxException e) {
+                            Log.e(TAG, "Failed to parse AR intent: " + urlStr, e);
+                        }
+                    }
+                }
+                return super.shouldOverrideUrlLoading(view, request);
             }
         });
     }
